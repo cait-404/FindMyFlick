@@ -1,0 +1,49 @@
+{
+  "tmdb_id": "746036",
+  "source_bundle": "20260113_142826_tmdb_746036_bundle.json",
+  "extracted_at": "20260113_143310",
+  "edition_notes": [
+    {
+      "country": "AS",
+      "date": "2024-08-30T00:00:00.000Z",
+      "type": 4,
+      "certification": "",
+      "note": "The Extended Cut on Peacock"
+    },
+    {
+      "country": "GU",
+      "date": "2024-08-31T00:00:00.000Z",
+      "type": 4,
+      "certification": "",
+      "note": "The Extended Cut on Peacock"
+    },
+    {
+      "country": "MP",
+      "date": "2024-08-30T00:00:00.000Z",
+      "type": 4,
+      "certification": "",
+      "note": "The Extended Cut on Peacock"
+    },
+    {
+      "country": "PR",
+      "date": "2024-08-30T00:00:00.000Z",
+      "type": 4,
+      "certification": "PG-13",
+      "note": "The Extended Cut on Peacock"
+    },
+    {
+      "country": "US",
+      "date": "2024-08-30T00:00:00.000Z",
+      "type": 4,
+      "certification": "PG-13",
+      "note": "The Extended Cut on Peacock"
+    },
+    {
+      "country": "VI",
+      "date": "2024-08-30T00:00:00.000Z",
+      "type": 4,
+      "certification": "PG-13",
+      "note": "The Extended Cut on Peacock"
+    }
+  ]
+}
