@@ -1,0 +1,140 @@
+{
+  "tmdb_id": "28",
+  "source_bundle": "20260113_145706_tmdb_28_bundle.json",
+  "extracted_at": "20260113_145800",
+  "edition_notes": [
+    {
+      "country": "DE",
+      "date": "2019-07-04T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "Munich Film Festival (Final Cut)"
+    },
+    {
+      "country": "DK",
+      "date": "2019-11-28T00:00:00.000Z",
+      "type": 3,
+      "certification": "15",
+      "note": "Final Cut"
+    },
+    {
+      "country": "ES",
+      "date": "2020-07-03T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "Final Cut"
+    },
+    {
+      "country": "FI",
+      "date": "2019-12-11T00:00:00.000Z",
+      "type": 3,
+      "certification": "K-16",
+      "note": "Final Cut"
+    },
+    {
+      "country": "FR",
+      "date": "2019-08-21T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "Final Cut"
+    },
+    {
+      "country": "FR",
+      "date": "2021-11-07T00:00:00.000Z",
+      "type": 6,
+      "certification": "",
+      "note": "ARTE (Final Cut)"
+    },
+    {
+      "country": "GB",
+      "date": "2019-08-13T00:00:00.000Z",
+      "type": 3,
+      "certification": "15",
+      "note": "Final Cut"
+    },
+    {
+      "country": "GR",
+      "date": "2019-09-29T00:00:00.000Z",
+      "type": 1,
+      "certification": "",
+      "note": "Athens Film Festival (Final Cut)"
+    },
+    {
+      "country": "IE",
+      "date": "2019-08-13T00:00:00.000Z",
+      "type": 3,
+      "certification": "16",
+      "note": "Final Cut"
+    },
+    {
+      "country": "IT",
+      "date": "2019-06-28T00:00:00.000Z",
+      "type": 2,
+      "certification": "",
+      "note": "Final Cut 4K"
+    },
+    {
+      "country": "KR",
+      "date": "2020-11-26T00:00:00.000Z",
+      "type": 3,
+      "certification": "18",
+      "note": "Final Cut"
+    },
+    {
+      "country": "NO",
+      "date": "2019-12-06T00:00:00.000Z",
+      "type": 3,
+      "certification": "15",
+      "note": "Final Cut"
+    },
+    {
+      "country": "NZ",
+      "date": "2019-07-20T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "New Zealand International Film Festival (Final Cut)"
+    },
+    {
+      "country": "PL",
+      "date": "2024-08-23T00:00:00.000Z",
+      "type": 2,
+      "certification": "",
+      "note": "Director's Cut"
+    },
+    {
+      "country": "SE",
+      "date": "2019-11-29T00:00:00.000Z",
+      "type": 3,
+      "certification": "15",
+      "note": "Final Cut"
+    },
+    {
+      "country": "TR",
+      "date": "2019-12-27T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "Final Cut"
+    },
+    {
+      "country": "TR",
+      "date": "2020-10-02T00:00:00.000Z",
+      "type": 3,
+      "certification": "",
+      "note": "Final Cut"
+    },
+    {
+      "country": "UA",
+      "date": "2019-10-30T00:00:00.000Z",
+      "type": 1,
+      "certification": "",
+      "note": "Kyiv Critics Week (Final Cut)"
+    },
+    {
+      "country": "US",
+      "date": "2019-08-27T00:00:00.000Z",
+      "type": 5,
+      "certification": "R",
+      "note": "Blu-ray (Final Cut)"
+    }
+  ]
+}

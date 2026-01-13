@@ -1,0 +1,4840 @@
+{
+  "core": {
+    "adult": false,
+    "backdrop_path": "/cFZRtb1Q4whERknfYtj7Fjsvxpg.jpg",
+    "belongs_to_collection": {
+      "id": 422837,
+      "name": "Blade Runner Collection",
+      "poster_path": "/qTcATCpiFDcgY8snQIfS2j0bFP7.jpg",
+      "backdrop_path": "/li3buIx57ph3RX5XlbpMzJPewZ0.jpg"
+    },
+    "budget": 28000000,
+    "genres": [
+      {
+        "id": 878,
+        "name": "Science Fiction"
+      },
+      {
+        "id": 18,
+        "name": "Drama"
+      },
+      {
+        "id": 53,
+        "name": "Thriller"
+      }
+    ],
+    "homepage": "http://www.warnerbros.com/blade-runner",
+    "id": 78,
+    "imdb_id": "tt0083658",
+    "origin_country": [
+      "US"
+    ],
+    "original_language": "en",
+    "original_title": "Blade Runner",
+    "overview": "In the smog-choked dystopian Los Angeles of 2019, blade runner Rick Deckard is called out of retirement to terminate a quartet of replicants who have escaped to Earth seeking their creator for a way to extend their short life spans.",
+    "popularity": 11.1023,
+    "poster_path": "/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg",
+    "production_companies": [
+      {
+        "id": 5798,
+        "logo_path": "/tmuI9BGXgpWLmokhlxpnG3IGNQB.png",
+        "name": "Shaw Brothers",
+        "origin_country": "HK"
+      },
+      {
+        "id": 7965,
+        "logo_path": "/eZ6DeFO1mhHtzxB1aACcEzKqQ7L.png",
+        "name": "The Ladd Company",
+        "origin_country": "US"
+      },
+      {
+        "id": 174,
+        "logo_path": "/ingPVoHnINIrFR7WHmYux1f5pES.png",
+        "name": "Warner Bros. Pictures",
+        "origin_country": "US"
+      }
+    ],
+    "production_countries": [
+      {
+        "iso_3166_1": "US",
+        "name": "United States of America"
+      },
+      {
+        "iso_3166_1": "HK",
+        "name": "Hong Kong"
+      },
+      {
+        "iso_3166_1": "GB",
+        "name": "United Kingdom"
+      }
+    ],
+    "release_date": "1982-06-25",
+    "revenue": 41722424,
+    "runtime": 118,
+    "spoken_languages": [
+      {
+        "english_name": "English",
+        "iso_639_1": "en",
+        "name": "English"
+      },
+      {
+        "english_name": "German",
+        "iso_639_1": "de",
+        "name": "Deutsch"
+      },
+      {
+        "english_name": "Cantonese",
+        "iso_639_1": "cn",
+        "name": "广州话 / 廣州話"
+      },
+      {
+        "english_name": "Japanese",
+        "iso_639_1": "ja",
+        "name": "日本語"
+      },
+      {
+        "english_name": "Hungarian",
+        "iso_639_1": "hu",
+        "name": "Magyar"
+      }
+    ],
+    "status": "Released",
+    "tagline": "Man has made his match... now it's his problem.",
+    "title": "Blade Runner",
+    "video": false,
+    "vote_average": 7.9,
+    "vote_count": 14601
+  },
+  "external_ids": {
+    "id": 78,
+    "imdb_id": "tt0083658",
+    "wikidata_id": "Q184843",
+    "facebook_id": null,
+    "instagram_id": null,
+    "twitter_id": null
+  },
+  "release_dates": {
+    "id": 78,
+    "results": [
+      {
+        "iso_3166_1": "AR",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-10-21T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-02-18T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "AU",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final cut, Sydney",
+            "release_date": "2007-11-11T00:00:00.000Z",
+            "type": 2
+          },
+          {
+            "certification": "M",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-12-16T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-07-22T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "BE",
+        "release_dates": [
+          {
+            "certification": "16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-09-30T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "BR",
+        "release_dates": [
+          {
+            "certification": "14",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-12-25T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "14",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Cinemark - Final Cut (2007)",
+            "release_date": "2015-08-31T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-03-19T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "14",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "VHS / DVD 1992 Director's Cut",
+            "release_date": "2007-06-25T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "CA",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final cut, Toronto",
+            "release_date": "2007-11-09T00:00:00.000Z",
+            "type": 2
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-06-25T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "CL",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "2015-12-12T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "CN",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Beijing International Film Festival",
+            "release_date": "2016-04-22T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "YOUKU",
+            "release_date": "2019-01-01T00:00:00.000Z",
+            "type": 4
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "IQIYI",
+            "release_date": "2019-01-30T00:00:00.000Z",
+            "type": 4
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray",
+            "release_date": "2019-10-28T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray",
+            "release_date": "2022-09-01T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray（30th Anniversary Collector's Limited Edition）",
+            "release_date": "2016-10-17T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "4K Ultra HD + Blu-ray",
+            "release_date": "2018-08-31T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "CO",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1983-03-16T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "CZ",
+        "release_dates": [
+          {
+            "certification": "18+",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-04-23T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "DE",
+        "release_dates": [
+          {
+            "certification": "16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "West Germany ",
+            "release_date": "1982-10-13T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "DK",
+        "release_dates": [
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-09-24T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Fuld digital restaurering",
+            "release_date": "2017-09-28T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-11-27T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut re-release",
+            "release_date": "2015-05-07T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "ES",
+        "release_dates": [
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-08-21T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2007-11-16T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "1982 Final Cut re-release",
+            "release_date": "2015-03-18T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-12-29T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "FI",
+        "release_dates": [
+          {
+            "certification": "K-16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-10-01T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "K-16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-11-20T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "FR",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Deauville American Film Festival",
+            "release_date": "1982-09-04T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-09-15T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2007-12-05T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "VOD",
+            "release_date": "2016-12-24T00:00:00.000Z",
+            "type": 4
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Netflix",
+            "release_date": "2020-06-01T00:00:00.000Z",
+            "type": 4
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "1999-09-29T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-Ray",
+            "release_date": "2012-01-25T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "4K UHD",
+            "release_date": "2017-09-27T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "GB",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Edinburgh International Film Festival",
+            "release_date": "1982-08-01T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut, BFI London Film Festival",
+            "release_date": "1992-11-22T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut Rerelease",
+            "release_date": "2015-05-07T00:00:00.000Z",
+            "type": 2
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-09-09T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-11-27T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2007-11-23T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "2017-11-13T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "GR",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-10-01T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "HK",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-12-22T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "HU",
+        "release_dates": [
+          {
+            "certification": "16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1988-06-23T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "IE",
+        "release_dates": [
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-10-01T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15A",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2014-12-14T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "IN",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "2020-06-25T00:00:00.000Z",
+            "type": 4
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "IT",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Venice Film Festival",
+            "release_date": "1982-09-07T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "\"International Cut\", Mostra internazionale d'arte cinematografica",
+            "release_date": "1982-10-14T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "\"The Final Cut\", Mostra internazionale d'arte cinematografica",
+            "release_date": "2007-09-01T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "\"Director's Cut\", Torino Film Festival",
+            "release_date": "1992-11-13T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-05-06T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut re-release",
+            "release_date": "2015-05-06T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "JP",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-07-03T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-10-10T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2007-11-17T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "KR",
+        "release_dates": [
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Re-release",
+            "release_date": "2022-10-05T00:00:00.000Z",
+            "type": 2
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Re-release",
+            "release_date": "2023-04-26T00:00:00.000Z",
+            "type": 2
+          },
+          {
+            "certification": "19",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-05-08T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final cut (Re-release)",
+            "release_date": "2018-02-15T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "LV",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "2016-05-13T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "MX",
+        "release_dates": [
+          {
+            "certification": "B-15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-11-11T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "NL",
+        "release_dates": [
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-11-10T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-04-18T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2015-06-18T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "2006-12-06T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu ray",
+            "release_date": "2008-01-16T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Veronica",
+            "release_date": "2018-05-12T00:00:00.000Z",
+            "type": 6
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "NO",
+        "release_dates": [
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1983-01-22T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-01-14T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2008-08-01T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "NZ",
+        "release_dates": [
+          {
+            "certification": "M",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-12-16T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "PE",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-10-28T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "PH",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1984-05-26T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "PL",
+        "release_dates": [
+          {
+            "certification": "16",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1990-12-01T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "PT",
+        "release_dates": [
+          {
+            "certification": "M/18",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Fantasporto - Festival Internacional de Cinema Fantástico",
+            "release_date": "1983-02-13T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "M/18",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut, Fantasporto Film Festival",
+            "release_date": "1993-02-01T00:00:00.000Z",
+            "type": 1
+          },
+          {
+            "certification": "M/12",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1983-02-25T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "RO",
+        "release_dates": [
+          {
+            "certification": "18",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-06-25T00:00:00.000Z",
+            "type": 2
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "RU",
+        "release_dates": [
+          {
+            "certification": "18+",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "The Final Cut",
+            "release_date": "2020-10-08T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "16+",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "2001-01-26T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "16+",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray «Юниверсал Пикчерс Рус»",
+            "release_date": "2010-11-23T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "SE",
+        "release_dates": [
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-09-10T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's Cut",
+            "release_date": "1992-12-04T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2007-12-05T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "1999-10-15T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray",
+            "release_date": "2007-12-19T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "4K Ultra HD",
+            "release_date": "2017-10-02T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "VHS",
+            "release_date": "1984-09-07T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "VHS (Director's Cut)",
+            "release_date": "1993-04-20T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "SG",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "2007-12-02T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "SI",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1993-01-22T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "TR",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1993-05-28T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "TW",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1983-10-22T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "輔15",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Re-release",
+            "release_date": "2020-06-12T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "UA",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final Cut",
+            "release_date": "2019-11-28T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "2001-04-26T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "US",
+        "release_dates": [
+          {
+            "certification": "R",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1982-06-25T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Final cut, New York Film Festival",
+            "release_date": "2007-09-29T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Director's cut",
+            "release_date": "1992-09-11T00:00:00.000Z",
+            "type": 3
+          },
+          {
+            "certification": "R",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "DVD",
+            "release_date": "1997-03-26T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "R",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "Blu-ray",
+            "release_date": "2007-12-18T00:00:00.000Z",
+            "type": 5
+          },
+          {
+            "certification": "R",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "4K UHD",
+            "release_date": "2017-09-05T00:00:00.000Z",
+            "type": 5
+          }
+        ]
+      },
+      {
+        "iso_3166_1": "UY",
+        "release_dates": [
+          {
+            "certification": "",
+            "descriptors": [],
+            "iso_639_1": "",
+            "note": "",
+            "release_date": "1983-06-16T00:00:00.000Z",
+            "type": 3
+          }
+        ]
+      }
+    ]
+  },
+  "watch_providers": {
+    "id": 78,
+    "results": {
+      "AD": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AD",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 23
+          }
+        ]
+      },
+      "AE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 8
+          }
+        ]
+      },
+      "AG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 11
+          }
+        ]
+      },
+      "AL": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AL",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "AO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AO",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 0
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 0
+          }
+        ]
+      },
+      "AR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AR",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+            "provider_id": 339,
+            "provider_name": "MovistarTV",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 35
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 8
+          }
+        ]
+      },
+      "AT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AT",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 9,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 61
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/cBN4jd4wPq6on0kESiTlevqvlnL.jpg",
+            "provider_id": 20,
+            "provider_name": "maxdome Store",
+            "display_priority": 12
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/cBN4jd4wPq6on0kESiTlevqvlnL.jpg",
+            "provider_id": 20,
+            "provider_name": "maxdome Store",
+            "display_priority": 12
+          }
+        ]
+      },
+      "AU": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AU",
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/9B7l9ZSos54kFrZbliVExt2z9C9.jpg",
+            "provider_id": 436,
+            "provider_name": "Fetch TV",
+            "display_priority": 31
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 94
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 95
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/g2IaWyo6jCY0rIFjb4qgZ0bSmm3.jpg",
+            "provider_id": 2285,
+            "provider_name": "JustWatch TV",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/9B7l9ZSos54kFrZbliVExt2z9C9.jpg",
+            "provider_id": 436,
+            "provider_name": "Fetch TV",
+            "display_priority": 31
+          }
+        ]
+      },
+      "AZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=AZ",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BB": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BB",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 23
+          }
+        ]
+      },
+      "BE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BE",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 10
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 33
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 38
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 10
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 33
+          }
+        ]
+      },
+      "BF": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BF",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 0
+          }
+        ]
+      },
+      "BG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BH": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BH",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BM": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BM",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BO",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 30
+          }
+        ]
+      },
+      "BR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BR",
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 13
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 13
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/5AkEgpCNaBP3Fbwd2m1GdQIk0vv.jpg",
+            "provider_id": 1825,
+            "provider_name": "HBO Max Amazon Channel",
+            "display_priority": 49
+          },
+          {
+            "logo_path": "/9kcTsX2laYclN4bFiMH3RuhZel2.jpg",
+            "provider_id": 2156,
+            "provider_name": "Telecine Amazon Channel",
+            "display_priority": 56
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 83
+          }
+        ]
+      },
+      "BS": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BS",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 24
+          }
+        ]
+      },
+      "BY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BY",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ]
+      },
+      "BZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=BZ",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 9
+          }
+        ]
+      },
+      "CA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CA",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/4bIKO5tqPgko0135wL9GhMsb1wv.jpg",
+            "provider_id": 140,
+            "provider_name": "CosmoGo",
+            "display_priority": 18
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 56
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/4bIKO5tqPgko0135wL9GhMsb1wv.jpg",
+            "provider_id": 140,
+            "provider_name": "CosmoGo",
+            "display_priority": 18
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 56
+          }
+        ]
+      },
+      "CD": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CD",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          }
+        ]
+      },
+      "CH": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CH",
+        "buy": [
+          {
+            "logo_path": "/47klot430ytIqldQUUx2avN45Sr.jpg",
+            "provider_id": 150,
+            "provider_name": "blue TV",
+            "display_priority": 3
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/l5SFTF3l9l1KSgZJM7foAppUenz.jpg",
+            "provider_id": 622,
+            "provider_name": "UPC TV",
+            "display_priority": 32
+          }
+        ]
+      },
+      "CL": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CL",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 57
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 57
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+            "provider_id": 339,
+            "provider_name": "MovistarTV",
+            "display_priority": 8
+          }
+        ]
+      },
+      "CM": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CM",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "CO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CO",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 9
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 60
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+            "provider_id": 339,
+            "provider_name": "MovistarTV",
+            "display_priority": 8
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 60
+          }
+        ]
+      },
+      "CR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CR",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 20
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 4
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 20
+          }
+        ]
+      },
+      "CV": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CV",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "CY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CY",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          }
+        ]
+      },
+      "CZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=CZ",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/489t5n9o1KhH7voGNQkrXT7vBKV.jpg",
+            "provider_id": 1939,
+            "provider_name": "Lepsi TV",
+            "display_priority": 26
+          },
+          {
+            "logo_path": "/qcTTC6rFBIVaCLzu0EKwuyrBlSR.jpg",
+            "provider_id": 2536,
+            "provider_name": "Oneplay",
+            "display_priority": 35
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ]
+      },
+      "DE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=DE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 9,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 113
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/cBN4jd4wPq6on0kESiTlevqvlnL.jpg",
+            "provider_id": 20,
+            "provider_name": "maxdome Store",
+            "display_priority": 16
+          },
+          {
+            "logo_path": "/nCsFBTEmlCMc5NA4fwPuluTz6AO.jpg",
+            "provider_id": 178,
+            "provider_name": "MagentaTV",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/dKh2TJ9lTWV0UIcDQGMnMyQ8AIN.jpg",
+            "provider_id": 1993,
+            "provider_name": "Videoload",
+            "display_priority": 105
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/cBN4jd4wPq6on0kESiTlevqvlnL.jpg",
+            "provider_id": 20,
+            "provider_name": "maxdome Store",
+            "display_priority": 16
+          },
+          {
+            "logo_path": "/nCsFBTEmlCMc5NA4fwPuluTz6AO.jpg",
+            "provider_id": 178,
+            "provider_name": "MagentaTV",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/dKh2TJ9lTWV0UIcDQGMnMyQ8AIN.jpg",
+            "provider_id": 1993,
+            "provider_name": "Videoload",
+            "display_priority": 105
+          },
+          {
+            "logo_path": "/xo4zowa5gbKT4z65ZathH6H4Cdg.jpg",
+            "provider_id": 2209,
+            "provider_name": "Freenet meinVOD",
+            "display_priority": 129
+          }
+        ]
+      },
+      "DK": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=DK",
+        "rent": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ]
+      },
+      "DO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=DO",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 30
+          }
+        ]
+      },
+      "DZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=DZ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "EC": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=EC",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 9
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 9
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+            "provider_id": 339,
+            "provider_name": "MovistarTV",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 5
+          }
+        ]
+      },
+      "EE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=EE",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "EG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=EG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "ES": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ES",
+        "buy": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 32
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 32
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/jse4MOi92Jgetym7nbXFZZBI6LK.jpg",
+            "provider_id": 2241,
+            "provider_name": "Movistar Plus+",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/f6TRLB3H4jDpFEZ0z2KWSSvu1SB.jpg",
+            "provider_id": 149,
+            "provider_name": "Movistar Plus+ Ficción Total ",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/kO2SWXvDCHAquaUuTJBuZkTBAuU.jpg",
+            "provider_id": 63,
+            "provider_name": "Filmin",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 16
+          },
+          {
+            "logo_path": "/5AkEgpCNaBP3Fbwd2m1GdQIk0vv.jpg",
+            "provider_id": 2472,
+            "provider_name": "HBO Max  Amazon Channel",
+            "display_priority": 81
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 82
+          }
+        ]
+      },
+      "FI": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=FI",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 54
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/7QzLA6rsML2rKxhuagWlDl7Zxlm.jpg",
+            "provider_id": 553,
+            "provider_name": "Telia Play",
+            "display_priority": 27
+          },
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 54
+          }
+        ]
+      },
+      "FJ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=FJ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "FR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=FR",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 78
+          },
+          {
+            "logo_path": "/5AkEgpCNaBP3Fbwd2m1GdQIk0vv.jpg",
+            "provider_id": 2472,
+            "provider_name": "HBO Max  Amazon Channel",
+            "display_priority": 91
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 93
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/cAUTwxqoI7zc9XtYr1SMtWZEsXg.jpg",
+            "provider_id": 58,
+            "provider_name": "Canal VOD",
+            "display_priority": 9
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/br0wtjMDSjMahkhzn5XAXYWyr3V.jpg",
+            "provider_id": 138,
+            "provider_name": "FILMO",
+            "display_priority": 17
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 19
+          },
+          {
+            "logo_path": "/1syoSwH2yIskHUqeOiK9re8AMJC.jpg",
+            "provider_id": 310,
+            "provider_name": "LaCinetek",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/11Yzww3g6lYZznKrom3cSrKP4St.jpg",
+            "provider_id": 239,
+            "provider_name": "Universcine",
+            "display_priority": 35
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 40
+          },
+          {
+            "logo_path": "/PAaj5bekwbeeoRC1evWg4KJW8p.jpg",
+            "provider_id": 2286,
+            "provider_name": "VIVA by videofutur",
+            "display_priority": 83
+          },
+          {
+            "logo_path": "/rdMFjYYE0uZ55rBdlX149gRF1XQ.jpg",
+            "provider_id": 2307,
+            "provider_name": "Premiere Max",
+            "display_priority": 85
+          },
+          {
+            "logo_path": "/yvui9yFtpWHt0ZrsPelItbuTavI.jpg",
+            "provider_id": 2601,
+            "provider_name": "Pathé Home",
+            "display_priority": 103
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/cAUTwxqoI7zc9XtYr1SMtWZEsXg.jpg",
+            "provider_id": 58,
+            "provider_name": "Canal VOD",
+            "display_priority": 9
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/br0wtjMDSjMahkhzn5XAXYWyr3V.jpg",
+            "provider_id": 138,
+            "provider_name": "FILMO",
+            "display_priority": 17
+          },
+          {
+            "logo_path": "/s7mg9n4UHrcdJQL78JmaU6oAdHt.jpg",
+            "provider_id": 59,
+            "provider_name": "Bbox VOD",
+            "display_priority": 18
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 19
+          },
+          {
+            "logo_path": "/1syoSwH2yIskHUqeOiK9re8AMJC.jpg",
+            "provider_id": 310,
+            "provider_name": "LaCinetek",
+            "display_priority": 21
+          },
+          {
+            "logo_path": "/11Yzww3g6lYZznKrom3cSrKP4St.jpg",
+            "provider_id": 239,
+            "provider_name": "Universcine",
+            "display_priority": 35
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 40
+          },
+          {
+            "logo_path": "/PAaj5bekwbeeoRC1evWg4KJW8p.jpg",
+            "provider_id": 2286,
+            "provider_name": "VIVA by videofutur",
+            "display_priority": 83
+          },
+          {
+            "logo_path": "/rdMFjYYE0uZ55rBdlX149gRF1XQ.jpg",
+            "provider_id": 2307,
+            "provider_name": "Premiere Max",
+            "display_priority": 85
+          },
+          {
+            "logo_path": "/yvui9yFtpWHt0ZrsPelItbuTavI.jpg",
+            "provider_id": 2601,
+            "provider_name": "Pathé Home",
+            "display_priority": 103
+          }
+        ]
+      },
+      "GB": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GB",
+        "rent": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 21
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/kAZkQcIxMxTmlwdgSB05fqtymp0.jpg",
+            "provider_id": 29,
+            "provider_name": "Sky Go",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/6sJLsWk4TZHz1EffmTRSkaDehkh.jpg",
+            "provider_id": 591,
+            "provider_name": "Now TV Cinema",
+            "display_priority": 58
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 21
+          }
+        ]
+      },
+      "GF": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GF",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "GG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GG",
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 84
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 84
+          }
+        ]
+      },
+      "GH": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GH",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "GQ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GQ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "GR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GR",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "GT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GT",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 20
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 20
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 4
+          }
+        ]
+      },
+      "GY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=GY",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 3
+          }
+        ]
+      },
+      "HK": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=HK",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 5
+          }
+        ]
+      },
+      "HN": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=HN",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 30
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ]
+      },
+      "HR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=HR",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "HU": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=HU",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 26
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 26
+          }
+        ]
+      },
+      "ID": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ID",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 6
+          }
+        ]
+      },
+      "IE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IE",
+        "flatrate": [
+          {
+            "logo_path": "/kAZkQcIxMxTmlwdgSB05fqtymp0.jpg",
+            "provider_id": 29,
+            "provider_name": "Sky Go",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/6sJLsWk4TZHz1EffmTRSkaDehkh.jpg",
+            "provider_id": 591,
+            "provider_name": "Now TV Cinema",
+            "display_priority": 43
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 42
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 42
+          }
+        ]
+      },
+      "IL": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IL",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "IN": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IN",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 10
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 38
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 10
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 73
+          }
+        ]
+      },
+      "IQ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IQ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "IS": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IS",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ]
+      },
+      "IT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=IT",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/6FDKQWcR6JfmRKLqezSsvGgRuUY.jpg",
+            "provider_id": 109,
+            "provider_name": "Timvision",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/cNqhhi5UYjAvJv2M69t5cwSn0So.jpg",
+            "provider_id": 40,
+            "provider_name": "CHILI",
+            "display_priority": 36
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/6FDKQWcR6JfmRKLqezSsvGgRuUY.jpg",
+            "provider_id": 109,
+            "provider_name": "Timvision",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 33
+          },
+          {
+            "logo_path": "/cNqhhi5UYjAvJv2M69t5cwSn0So.jpg",
+            "provider_id": 40,
+            "provider_name": "CHILI",
+            "display_priority": 36
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 87
+          }
+        ]
+      },
+      "JM": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=JM",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 22
+          }
+        ]
+      },
+      "JO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=JO",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "JP": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=JP",
+        "flatrate": [
+          {
+            "logo_path": "/a5T7vNaGvoeckYO6rQkHolvyYf4.jpg",
+            "provider_id": 84,
+            "provider_name": "U-NEXT",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 9,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/zA1rTWwNDx96pwkHUuvVWWkdpPa.jpg",
+            "provider_id": 2284,
+            "provider_name": "HBO Max on U-Next",
+            "display_priority": 27
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 72
+          }
+        ]
+      },
+      "KE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=KE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "KR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=KR",
+        "rent": [
+          {
+            "logo_path": "/hPcjSaWfMwEqXaCMu7Fkb529Dkc.jpg",
+            "provider_id": 356,
+            "provider_name": "wavve",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/hPcjSaWfMwEqXaCMu7Fkb529Dkc.jpg",
+            "provider_id": 356,
+            "provider_name": "wavve",
+            "display_priority": 3
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/hPcjSaWfMwEqXaCMu7Fkb529Dkc.jpg",
+            "provider_id": 356,
+            "provider_name": "wavve",
+            "display_priority": 3
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          }
+        ]
+      },
+      "KW": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=KW",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "LB": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LB",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "LC": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LC",
+        "flatrate": [
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 10
+          }
+        ]
+      },
+      "LI": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LI",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "LT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LT",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "LU": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LU",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 2
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 2
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 16
+          }
+        ]
+      },
+      "LV": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LV",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "LY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=LY",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MC": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MC",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 25
+          }
+        ]
+      },
+      "MD": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MD",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MK": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MK",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "ML": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ML",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MT",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "MW": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MW",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          }
+        ]
+      },
+      "MX": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MX",
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 20
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 11
+          },
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 20
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/5AkEgpCNaBP3Fbwd2m1GdQIk0vv.jpg",
+            "provider_id": 1825,
+            "provider_name": "HBO Max Amazon Channel",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/8aBqoNeGGr0oSA85iopgNZUOTOc.jpg",
+            "provider_id": 2100,
+            "provider_name": "Amazon Prime Video with Ads",
+            "display_priority": 73
+          }
+        ]
+      },
+      "MY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MY",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 7
+          }
+        ]
+      },
+      "MZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=MZ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "NE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "NG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "NI": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NI",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 13
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ]
+      },
+      "NL": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NL",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 34
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 14
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 34
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 0
+          },
+          {
+            "logo_path": "/nzjqsR28PVVp5GJAlHtbBArNKqN.jpg",
+            "provider_id": 563,
+            "provider_name": "KPN",
+            "display_priority": 29
+          }
+        ]
+      },
+      "NO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NO",
+        "buy": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/tpfmd22xEapb1aW2gzjSM5104rx.jpg",
+            "provider_id": 431,
+            "provider_name": "TV 2 Play",
+            "display_priority": 16
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 12
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/tpfmd22xEapb1aW2gzjSM5104rx.jpg",
+            "provider_id": 431,
+            "provider_name": "TV 2 Play",
+            "display_priority": 16
+          }
+        ]
+      },
+      "NZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=NZ",
+        "rent": [
+          {
+            "logo_path": "/g2IaWyo6jCY0rIFjb4qgZ0bSmm3.jpg",
+            "provider_id": 2285,
+            "provider_name": "JustWatch TV",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 59
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/iscLKFDwQlr0BAgVDBcuRapLiwC.jpg",
+            "provider_id": 273,
+            "provider_name": "Neon TV",
+            "display_priority": 3
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 59
+          }
+        ]
+      },
+      "OM": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=OM",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "PA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 30
+          }
+        ]
+      },
+      "PE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PE",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/tRNA2CRgA4XHvd7Mx9dH3sFtDVb.jpg",
+            "provider_id": 339,
+            "provider_name": "MovistarTV",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/21M5CpiOYGOhHj2sVPXqwt6yeTO.jpg",
+            "provider_id": 167,
+            "provider_name": "Claro video",
+            "display_priority": 9
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 7
+          }
+        ]
+      },
+      "PF": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PF",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "PG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 0
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 0
+          }
+        ]
+      },
+      "PH": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PH",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ]
+      },
+      "PK": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PK",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "PL": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PL",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/jhMNVBV2UocEGepRkr9oFPD7Gpb.jpg",
+            "provider_id": 505,
+            "provider_name": "Player",
+            "display_priority": 10
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 27
+          },
+          {
+            "logo_path": "/cNqhhi5UYjAvJv2M69t5cwSn0So.jpg",
+            "provider_id": 40,
+            "provider_name": "CHILI",
+            "display_priority": 32
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 35
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/jhMNVBV2UocEGepRkr9oFPD7Gpb.jpg",
+            "provider_id": 505,
+            "provider_name": "Player",
+            "display_priority": 10
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 27
+          },
+          {
+            "logo_path": "/cNqhhi5UYjAvJv2M69t5cwSn0So.jpg",
+            "provider_id": 40,
+            "provider_name": "CHILI",
+            "display_priority": 32
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 35
+          }
+        ]
+      },
+      "PS": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PS",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "PT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PT",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 32
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 43
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 7
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 43
+          }
+        ]
+      },
+      "PY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=PY",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 29
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 19
+          }
+        ]
+      },
+      "QA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=QA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "RO": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=RO",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ]
+      },
+      "RS": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=RS",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "SA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 21
+          }
+        ]
+      },
+      "SC": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SC",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "SE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SE",
+        "rent": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 39
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/bnoTnLzz2MAhK3Yc6P9KXe5drIz.jpg",
+            "provider_id": 76,
+            "provider_name": "Viaplay",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 8
+          },
+          {
+            "logo_path": "/bZvc9dXrXNly7cA0V4D9pR8yJwm.jpg",
+            "provider_id": 35,
+            "provider_name": "Rakuten TV",
+            "display_priority": 13
+          },
+          {
+            "logo_path": "/sNmIwrniZZORvNJOmEuWGhwBJNf.jpg",
+            "provider_id": 426,
+            "provider_name": "SF Anytime",
+            "display_priority": 15
+          },
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 39
+          }
+        ]
+      },
+      "SG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 7
+          }
+        ]
+      },
+      "SI": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SI",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "SK": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SK",
+        "rent": [
+          {
+            "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+            "provider_id": 2,
+            "provider_name": "Apple TV",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/SPnB1qiCkYfirS2it3hZORwGVn.jpg",
+            "provider_id": 2,
+            "provider_name": "Apple TV",
+            "display_priority": 4
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 6
+          }
+        ]
+      },
+      "SN": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SN",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "SV": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=SV",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 30
+          }
+        ]
+      },
+      "TC": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TC",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 10
+          }
+        ]
+      },
+      "TD": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TD",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "TH": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TH",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 3
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ]
+      },
+      "TN": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TN",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "TR": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TR",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 5
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 4
+          }
+        ]
+      },
+      "TT": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TT",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 11
+          }
+        ]
+      },
+      "TW": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TW",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "TZ": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=TZ",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 17
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 17
+          }
+        ]
+      },
+      "UA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=UA",
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "UG": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=UG",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "US": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=US",
+        "rent": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 16
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 17
+          },
+          {
+            "logo_path": "/19fkcOz0xeUgCVW8tO85uOYnYK9.jpg",
+            "provider_id": 7,
+            "provider_name": "Fandango At Home",
+            "display_priority": 35
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/qR6FKvnPBx2O37FDg8PNM7efwF3.jpg",
+            "provider_id": 10,
+            "provider_name": "Amazon Video",
+            "display_priority": 6
+          },
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 16
+          },
+          {
+            "logo_path": "/pTnn5JwWr4p3pG8H6VrpiQo7Vs0.jpg",
+            "provider_id": 192,
+            "provider_name": "YouTube",
+            "display_priority": 17
+          },
+          {
+            "logo_path": "/19fkcOz0xeUgCVW8tO85uOYnYK9.jpg",
+            "provider_id": 7,
+            "provider_name": "Fandango At Home",
+            "display_priority": 35
+          }
+        ]
+      },
+      "UY": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=UY",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 3
+          }
+        ]
+      },
+      "VE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=VE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          },
+          {
+            "logo_path": "/jbe4gVSfRlbPTdESXhEKpornsfu.jpg",
+            "provider_id": 1899,
+            "provider_name": "HBO Max",
+            "display_priority": 27
+          }
+        ],
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 3
+          }
+        ]
+      },
+      "YE": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=YE",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "ZA": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ZA",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "ZM": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ZM",
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 1
+          }
+        ]
+      },
+      "ZW": {
+        "link": "https://www.themoviedb.org/movie/78-blade-runner/watch?locale=ZW",
+        "rent": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "buy": [
+          {
+            "logo_path": "/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg",
+            "provider_id": 3,
+            "provider_name": "Google Play Movies",
+            "display_priority": 1
+          }
+        ],
+        "flatrate": [
+          {
+            "logo_path": "/pvske1MyAoymrs5bguRfVqYiM9a.jpg",
+            "provider_id": 119,
+            "provider_name": "Amazon Prime Video",
+            "display_priority": 2
+          }
+        ]
+      }
+    }
+  }
+}
