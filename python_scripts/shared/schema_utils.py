@@ -40,10 +40,32 @@ def load_api_key(name: str) -> str:
         raise RuntimeError(f"Missing required environment variable: {name}")
     return key
 
-def fetch_json(url: str, params: dict | None = None, headers: dict | None = None, timeout: int = 20) -> dict:
-    r = requests.get(url, params=params or {}, headers=headers or {}, timeout=timeout)
-    r.raise_for_status()
-    return r.json()
+def fetch_json(url, params=None, headers=None, timeout=30):
+    r = requests.get(url, params=params, headers=headers, timeout=timeout)
+
+    # Raise on HTTP errors (401/403/429/etc.)
+    try:
+        r.raise_for_status()
+    except requests.HTTPError as e:
+        snippet = (r.text or "")[:500]
+        raise RuntimeError(
+            f"HTTP error for {r.url}\n"
+            f"Status: {r.status_code}\n"
+            f"Content-Type: {r.headers.get('Content-Type')}\n"
+            f"Body (first 500 chars):\n{snippet}"
+        ) from e
+
+    # If status is OK but body isn't JSON, show what it is
+    try:
+        return r.json()
+    except Exception as e:
+        snippet = (r.text or "")[:500]
+        raise RuntimeError(
+            f"Response was not JSON for {r.url}\n"
+            f"Status: {r.status_code}\n"
+            f"Content-Type: {r.headers.get('Content-Type')}\n"
+            f"Body (first 500 chars):\n{snippet}"
+        ) from e
 
 def infer_type(value) -> str:
     if value is None:
