@@ -3,3 +3,5 @@
 
 \ir v_movies_streamable_us.sql
 \ir v_movies_streamable_us_agg.sql
+\ir v_movie_credits_agg.sql
+\ir v_movie_people_credits.sql
