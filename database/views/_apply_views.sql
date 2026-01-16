@@ -1,4 +1,10 @@
--- Apply all views (relative includes)
+/*
+_apply_views.sql
+----------------
+Run from psql:
+  \i database/views/_apply_views.sql
+*/
+
 \set ON_ERROR_STOP on
 
 \ir v_movies_streamable_us.sql
