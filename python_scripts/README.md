@@ -2,162 +2,280 @@
 
 ## Overview
 
-This folder contains Python proof-of-concept scripts developed as part of the **Find My Flick** Senior Capstone Project.  
-The scripts demonstrate how to access and structure data from multiple APIs, including:
+This folder contains Python scripts used for the FindMyFlick Senior Capstone Project. There are two main types of scripts:
 
-- **The Movie Database (TMDB)** – for movie details such as title, release year, genre, cast, directors, writers, and poster images.  
-- **DoesTheDogDie (DTDD)** – for content warnings and user-generated sensitivity data.
+1. API exploration and schema mapping
+   - Used to understand available fields, data types, and identifier behavior across APIs.
 
-Some scripts are designed for demonstration (user-facing output), while others focus on identifying API structures and field definitions for later integration into the web application.
+2. Database seed generation
+   - Used to generate SQL seed files that populate the Postgres database with a repeatable starter dataset for frontend/backend development.
+
+Primary APIs used:
+- TMDB (movie metadata, credits, keywords, streaming providers)
+- DoesTheDogDie (DTDD) (content warning topics and per-movie warning votes/answers)
+- OMDb (supplemental metadata like ratings, etc.)
+
+Important note about “editions”:
+- The exploration work confirmed that “extended editions / director’s cuts” do not get separate TMDB movie IDs in a way that helps us treat them as separate titles. They may show up as different “watch” listings on a streaming service, but they generally do not map cleanly to separate TMDB movie records.
 
 ---
 
 ## Folder Structure
 
-Each schema_*.py script maps a single API endpoint to document available fields, types, and sample values
+Each schema_*.py script maps a single API endpoint to document available fields, types, and sample values.
 
-```
 python_scripts/
-├── assets/                                # Example outputs (markdown exports and samples)
-│   ├── movie_lookup_example.png           # Example Power BI / app output
-│   ├── schema_omdb_core_fight_club.md     # OMDb sample output for Fight Club
-│   ├── schema_tmdb_credits.md             # TMDB /movie/{id}/credits field list
-│   ├── schema_tmdb_movie_core.md          # TMDB /movie/{id} field list
-│   ├── schema_tmdb_providers.md           # TMDB /movie/{id}/providers (US-only, flatrate or free with ads)
-│   ├── schema_tmdb_release_dates.md       # TMDB /movie/{id}/release_dates field list
-│   ├── schema_tmdb_images.md              # TMDB /movie/{id}/images field list (posters, backdrops)
-│   ├── schema_tmdb_keywords.md            # TMDB /movie/{id}/keywords field list
-│   ├── schema_tmdb_external_ids.md        # TMDB /movie/{id}/external_ids field list (for cross-API linking)
-│   ├── schema_tmdb_recommendations.md     # TMDB /movie/{id}/recommendations (user-similarity algorithm)
-│   ├── schema_tmdb_similar.md             # TMDB /movie/{id}/similar (metadata-similarity algorithm)
-│   ├── schema_tmdb_discover.md            # TMDB /discover/movie (filtered search / recommendation algorithm)
-│   └── schema_tmdb_trending_week.md       # TMDB /trending/movie/week (current popularity algorithm)
+├── assets/                                                    # Example outputs (markdown exports and samples)
+│   ├── movie_lookup_example.png                               # Example Power BI / app output
+│   ├── schema_omdb_core_fight_club.md                         # OMDb sample output for Fight Club
+│   ├── schema_tmdb_credits.md                                 # TMDB /movie/{id}/credits field list
+│   ├── schema_tmdb_movie_core.md                              # TMDB /movie/{id} field list
+│   ├── schema_tmdb_providers.md                               # TMDB /movie/{id}/providers (US-only, flatrate or free with ads)
+│   ├── schema_tmdb_release_dates.md                           # TMDB /movie/{id}/release_dates field list
+│   ├── schema_tmdb_images.md                                  # TMDB /movie/{id}/images field list (posters, backdrops)
+│   ├── schema_tmdb_keywords.md                                # TMDB /movie/{id}/keywords field list
+│   ├── schema_tmdb_external_ids.md                            # TMDB /movie/{id}/external_ids field list (for cross-API linking)
+│   ├── schema_tmdb_recommendations.md                         # TMDB /movie/{id}/recommendations (user-similarity algorithm)
+│   ├── schema_tmdb_similar.md                                 # TMDB /movie/{id}/similar (metadata-similarity algorithm)
+│   ├── schema_tmdb_discover.md                                # TMDB /discover/movie (filtered search / recommendation algorithm)
+│   └── schema_tmdb_trending_week.md                           # TMDB /trending/movie/week (current popularity algorithm)
 │
-├── dtdd/                                  # Scripts for analyzing DoesTheDogDie API endpoints
-│   └── schema_dtdd_topics_catalog.py      # Aggregates unique topics across many sampled movies
-│
-├── omdb/                                  # Scripts for analyzing OMDb API endpoint
-│   └── schema_omdb_core.py                # Core movie metadata including MPAA rating, year, and language
-│
-├── tmdb/                                  # Scripts for analyzing TMDB API endpoints
-│   ├── schema_tmdb_credits.py             # Actors, directors, and crew members
-│   ├── schema_tmdb_movie_core.py          # General movie info (poster path, release date, genre, etc.)
-│   ├── schema_tmdb_providers.py           # Paid subscription and ad-supported streaming providers (US-only)
-│   ├── schema_tmdb_release_dates.py       # Full release date info including region and certification
-│   ├── schema_tmdb_images.py              # Image metadata (posters, backdrops)
-│   ├── schema_tmdb_keywords.py            # Movie keywords and tags
-│   ├── schema_tmdb_external_ids.py        # External identifiers (IMDb, Facebook, Instagram, Twitter)
-│   │
-│   ├── algorithm_tmdb_recommendations.py  # User-similarity recommendation engine
-│   ├── algorithm_tmdb_similar.py          # Metadata-similarity recommendation engine
-│   ├── algorithm_tmdb_discover.py         # Filtered search / hybrid recommendation system
-│   └── algorithm_tmdb_trending_week.py    # Current popularity algorithm
-│
-├── shared/                                # Shared helpers for fetching, flattening, and scoping API data
-│   ├── constants.py                       # Language and region defaults (US market, English text)
-│   └── schema_utils.py                    # Flatten JSON and export markdown tables
-│
-├── content_warnings/                      # DoesTheDogDie taxonomy and processing scripts
+├── content_warnings/                                          # DoesTheDogDie taxonomy and processing scripts
 │   ├── data/
 │   │   └── dtdd/
-│   │       └── dtdd_topics_catalog.json   # Raw DoesTheDogDie topics export (200+ entries)
+│   │       └── dtdd_topics_catalog.json                       # Raw DoesTheDogDie topics export (200+ entries)
 │   │
 │   └── taxonomy/
-│       ├── umbrellas.json                 # Tier-1 umbrella categories (12 total)
-│       ├── claude_taxonomy.yml            # Tier-2 subcategories mapped to DTDD topic IDs
-│       ├── structure_report.md            # Human-readable summary + validation
-│       ├── expanded.json                  # Backend-ready taxonomy for integration
-│       ├── build_structure_report.py      # Generates structure_report.md
-│       └── build_expanded_json.py         # Generates expanded.json
+│       ├── umbrellas.json                                     # Tier-1 umbrella categories (12 total)
+│       ├── claude_taxonomy.yml                                # Tier-2 subcategories mapped to DTDD topic IDs
+│       ├── structure_report.md                                # Human-readable summary + validation
+│       ├── expanded.json                                      # Backend-ready taxonomy for integration
+│       ├── build_structure_report.py                          # Generates structure_report.md
+│       └── build_expanded_json.py                             # Generates expanded.json
 │
-├── normalization/                         # TMDB and related normalization scripts and outputs
+├── dtdd/                                                      # Scripts for analyzing DoesTheDogDie API endpoints
+│   └── schema_dtdd_topics_catalog.py                          # Aggregates unique topics across many sampled movies
+│
+├── exploration/                                               # One-off investigations and research scripts
+│   ├── output/                                                # Outputs generated by exploration scripts
+│   ├── __init__.py
+│   ├── edition_probe_omdb.py                                  # Checks whether alternate editions have different OMDb IDs
+│   ├── edition_probe_tmdb.py                                  # Checks whether alternate editions have different TMDB IDs
+│   ├── extract_edition_notes_from_bundle.py                   # Extracts edition-related notes from bundled API results
+│   └── README.md                                              # Notes and findings for exploration work
+│
+├── normalization/                                             # TMDB and related normalization scripts and outputs
 │   ├── data/
 │   │   └── tmdb/
-│   │       ├── services_us_tiered.json    # Streaming providers grouped by monetization tier (subscription, free_with_ads, rent, buy)
-│   │       └── genres.json                # Unified genre dictionary (movie + TV, with union and byId mappings)
+│   │       ├── services_us_tiered.json                        # Streaming providers grouped by monetization tier (subscription, free_with_ads, rent, buy)
+│   │       └── genres.json                                    # Unified genre dictionary (movie + TV, with union and byId mappings)
 │   │
 │   └── scripts/
-│       ├── build_tmdb_us_tiered_providers.py # Builds U.S. provider tiers
-│       └── build_tmdb_genres.py              # Builds combined genre dictionary
+│       ├── build_tmdb_us_tiered_providers.py                  # Builds U.S. provider tiers
+│       └── build_tmdb_genres.py                               # Builds combined genre dictionary
 │
-└── README.md                              # This file
+├── omdb/                                                      # Scripts for analyzing OMDb API endpoint
+│   └── schema_omdb_core.py                                    # Core movie metadata including MPAA rating, year, and language
+│
+├── prototypes/                                                # Experimental scripts (not part of the standard seed workflow)
+│   └── (varies)                                               # Keep anything here as "nice-to-have" experiments
+│
+├── seed/                                                      # Seed SQL generators for database population
+│   ├── __init__.py
+│   ├── seed_dtdd_media_map_for_seeded_movies_to_sql.py        # Builds movie_dtdd_titles mapping (imdb -> dtdd_media_id)
+│   ├── seed_dtdd_topics_to_sql.py                             # Seeds warnings/topics catalog from DTDD
+│   ├── seed_dtdd_warnings_for_seeded_movies_to_sql.py         # Seeds per-movie warning answers from DTDD
+│   ├── seed_tmdb_collections_for_seeded_movies_to_sql.py      # Seeds collections + movie_collections from TMDB
+│   ├── seed_tmdb_genres_for_seeded_movies_to_sql.py           # Seeds movie_genres from TMDB
+│   ├── seed_tmdb_keywords_for_seeded_movies_to_sql.py         # Seeds keywords + movie_keywords from TMDB
+│   ├── seed_tmdb_people_for_seeded_movies_to_sql.py           # Seeds people + credits from TMDB
+│   ├── seed_us_popular_100_movies_to_sql.py                   # Seeds base movie list (starter dataset)
+│   ├── seed_us_watch_providers_for_seeded_movies_to_sql.py    # Seeds streaming providers (US only)
+│   └── seed_warnings_from_catalog_to_sql.py                   # Seeds warning catalog into Postgres
+│
+├── shared/                                                    # Shared helpers for fetching, flattening, and scoping API data
+│   ├── constants.py                                           # Language and region defaults (US market, English text)
+│   └── schema_utils.py                                        # Flatten JSON and export markdown tables
+│
+├── tmdb/                                                      # Scripts for analyzing TMDB API endpoints
+│   ├── schema_tmdb_credits.py                                 # Actors, directors, and crew members
+│   ├── schema_tmdb_movie_core.py                              # General movie info (poster path, release date, genre, etc.)
+│   ├── schema_tmdb_providers.py                               # Paid subscription and ad-supported streaming providers (US-only)
+│   ├── schema_tmdb_release_dates.py                           # Full release date info including region and certification
+│   ├── schema_tmdb_images.py                                  # Image metadata (posters, backdrops)
+│   ├── schema_tmdb_keywords.py                                # Movie keywords and tags
+│   ├── schema_tmdb_external_ids.py                            # External identifiers (IMDb, Facebook, Instagram, Twitter)
+│   │
+│   ├── algorithm_tmdb_recommendations.py                      # User-similarity recommendation engine
+│   ├── algorithm_tmdb_similar.py                              # Metadata-similarity recommendation engine
+│   ├── algorithm_tmdb_discover.py                             # Filtered search / hybrid recommendation system
+│   └── algorithm_tmdb_trending_week.py                        # Current popularity algorithm
+│
+├── .env.template                                              # Environment variable template (copy to project root as .env)
+└── README.md                                                  # This file
 ```
 
 ---
 
-## Setup
+## How to Use This Repo
 
-1. **Install Python (if not already installed):**
-   - [Download Python](https://www.python.org/downloads/) (version 3.9 or later recommended).
-   - Make sure to check the option to "Add Python to PATH" during installation.
+This repo has two main kinds of Python scripts:
 
-2. **Copy the environment template:**
-   Run the following command in your terminal:
-   ```
-   cp python_scripts/.env.template python_scripts/.env
-   ```
-   
-   Then edit .env and fill in your API keys:
-   - [TMDB API key](https://www.themoviedb.org/settings/api)
-   - [DoesTheDogDie API key](https://www.doesthedogdie.com/profile)
-   - [OMDb API key](http://www.omdbapi.com/apikey.aspx)
+1. Exploration / schema scripts  
+   - Used to inspect API endpoints and export example outputs (mostly for documentation and planning).
+   - These do not populate the database.
 
-3. **(Optional but recommended) Create and activate a virtual environment:**
-   Run the following command in your terminal:
-   ```
-   python -m venv .venv
-   .\.venv\Scripts\activate   # On Windows
-   source .venv/bin/activate     # On macOS/Linux
-   ```
-   
-4. **Install required packages:**
-   Run the following command in your terminal:
-   ```
-   pip install -r requirements.txt
-   ```
-   
-5. **Run the script:**
-   Make sure your virtual environment is active and your `.env` has `TMDB_API_KEY` (and any other keys needed).
-   Run the following commands in your terminal:
+2. Seed scripts  
+   - Used to generate SQL seed files in `database/seed/` so the database can be populated consistently.
+   - The generated `.sql` files are then applied using `psql`.
 
-### Demo script (content warnings):
-```
-python python_scripts/prototypes/movie_lookup_demo.py
-```
+Most commands below assume you run them from the repo root:
+
+- `C:\repos\FindMyFlick` (Windows)
+- `~/repos/FindMyFlick` (macOS/Linux)
+
+---
+
+## Environment Variables
+
+This project loads environment variables from the repo root `.env`.
+
+Your `.env` is not committed. Use `.env.template` as a starting point if needed.
+
+Minimum keys typically needed:
+
+- `TMDB_API_KEY`
+- `OMDB_API_KEY`
+- `DTDD_API_KEY`
+
+If you run the seed scripts that connect to Postgres, also set:
+
+- `DB_HOST` (example: `localhost`)
+- `DB_PORT` (example: `5432`)
+- `DB_NAME` (example: `findmyflick`)
+- `DB_USER` (example: `postgres`)
+- `DB_PASS` (your local Postgres password)
+
+Note: The seed scripts assume you are running them from the repo root so `load_dotenv(Path.cwd() / ".env")` resolves correctly.
+
+## Setup (Part 1): prerequisites + Python environment
+
+### Prerequisites
+Install these before running anything:
+- PostgreSQL (local) with `psql` available in your terminal
+- Python 3.x
+- Git
+
+### Environment variables
+This repo uses a `.env` file at the project root (same level as `database/` and `python_scripts/`).
+
+Minimum keys used by the Python seed scripts:
+- `DB_HOST`
+- `DB_PORT`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+
+API keys used by scripts (as needed):
+- `TMDB_API_KEY`
+- `OMDB_API_KEY`
+- `DTDD_API_KEY`
+
+Example `.env` (do not commit your real file):
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=findmyflick
+DB_USER=postgres
+DB_PASS=your_postgres_password
+TMDB_API_KEY=your_key
+OMDB_API_KEY=your_key
+DTDD_API_KEY=your_key
+
+### Create + activate the virtual environment
+From the repo root:
+
+PowerShell:
+.\.venv\Scripts\python.exe -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+### Install Python dependencies
+Use pip through the venv Python:
+
+.\.venv\Scripts\python.exe -m pip install -U pip
+.\.venv\Scripts\python.exe -m pip install python-dotenv requests psycopg[binary]
+
+Notes:
+- We use `psycopg` (v3) + `psycopg[binary]` for Postgres connections in seed scripts.
+- `python-dotenv` loads your root `.env` file inside scripts.
+
+### Confirm `.env` loads
+From the repo root:
+
+python -c "from pathlib import Path; from dotenv import load_dotenv; import os; load_dotenv(Path.cwd()/'.env'); print('DB_HOST', os.getenv('DB_HOST')); print('DB_NAME', os.getenv('DB_NAME')); print('DB_USER', os.getenv('DB_USER')); print('DB_PASS set?', os.getenv('DB_PASS') is not None)"
 
 
-### Schema / API-mapping scripts (TMDB example):
-Run **from the project root** using module syntax so imports from `python_scripts.shared` resolve:
-```
-python -m python_scripts.tmdb.schema_movie_core
-```
+## Setup (Part 2): build the database (schema → seed → views)
 
+Run these from the repo root.
 
-The script uses a built-in `EXAMPLE_MOVIE_ID`.  
-If you want to try a different movie ID temporarily, you can:
+### 1. Create the database (if you haven’t already)
+If `findmyflick` already exists, skip this step.
 
-- **Option A (edit constant):** open `python_scripts/tmdb/schema_movie_core.py` and change `EXAMPLE_MOVIE_ID`.
-- **Option B (env var override)**
+psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE findmyflick;"
 
-macOS/Linux:
-```
-TMDB_MOVIE_ID=603 python -m python_scripts.tmdb.schema_movie_core
-```
+### 2. Apply schema files (creates tables, indexes, constraints)
+Run the schema scripts in order:
 
-Windows PowerShell (session only):
-```
-$env:TMDB_MOVIE_ID = "603"
-python -m python_scripts.tmdb.schema_movie_core
-```
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/001_init.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/002_streaming_providers.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/003_genres.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/004_people_and_credits.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/005_search_extensions_and_indexes.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/006_keywords.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/007_collections.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/008_dtdd.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/schema/009_dtdd_match_bridge.sql
 
+### 3. Seed baseline data (local “starter” dataset)
+These are the SQL seed files under `database/seed/`.
 
-### Where the results go:
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/000_seed_warnings_catalog.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/001_seed_us_popular_100_movies.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/002_seed_us_popular_100_movie_streaming.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/003_seed_us_popular_100_movie_genres.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/004_seed_us_popular_100_people_and_credits.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/006_seed_us_popular_100_movie_keywords.sql
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/007_seed_us_popular_100_movie_collections.sql
 
-- You’ll see a formatted table in the terminal.
-- A Markdown export is also written here:
-  ```
-  python_scripts/assets/schema_tmdb_movie_core.md
-  ```
+DTDD seed files:
+- 009 is generated by the Python script in step 5
+- 008 is generated by the Python script in step 6
+
+### 4. Apply views (rebuild all views in the right order)
+Run the view apply script:
+
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/views/_apply_views.sql
+
+### 5. Optional: generate DTDD media map (movie → DTDD media id)
+This hits the DTDD API and writes these files:
+- database/seed/009_seed_us_streamable_dtdd_media_map.sql
+- database/seed/009_seed_us_streamable_dtdd_media_map.log.json
+
+python python_scripts/seed/seed_dtdd_media_map_for_seeded_movies_to_sql.py
+
+Then apply the generated SQL:
+
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/009_seed_us_streamable_dtdd_media_map.sql
+
+### 6. Optional: generate DTDD warnings for seeded movies (writes into movie_warnings)
+This hits the DTDD API and writes:
+- database/seed/008_seed_us_popular_100_movie_warnings.sql
+
+python python_scripts/seed/seed_dtdd_warnings_for_seeded_movies_to_sql.py
+
+Then apply the generated SQL:
+
+psql -h localhost -p 5432 -U postgres -d findmyflick -f database/seed/008_seed_us_popular_100_movie_warnings.sql
 
 ---
 
