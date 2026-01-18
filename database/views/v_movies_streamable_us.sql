@@ -1,0 +1,31 @@
+/*
+v_movies_streamable_us.sql
+Purpose:
+  US streamable titles only (subscription/free/free_with_ads).
+  One row per (movie, provider, offer_type).
+*/
+
+DROP VIEW IF EXISTS public.v_movies_streamable_us;
+
+CREATE VIEW public.v_movies_streamable_us AS
+SELECT DISTINCT
+  m.imdb_id,
+  m.tmdb_id,
+  m.title,
+  m.release_year,
+  m.poster_url,
+  m.runtime_minutes,
+  m.plot_summary,
+  m.original_language,
+  sp.provider_name,
+  ms.offer_type,
+  CASE ms.offer_type
+    WHEN 'subscription' THEN 1
+    WHEN 'free' THEN 2
+    WHEN 'free_with_ads' THEN 3
+    ELSE 99
+  END AS offer_rank
+FROM public.movies m
+JOIN public.movie_streaming ms ON ms.imdb_id = m.imdb_id
+JOIN public.streaming_providers sp ON sp.tmdb_provider_id = ms.tmdb_provider_id
+WHERE ms.offer_type IN ('subscription', 'free', 'free_with_ads');
