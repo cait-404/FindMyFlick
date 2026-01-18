@@ -1,4 +1,4 @@
-# FindMyFlick database: table dictionary (readable)
+# FindMyFlick database: table dictionary
 
 This document describes the Postgres tables in `database/schema/`, what each table is used for, how the tables link together for search, and which tables are populated by the seed scripts in `database/seed/`.
 
