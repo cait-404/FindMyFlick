@@ -184,7 +184,7 @@ def derive_answer_from_topic_stat(stat: Dict[str, Any]) -> str:
 
 
 def extract_topic_id(stat: Dict[str, Any]) -> Optional[int]:
-    for k in ["TopicItemId", "topicItemId", "topic_id", "topicId", "topicItemID"]:
+    for k in ["TopicId", "topicId", "TopicItemId", "topicItemId", "topic_id", "topicItemID"]:
         if k in stat and stat[k] is not None:
             try:
                 return int(stat[k])
