@@ -33,6 +33,7 @@ From VS Code PowerShell (repo root), run:
 psql --version
 pg_dump --version
 pg_restore --version
+```
 
 If any of these say "not recognized", you need to add Postgres `bin` to your PATH.
 
@@ -52,7 +53,7 @@ In VS Code PowerShell:
 
 ```powershell
 psql -U postgres
-
+```
 
 If it prompts for a password, enter the password you set during installation.
 
@@ -64,6 +65,7 @@ Exit psql:
 
 ```sql
 \q
+```
 
 ### 5. Run the database restore script
 
@@ -71,6 +73,7 @@ From the repository root, run the restore script:
 
 ```powershell
 .\restore_findmyflick.ps1
+```
 
 When it finishes, it prints a movie count and a success message.
 
@@ -78,6 +81,7 @@ If PowerShell blocks scripts, run this first (same terminal window), then rerun 
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
+```
 
 ---
 
