@@ -1,265 +1,335 @@
 """
 seed_dtdd_warnings_for_seeded_movies_to_sql.py
-----------------------------------------------
-Purpose:
-  For the seeded movies (from 001_seed_us_popular_100_movies.sql), call DoesTheDogDie API:
-    - Resolve DTDD item id using imdb id search
-    - Fetch /media/{itemId} to get topic stats
-  Then generate a seed SQL file to populate:
-    - movie_dtdd_titles
-    - warnings (upsert any topics not already present)
-    - movie_warnings (per-movie answers)
 
-Output:
-  database/seed/008_seed_us_popular_100_movie_warnings.sql
+Purpose
+- Generate SQL that populates public.movie_warnings for any movie that already has a DTDD match in public.movie_dtdd_titles.
+- This script DOES NOT try to match DTDD again. It trusts movie_dtdd_titles.dtdd_media_id.
+- It writes one row per (imdb_id, dtdd_topic_id) using the existing topic catalog in public.warnings.
+- For a given movie:
+  - If DTDD provides Yes/No counts, answer is derived from whichever is larger.
+  - If both are 0 or missing, answer is 'unknown'.
+  - If DTDD does not return a topic, answer defaults to 'unknown'.
 
-Assumptions:
-  - DTDD_API_KEY is available via .env (schema_utils.load_api_key handles this)
-  - TMDB seed already ran and movies exist in DB
-  - warnings table already exists (topics catalog), but script can upsert missing topics
-
-Run:
-  python -m python_scripts.seed.seed_dtdd_warnings_for_seeded_movies_to_sql
+Requirements
+- Python packages: requests, psycopg (preferred) or psycopg2
+- Environment variables (recommended):
+  - DTDD_API_KEY
+  - DB_HOST (default localhost)
+  - DB_PORT (default 5432)
+  - DB_NAME (default findmyflick)
+  - DB_USER (default postgres)
+  - DB_PASS (default empty)
+Optional:
+  - DTDD_RATE_LIMIT_SECONDS (default 0.25)
+  - DTDD_LIMIT_MOVIES (default 0 = no limit)
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-from datetime import datetime
-from typing import Any, Dict, List, Tuple
-import re
-import time
 import json
-import urllib.request
+import os
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-from python_scripts.shared.schema_utils import load_api_key
+import requests
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+try:
+    import psycopg  # psycopg v3
+except ImportError:
+    psycopg = None
 
-MOVIES_SEED_SQL = PROJECT_ROOT / "database" / "seed" / "001_seed_us_popular_100_movies.sql"
-OUT_SQL = PROJECT_ROOT / "database" / "seed" / "008_seed_us_popular_100_movie_warnings.sql"
-
-DTDD_SEARCH_URL = "https://www.doesthedogdie.com/dddsearch"
-DTDD_MEDIA_URL = "https://www.doesthedogdie.com/media"  # /{itemId}
-
-SLEEP_SECONDS = 0.25
-
-
-def sql_escape(s: str) -> str:
-    return s.replace("'", "''")
-
-
-def sql_literal(v: Any) -> str:
-    if v is None:
-        return "NULL"
-    if isinstance(v, bool):
-        return "TRUE" if v else "FALSE"
-    if isinstance(v, (int, float)):
-        return str(v)
-    return f"'{sql_escape(str(v))}'"
+try:
+    import psycopg2  # type: ignore
+except ImportError:
+    psycopg2 = None
 
 
-def http_get_json(url: str, headers: Dict[str, str]) -> Dict[str, Any]:
-    req = urllib.request.Request(url, headers=headers, method="GET")
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        raw = resp.read()
-    return json.loads(raw.decode("utf-8", errors="replace"))
+DTDD_BASE_URL = "https://www.doesthedogdie.com"
+DTDD_MEDIA_URL = f"{DTDD_BASE_URL}/media"
 
 
-def extract_imdb_ids(seed_sql_path: Path) -> List[str]:
+@dataclass(frozen=True)
+class DbConfig:
+    host: str
+    port: int
+    dbname: str
+    user: str
+    password: str
+
+
+def get_repo_root() -> Path:
+    # .../python_scripts/seed/script.py -> parents[0]=seed, [1]=python_scripts, [2]=repo root
+    return Path(__file__).resolve().parents[2]
+
+
+def get_output_paths() -> Tuple[Path, Path]:
+    repo_root = get_repo_root()
+    sql_path = repo_root / "database" / "seed" / "010_seed_us_streamable_dtdd_warnings.sql"
+    log_path = repo_root / "python_scripts" / "assets" / "dtdd_warnings_seed_log.json"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    return sql_path, log_path
+
+
+def get_env_db_config() -> DbConfig:
+    return DbConfig(
+        host=os.environ.get("DB_HOST", "localhost"),
+        port=int(os.environ.get("DB_PORT", "5432")),
+        dbname=os.environ.get("DB_NAME", "findmyflick"),
+        user=os.environ.get("DB_USER", "postgres"),
+        password=os.environ.get("DB_PASS", ""),
+    )
+
+
+def connect_db(cfg: DbConfig):
+    if psycopg is not None:
+        return psycopg.connect(
+            host=cfg.host,
+            port=cfg.port,
+            dbname=cfg.dbname,
+            user=cfg.user,
+            password=cfg.password,
+        )
+    if psycopg2 is not None:
+        return psycopg2.connect(
+            host=cfg.host,
+            port=cfg.port,
+            dbname=cfg.dbname,
+            user=cfg.user,
+            password=cfg.password,
+        )
+    raise RuntimeError("Neither psycopg (v3) nor psycopg2 is installed. Install one of them.")
+
+
+def http_get_json(url: str, headers: Dict[str, str], timeout: int = 30, retries: int = 3) -> Dict[str, Any]:
+    last_err: Optional[Exception] = None
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, headers=headers, timeout=timeout)
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:
+            last_err = e
+            # small backoff
+            time.sleep(0.75 * attempt)
+    raise RuntimeError(f"Failed GET {url} after {retries} attempts: {last_err}")
+
+
+def sql_escape_literal(value: str) -> str:
+    # Escape for SQL single-quoted literals
+    return value.replace("'", "''")
+
+
+def fetch_dtdd_targets(conn) -> List[Tuple[str, int, str, float]]:
     """
-    Extract imdb ids from INSERT statements like:
-      ('tt123...', 12345, 'Title', 2025, ...)
+    Returns: [(imdb_id, dtdd_media_id, match_method, match_score), ...]
     """
-    text = seed_sql_path.read_text(encoding="utf-8", errors="replace")
-    pattern = re.compile(r"\(\s*'(?P<imdb>tt\d+)'\s*,", re.MULTILINE)
-    ids = [m.group("imdb") for m in pattern.finditer(text)]
-
-    # de-dupe keep order
-    seen = set()
-    out: List[str] = []
-    for imdb_id in ids:
-        if imdb_id in seen:
-            continue
-        seen.add(imdb_id)
-        out.append(imdb_id)
-    return out
-
-
-def pick_best_dtdd_item(items: List[Dict[str, Any]]) -> Dict[str, Any] | None:
+    q = """
+        SELECT imdb_id, dtdd_media_id, match_method, COALESCE(match_score, 0) AS match_score
+        FROM public.movie_dtdd_titles
+        WHERE dtdd_media_id IS NOT NULL
+        ORDER BY match_method, match_score DESC, imdb_id;
     """
-    Prefer Movie itemTypeId=15 when available.
-    If multiple, pick the one with a tmdbId when present, else first.
+    with conn.cursor() as cur:
+        cur.execute(q)
+        rows = cur.fetchall()
+    targets: List[Tuple[str, int, str, float]] = []
+    for imdb_id, dtdd_media_id, match_method, match_score in rows:
+        targets.append((str(imdb_id), int(dtdd_media_id), str(match_method), float(match_score)))
+    return targets
+
+
+def fetch_warning_topics(conn) -> List[Tuple[int, str]]:
     """
-    if not items:
-        return None
+    Returns: [(dtdd_topic_id, topic_name), ...]
+    """
+    q = """
+        SELECT dtdd_topic_id, topic_name
+        FROM public.warnings
+        ORDER BY dtdd_topic_id;
+    """
+    with conn.cursor() as cur:
+        cur.execute(q)
+        rows = cur.fetchall()
+    topics: List[Tuple[int, str]] = [(int(r[0]), str(r[1])) for r in rows]
+    return topics
 
-    movies = [i for i in items if i.get("itemTypeId") == 15]
-    pool = movies if movies else items
 
-    with_tmdb = [i for i in pool if i.get("tmdbId") is not None]
-    return with_tmdb[0] if with_tmdb else pool[0]
+def derive_answer_from_topic_stat(stat: Dict[str, Any]) -> str:
+    """
+    DTDD topicItemStats commonly includes yes/no counts with different key casing.
+    We derive:
+      - 'yes' if yes_count > no_count
+      - 'no'  if no_count > yes_count
+      - 'unknown' otherwise
+    """
+    def pick_int(d: Dict[str, Any], keys: Sequence[str]) -> int:
+        for k in keys:
+            if k in d and d[k] is not None:
+                try:
+                    return int(d[k])
+                except Exception:
+                    pass
+        return 0
 
+    yes_ct = pick_int(stat, ["YesSum", "yesSum", "yes", "Yes", "yes_count", "yesCount"])
+    no_ct = pick_int(stat, ["NoSum", "noSum", "no", "No", "no_count", "noCount"])
 
-def majority_answer(yes_sum: Any, no_sum: Any) -> str:
-    try:
-        y = int(yes_sum or 0)
-        n = int(no_sum or 0)
-    except Exception:
-        return "unknown"
-
-    if y > n:
+    if yes_ct > no_ct:
         return "yes"
-    if n > y:
+    if no_ct > yes_ct:
         return "no"
     return "unknown"
 
 
-def main() -> None:
-    dtdd_key = load_api_key("DTDD_API_KEY")
+def extract_topic_id(stat: Dict[str, Any]) -> Optional[int]:
+    for k in ["TopicItemId", "topicItemId", "topic_id", "topicId", "topicItemID"]:
+        if k in stat and stat[k] is not None:
+            try:
+                return int(stat[k])
+            except Exception:
+                return None
+    return None
 
-    if not MOVIES_SEED_SQL.exists():
-        raise RuntimeError(f"Movies seed SQL not found: {MOVIES_SEED_SQL}")
 
-    imdb_ids = extract_imdb_ids(MOVIES_SEED_SQL)
-    print(f"Found {len(imdb_ids)} imdb ids in: {MOVIES_SEED_SQL.name}")
+def build_movie_topic_answer_map(media_json: Dict[str, Any]) -> Dict[int, str]:
+    stats = media_json.get("topicItemStats") or []
+    if not isinstance(stats, list):
+        return {}
 
-    headers = {"Accept": "application/json", "X-API-KEY": dtdd_key}
-
-    # Collect rows
-    dtdd_titles: List[Dict[str, Any]] = []
-    warnings_by_id: Dict[int, Dict[str, Any]] = {}
-    movie_warning_rows: List[Dict[str, Any]] = []
-
-    for imdb_id in imdb_ids:
-        # 1) Resolve DTDD item id via imdb search
-        search_url = f"{DTDD_SEARCH_URL}?imdb={imdb_id}"
-        search = http_get_json(search_url, headers=headers)
-        items = search.get("items") or []
-        best = pick_best_dtdd_item([i for i in items if isinstance(i, dict)])
-
-        if not best or not isinstance(best.get("id"), int):
-            # no DTDD record found for this imdb id
-            time.sleep(SLEEP_SECONDS)
+    out: Dict[int, str] = {}
+    for item in stats:
+        if not isinstance(item, dict):
             continue
+        topic_id = extract_topic_id(item)
+        if topic_id is None:
+            continue
+        out[topic_id] = derive_answer_from_topic_stat(item)
+    return out
 
-        dtdd_item_id = int(best["id"])
-        dtdd_titles.append(
-            {
-                "imdb_id": imdb_id,
-                "dtdd_title_id": dtdd_item_id,
-                "match_method": "imdb",
-            }
-        )
 
-        # 2) Fetch media details (topic stats)
-        media_url = f"{DTDD_MEDIA_URL}/{dtdd_item_id}"
-        media = http_get_json(media_url, headers=headers)
-        stats = media.get("topicItemStats") or []
+def generate_sql(
+    targets: List[Tuple[str, int, str, float]],
+    topics: List[Tuple[int, str]],
+    dtdd_api_key: str,
+    rate_limit_seconds: float,
+    limit_movies: int,
+) -> Tuple[str, Dict[str, Any]]:
+    headers = {"Accept": "application/json", "X-API-KEY": dtdd_api_key}
 
-        for s in stats:
-            if not isinstance(s, dict):
-                continue
+    lines: List[str] = []
+    log: Dict[str, Any] = {
+        "generated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "targets_total": len(targets),
+        "topics_total": len(topics),
+        "processed_movies": 0,
+        "movies_written": 0,
+        "errors": [],
+        "notes": [],
+    }
 
-            topic = s.get("topic") or {}
-            if not isinstance(topic, dict):
-                continue
+    lines.append("-- Auto-generated by python_scripts/seed/seed_dtdd_warnings_for_seeded_movies_to_sql.py")
+    lines.append("BEGIN;")
+    lines.append("")
+    lines.append("-- Ensure consistent lookup table exists (warnings) before inserting movie_warnings.")
+    lines.append("-- This script assumes public.warnings is already populated.")
+    lines.append("")
 
-            topic_id = topic.get("id")
-            topic_name = topic.get("name")
+    processed = 0
+    for imdb_id, dtdd_media_id, match_method, match_score in targets:
+        if limit_movies > 0 and processed >= limit_movies:
+            break
 
-            if not isinstance(topic_id, int) or not topic_name:
-                continue
+        processed += 1
+        log["processed_movies"] = processed
 
-            warnings_by_id[topic_id] = {
-                "dtdd_topic_id": topic_id,
-                "topic_name": str(topic_name),
-                # optional fields in your table, keep NULL if you don't have them
-                "topic_type": None,
-                "parent_dtdd_topic_id": None,
-                "tier": None,
-            }
+        media_url = f"{DTDD_MEDIA_URL}/{dtdd_media_id}"
+        try:
+            media_json = http_get_json(media_url, headers=headers)
+            topic_map = build_movie_topic_answer_map(media_json)
 
-            answer = majority_answer(s.get("yesSum"), s.get("noSum"))
+            # Insert one row per topic, defaulting to 'unknown' when missing
+            # Assumptions about schema:
+            #   public.movie_warnings(imdb_id text, dtdd_topic_id int, answer text)
+            #   Unique/PK on (imdb_id, dtdd_topic_id)
+            for topic_id, _topic_name in topics:
+                answer = topic_map.get(topic_id, "unknown")
+                lines.append(
+                    "INSERT INTO public.movie_warnings (imdb_id, dtdd_topic_id, answer) "
+                    f"VALUES ('{sql_escape_literal(imdb_id)}', {topic_id}, '{answer}') "
+                    "ON CONFLICT (imdb_id, dtdd_topic_id) DO UPDATE SET answer = EXCLUDED.answer;"
+                )
 
-            # comment is often on the stat record, fall back to first comment if present
-            comment = s.get("comment")
-            if not comment and isinstance(s.get("comments"), list) and s["comments"]:
-                c0 = s["comments"][0]
-                if isinstance(c0, dict):
-                    comment = c0.get("comment")
+            lines.append("")
+            log["movies_written"] += 1
 
-            is_spoiler = topic.get("isSpoiler")
-            is_spoiler_bool = bool(is_spoiler) if isinstance(is_spoiler, bool) else None
-
-            movie_warning_rows.append(
+        except Exception as e:
+            log["errors"].append(
                 {
                     "imdb_id": imdb_id,
-                    "dtdd_topic_id": topic_id,
-                    "answer": answer,
-                    "is_spoiler": is_spoiler_bool,
-                    "warning_comment": comment,
+                    "dtdd_media_id": dtdd_media_id,
+                    "match_method": match_method,
+                    "match_score": match_score,
+                    "error": str(e),
                 }
             )
+            # Keep going so one failure does not stop the entire script
+            log["notes"].append(f"Skipped {imdb_id} (dtdd_media_id={dtdd_media_id}) due to error.")
+        finally:
+            time.sleep(rate_limit_seconds)
 
-        time.sleep(SLEEP_SECONDS)
+    lines.append("COMMIT;")
+    lines.append("")
+    lines.append("-- End of generated seed SQL")
 
-    print(f"DTDD titles mapped: {len(dtdd_titles)}")
-    print(f"Topics collected (unique): {len(warnings_by_id)}")
-    print(f"Movie warning rows: {len(movie_warning_rows)}")
+    return "\n".join(lines) + "\n", log
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    lines: List[str] = []
-    lines.append(f"-- Generated {ts}\nBEGIN;\n\n")
 
-    # Upsert movie_dtdd_titles
-    for r in dtdd_titles:
-        lines.append(
-            "INSERT INTO public.movie_dtdd_titles (\n"
-            "  imdb_id, dtdd_title_id, match_method\n"
-            ") VALUES (\n"
-            f"  {sql_literal(r['imdb_id'])}, {sql_literal(r['dtdd_title_id'])}, {sql_literal(r.get('match_method'))}\n"
-            ")\n"
-            "ON CONFLICT (imdb_id) DO UPDATE SET\n"
-            "  dtdd_title_id = EXCLUDED.dtdd_title_id,\n"
-            "  match_method = EXCLUDED.match_method,\n"
-            "  updated_at = NOW();\n\n"
+def main() -> None:
+    dtdd_api_key = os.environ.get("DTDD_API_KEY", "").strip()
+    if not dtdd_api_key:
+        raise RuntimeError("DTDD_API_KEY is not set. Set it in your environment before running this script.")
+
+    rate_limit_seconds = float(os.environ.get("DTDD_RATE_LIMIT_SECONDS", "0.25"))
+    limit_movies = int(os.environ.get("DTDD_LIMIT_MOVIES", "0"))
+
+    sql_path, log_path = get_output_paths()
+    db_cfg = get_env_db_config()
+
+    conn = connect_db(db_cfg)
+    try:
+        targets = fetch_dtdd_targets(conn)
+        topics = fetch_warning_topics(conn)
+
+        if not topics:
+            raise RuntimeError(
+                "public.warnings is empty. Populate warnings topics first, then rerun this script."
+            )
+
+        sql_text, log = generate_sql(
+            targets=targets,
+            topics=topics,
+            dtdd_api_key=dtdd_api_key,
+            rate_limit_seconds=rate_limit_seconds,
+            limit_movies=limit_movies,
         )
 
-    # Upsert warnings (topics catalog)
-    for tid in sorted(warnings_by_id.keys()):
-        t = warnings_by_id[tid]
-        lines.append(
-            "INSERT INTO public.warnings (\n"
-            "  dtdd_topic_id, topic_name, topic_type, parent_dtdd_topic_id, tier\n"
-            ") VALUES (\n"
-            f"  {sql_literal(t['dtdd_topic_id'])}, {sql_literal(t['topic_name'])}, "
-            f"{sql_literal(t.get('topic_type'))}, {sql_literal(t.get('parent_dtdd_topic_id'))}, {sql_literal(t.get('tier'))}\n"
-            ")\n"
-            "ON CONFLICT (dtdd_topic_id) DO UPDATE SET\n"
-            "  topic_name = EXCLUDED.topic_name,\n"
-            "  updated_at = NOW();\n\n"
-        )
+        sql_path.parent.mkdir(parents=True, exist_ok=True)
+        sql_path.write_text(sql_text, encoding="utf-8")
+        log_path.write_text(json.dumps(log, indent=2), encoding="utf-8")
 
-    # Upsert movie_warnings
-    for r in movie_warning_rows:
-        lines.append(
-            "INSERT INTO public.movie_warnings (\n"
-            "  imdb_id, dtdd_topic_id, source, answer, is_spoiler, warning_comment\n"
-            ") VALUES (\n"
-            f"  {sql_literal(r['imdb_id'])}, {sql_literal(r['dtdd_topic_id'])}, 'DTDD', "
-            f"{sql_literal(r.get('answer'))}, {sql_literal(r.get('is_spoiler'))}, {sql_literal(r.get('warning_comment'))}\n"
-            ")\n"
-            "ON CONFLICT (imdb_id, dtdd_topic_id) DO UPDATE SET\n"
-            "  answer = EXCLUDED.answer,\n"
-            "  is_spoiler = EXCLUDED.is_spoiler,\n"
-            "  warning_comment = EXCLUDED.warning_comment,\n"
-            "  updated_at = NOW();\n\n"
-        )
+        print(f"Wrote SQL: {sql_path}")
+        print(f"Wrote log: {log_path}")
+        print(f"Targets found: {len(targets)} (dtdd_media_id not null)")
+        print(f"Topics found: {len(topics)} (from public.warnings)")
+        print(f"Movies written: {log.get('movies_written')}")
 
-    lines.append("COMMIT;\n")
-    OUT_SQL.write_text("".join(lines), encoding="utf-8")
-    print(f"Saved: {OUT_SQL}")
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
