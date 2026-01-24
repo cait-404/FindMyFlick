@@ -34,3 +34,14 @@ C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\n
 C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.Caching.Memory.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.Logging.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Npgsql.dll
+C:\GIT\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

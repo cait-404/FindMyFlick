@@ -373,6 +373,13 @@
           },
           "Tags": {
             "$ref": "#/components/schemas/Tags"
+          },
+          "tagVotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagVote"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -391,14 +398,6 @@
           "tagName": {
             "type": "string",
             "nullable": true
-          },
-          "upvotes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "downvotes": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -417,14 +416,6 @@
           "tagName": {
             "type": "string",
             "nullable": true
-          },
-          "upvotes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "downvotes": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -455,6 +446,24 @@
           }
         },
         "additionalProperties": { }
+      },
+      "TagVote": {
+        "type": "object",
+        "properties": {
+          "tagID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upvotes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "downvotes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "Tags": {
         "type": "object",
@@ -497,14 +506,6 @@
           "tagName": {
             "type": "string",
             "nullable": true
-          },
-          "upvotes": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "downvotes": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false

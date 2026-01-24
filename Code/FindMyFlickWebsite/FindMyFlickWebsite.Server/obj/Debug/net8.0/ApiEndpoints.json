@@ -1,7 +1,7 @@
 [
   {
     "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "GetAll",
+    "Method": "GetAllAsync",
     "RelativePath": "api/Movies",
     "HttpMethod": "GET",
     "IsController": true,
