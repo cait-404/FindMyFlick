@@ -34,5 +34,7 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.Urls.Clear();
+app.Urls.Add("https://localhost:5002");
+app.Urls.Add("http://localhost:5003");
 app.Run();
