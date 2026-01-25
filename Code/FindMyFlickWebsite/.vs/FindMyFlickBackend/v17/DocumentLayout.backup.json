@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|c:\\git\\findmyflick\\code\\findmyflickwebsite\\findmyflickwebsite.server\\controllers\\moviescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|solutionrelative:findmyflickwebsite.server\\controllers\\moviescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|c:\\git\\findmyflick\\code\\findmyflickwebsite\\findmyflickwebsite.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|solutionrelative:findmyflickwebsite.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|c:\\git\\findmyflick\\code\\findmyflickwebsite\\findmyflickwebsite.server\\models\\movies.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|solutionrelative:findmyflickwebsite.server\\models\\movies.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|c:\\git\\findmyflick\\code\\findmyflickwebsite\\findmyflickwebsite.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|solutionrelative:findmyflickwebsite.server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|c:\\git\\findmyflick\\code\\findmyflickwebsite\\findmyflickwebsite.server\\controllers\\moviescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87390255-B610-4829-A02A-AF959238EF92}|FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj|solutionrelative:findmyflickwebsite.server\\controllers\\moviescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,12 +27,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Program.cs",
+              "RelativeDocumentMoniker": "FindMyFlickWebsite.Server\\Program.cs",
+              "ToolTip": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Program.cs",
+              "RelativeToolTip": "FindMyFlickWebsite.Server\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T21:26:25.458Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "MoviesController.cs",
               "DocumentMoniker": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Controllers\\MoviesController.cs",
               "RelativeDocumentMoniker": "FindMyFlickWebsite.Server\\Controllers\\MoviesController.cs",
               "ToolTip": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Controllers\\MoviesController.cs",
               "RelativeToolTip": "FindMyFlickWebsite.Server\\Controllers\\MoviesController.cs",
-              "ViewState": "AgIAAHwBAAAAAAAAAAAgwDYAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADYAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-10T02:37:01.116Z",
               "EditorCaption": ""
@@ -45,22 +58,9 @@
               "RelativeDocumentMoniker": "FindMyFlickWebsite.Server\\Models\\Movies.cs",
               "ToolTip": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Models\\Movies.cs",
               "RelativeToolTip": "FindMyFlickWebsite.Server\\Models\\Movies.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAywAEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-29T03:17:39.321Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Program.cs",
-              "RelativeDocumentMoniker": "FindMyFlickWebsite.Server\\Program.cs",
-              "ToolTip": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\Program.cs",
-              "RelativeToolTip": "FindMyFlickWebsite.Server\\Program.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAIAwwBYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-29T03:15:36.522Z",
               "EditorCaption": ""
             }
           ]
