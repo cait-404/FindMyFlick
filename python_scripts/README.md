@@ -83,7 +83,6 @@ python_scripts/
 ├── seed/                                                      # Seed SQL generators for database population
 │   ├── __init__.py
 │   ├── seed_dtdd_media_map_for_seeded_movies_to_sql.py        # Builds movie_dtdd_titles mapping (imdb -> dtdd_media_id)
-│   ├── seed_dtdd_topics_to_sql.py                             # Seeds warnings/topics catalog from DTDD
 │   ├── seed_dtdd_warnings_for_seeded_movies_to_sql.py         # Seeds per-movie warning answers from DTDD
 │   ├── seed_tmdb_collections_for_seeded_movies_to_sql.py      # Seeds collections + movie_collections from TMDB
 │   ├── seed_tmdb_genres_for_seeded_movies_to_sql.py           # Seeds movie_genres from TMDB
