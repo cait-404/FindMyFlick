@@ -93,6 +93,9 @@ python_scripts/
 │   ├── seed_us_watch_providers_for_seeded_movies_to_sql.py    # Seeds streaming providers (US only)
 │   └── seed_warnings_from_catalog_to_sql.py                   # Seeds warning catalog into Postgres
 │
+├── seed_fix/                                                  # Seed correction scripts for fields not populated
+│   ├── fix_mpaa_from_omdb.py                                  # Added MPAA ratings to seeded movies table
+│
 ├── shared/                                                    # Shared helpers for fetching, flattening, and scoping API data
 │   ├── constants.py                                           # Language and region defaults (US market, English text)
 │   └── schema_utils.py                                        # Flatten JSON and export markdown tables
