@@ -83,7 +83,6 @@ python_scripts/
 ├── seed/                                                      # Seed SQL generators for database population
 │   ├── __init__.py
 │   ├── seed_dtdd_media_map_for_seeded_movies_to_sql.py        # Builds movie_dtdd_titles mapping (imdb -> dtdd_media_id)
-│   ├── seed_dtdd_topics_to_sql.py                             # Seeds warnings/topics catalog from DTDD
 │   ├── seed_dtdd_warnings_for_seeded_movies_to_sql.py         # Seeds per-movie warning answers from DTDD
 │   ├── seed_tmdb_collections_for_seeded_movies_to_sql.py      # Seeds collections + movie_collections from TMDB
 │   ├── seed_tmdb_genres_for_seeded_movies_to_sql.py           # Seeds movie_genres from TMDB
@@ -92,6 +91,9 @@ python_scripts/
 │   ├── seed_us_popular_100_movies_to_sql.py                   # Seeds base movie list (starter dataset)
 │   ├── seed_us_watch_providers_for_seeded_movies_to_sql.py    # Seeds streaming providers (US only)
 │   └── seed_warnings_from_catalog_to_sql.py                   # Seeds warning catalog into Postgres
+│
+├── seed_fix/                                                  # Seed correction scripts for fields not populated
+│   ├── fix_mpaa_from_omdb.py                                  # Added MPAA ratings to seeded movies table
 │
 ├── shared/                                                    # Shared helpers for fetching, flattening, and scoping API data
 │   ├── constants.py                                           # Language and region defaults (US market, English text)

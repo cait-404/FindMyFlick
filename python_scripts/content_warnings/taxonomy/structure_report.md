@@ -1,12 +1,12 @@
 # Content Warning Taxonomy — Structure Report
 
-- **Total catalog topics**: 200
-- **Unique mapped topic_ids**: 196
+- **Total catalog topics**: 202
+- **Unique mapped topic_ids**: 202
 
 ## Tier 1 — Umbrellas
 - **U01 — Animal Harm & Death**  _(mapped items: 15)_
 - **U02 — Death & Dying**  _(mapped items: 14)_
-- **U03 — Violence & Gore**  _(mapped items: 23)_
+- **U03 — Violence & Gore**  _(mapped items: 28)_
 - **U04 — Sexual Content & Assault**  _(mapped items: 12)_
 - **U05 — Child Harm & Family Trauma**  _(mapped items: 12)_
 - **U06 — Mental Health & Illness**  _(mapped items: 18)_
@@ -15,8 +15,8 @@
 - **U09 — Medical & Hospital Content**  _(mapped items: 13)_
 - **U10 — Discrimination & Hate**  _(mapped items: 21)_
 - **U11 — Phobias & Sensory Triggers**  _(mapped items: 25)_
-- **U12 — Psychological & Emotional Trauma**  _(mapped items: 15)_
-- **U13 — Accidents, Disasters & Situations**  _(mapped items: 26)_
+- **U12 — Psychological & Emotional Trauma**  _(mapped items: 17)_
+- **U13 — Accidents, Disasters & Situations**  _(mapped items: 27)_
 
 ---
 
@@ -70,6 +70,10 @@
 - **Gun violence**: 232 — there's gun violence
 - **Torture**: 203 — there's torture
 - **Body horror**: 296 — there's body horror
+- **Cannibalism**: 254 — there's cannibalism
+- **Woman brutalized for spectacle**: 367 — a woman is brutalized for spectacle
+- **Live gunfire**: 378 — there's live gunfire
+- **Domestic violence**: 219 — there's domestic violence
 
 ### Specific Injuries
 - **Eye mutilation**: 200 — there's eye mutilation
@@ -91,6 +95,7 @@
 - **Someone restrained**: 274 — someone is restrained
 - **Choking**: 309 — somebody is choked
 - **Woman slapped**: 342 — a woman gets slapped
+- **Someone is abused with a belt**: 365 — someone is abused with a belt
 
 ---
 
@@ -287,6 +292,8 @@
 - **Sacrifice**: 289 — someone sacrifices themselves
 - **Becomes unconscious**: 298 — Someone becomes unconscious
 - **Existentialism debated**: 341 — existentialism is debated
+- **Anti-abortion themes**: 316 — there's anti-abortion themes
+- **Someone is abused with a belt**: 365 — someone is abused with a belt
 
 ---
 
@@ -298,6 +305,7 @@
 - **Nuclear explosion**: 221 — there's a nuclear explosion
 - **9/11 depictions**: 283 — there are 9/11 depictions
 - **Falls down stairs**: 271 — someone falls down stairs
+- **Tsunami**: 373 — there is a tsunami
 
 ### Settings & Scenes
 - **Shower scenes**: 176 — there are shower scenes
@@ -331,10 +339,6 @@
 ---
 
 ## Validation
-- Unique mapped topic_ids: **196** / 200
-- Unmapped topic_ids (in catalog, missing from YAML): 4
-  - 254 — there's cannibalism
-  - 316 — there's anti-abortion themes
-  - 365 — someone is abused with a belt
-  - 367 — a woman is brutalized for spectacle
+- Unique mapped topic_ids: **202** / 202
+- Unmapped topic_ids: **none**
 - Unknown topic_ids: **none**

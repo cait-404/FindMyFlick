@@ -42,7 +42,9 @@ The following tables are populated by the provided seed scripts:
 - `keywords`, `movie_keywords` (`006_seed_us_popular_100_movie_keywords.sql`)  
 - `collections`, `movie_collections` (`007_seed_us_popular_100_movie_collections.sql`)  
 - `warnings` (`000_seed_warnings_catalog.sql`)  
-- `movie_warnings` and `movie_dtdd_titles` (DTDD results + matches) (`008_seed_us_popular_100_movie_warnings.sql`, `009_seed_us_streamable_dtdd_media_map.sql`)  
+- `warning_categories` and `warning_category_topics` (umbrella taxonomy mapping) (`011_seed_warning_taxonomy.sql`)
+- `warning_subcategories` and `warning_subcategory_topics` (subcategory mapping) (`012_seed_warning_subcategories.sql`)
+- `movie_warnings` and `movie_dtdd_titles` (DTDD results + matches) (`008_seed_us_popular_100_movie_warnings.sql`, `009_seed_us_streamable_dtdd_media_map.sql`, `010_seed_us_streamable_dtdd_warnings.sql`)
 
 So, yes: the database includes **seed data intended to support searches immediately**, at least for the seeded movie subset.
 
@@ -56,7 +58,8 @@ So, yes: the database includes **seed data intended to support searches immediat
 - People + credits: `people`, `movie_cast`, `movie_crew`
 - Keywords: `keywords`, `movie_keywords`
 - Collections: `collections`, `movie_collections`
-- Content warnings: `warnings`, `movie_warnings`
+- User plot tags + voting: `plot_tags`, `movie_plot_tags`, `movie_plot_tag_votes`
+- Content warnings: `warnings`, `movie_warnings`, `warning_categories`, `warning_category_topics`, `warning_subcategories`, `warning_subcategory_topics`
 - DTDD matching / identity bridge: `movie_dtdd_titles`
 
 ---
@@ -427,6 +430,122 @@ Seeded:
 | updated_at | TIMESTAMPTZ | NO |  | Update timestamp for answer/comment changes. |
 
 ---
+
+## `warning_categories`
+
+Stores the umbrella (top-level) content warning categories (from `claude_taxonomy.yml`).
+
+- **Primary key:** `category_id`
+- **Unique:** `category_name`
+- **Used by:** `warning_category_topics`, `warning_subcategories`
+- **Seeded:** `database/seed/011_seed_warning_taxonomy.sql`
+
+Columns:
+- `category_id` (PK)
+- `category_name` (unique)
+- `created_at`
+- `updated_at`
+
+
+## `warning_category_topics`
+
+Bridge table mapping DTDD topics (`warnings`) to umbrella categories (`warning_categories`).
+A topic can map to more than one umbrella.
+
+- **Primary key:** (`category_id`, `dtdd_topic_id`)
+- **Foreign keys:**
+  - `category_id` → `warning_categories.category_id`
+  - `dtdd_topic_id` → `warnings.dtdd_topic_id`
+- **Seeded:** `database/seed/011_seed_warning_taxonomy.sql`
+
+Columns:
+- `category_id` (FK)
+- `dtdd_topic_id` (FK)
+- `created_at`
+
+
+## `warning_subcategories`
+
+Optional subcategory headings under an umbrella category (the YAML group headings like "General Violence", "Actions", etc.).
+
+- **Primary key:** `subcategory_id`
+- **Unique:** (`category_id`, `subcategory_name`)
+- **Foreign keys:** `category_id` → `warning_categories.category_id`
+- **Seeded:** `database/seed/012_seed_warning_subcategories.sql`
+
+Columns:
+- `subcategory_id` (PK)
+- `category_id` (FK)
+- `subcategory_name`
+- `created_at`
+- `updated_at`
+
+
+## `warning_subcategory_topics`
+
+Bridge table mapping DTDD topics (`warnings`) to subcategories (`warning_subcategories`).
+A topic can map to more than one subcategory (and can still map to multiple umbrellas via `warning_category_topics`).
+
+- **Primary key:** (`subcategory_id`, `dtdd_topic_id`)
+- **Foreign keys:**
+  - `subcategory_id` → `warning_subcategories.subcategory_id`
+  - `dtdd_topic_id` → `warnings.dtdd_topic_id`
+- **Seeded:** `database/seed/012_seed_warning_subcategories.sql`
+
+Columns:
+- `subcategory_id` (FK)
+- `dtdd_topic_id` (FK)
+- `created_at`
+
+
+## `plot_tags`
+
+Stores the unique user-submitted plot tag text (case-insensitive via `tag_text_norm`).
+
+- **Primary key:** `plot_tag_id`
+- **Unique:** `tag_text_norm`
+- **Seeded:** not seeded (starts empty)
+
+Columns:
+- `plot_tag_id` (PK)
+- `tag_text` (original tag text)
+- `tag_text_norm` (lowercased + trimmed version used for uniqueness)
+- `created_at`
+
+
+## `movie_plot_tags`
+
+Links a plot tag to a specific movie.
+
+- **Primary key:** (`imdb_id`, `plot_tag_id`)
+- **Foreign keys:**
+  - `imdb_id` → `movies.imdb_id`
+  - `plot_tag_id` → `plot_tags.plot_tag_id`
+- **Seeded:** not seeded (starts empty)
+
+Columns:
+- `imdb_id` (FK)
+- `plot_tag_id` (FK)
+- `created_at`
+- `created_by_user_id` (placeholder until the app’s users/auth tables exist)
+- `status` (e.g., `pending` / `approved` / `rejected`)
+
+
+## `movie_plot_tag_votes`
+
+Stores each user’s vote for a specific movie-tag pair (one row per user per pair; users can change their vote by updating this row).
+
+- **Primary key:** (`imdb_id`, `plot_tag_id`, `user_id`)
+- **Foreign keys:**
+  - (`imdb_id`, `plot_tag_id`) → `movie_plot_tags` (movie-tag pair must exist before votes)
+- **Seeded:** not seeded (starts empty)
+
+Columns:
+- `imdb_id`
+- `plot_tag_id`
+- `user_id` (placeholder until the app’s users/auth tables exist)
+- `vote` (+1 / -1)
+- `created_at`
 
 ## `movie_dtdd_titles`
 

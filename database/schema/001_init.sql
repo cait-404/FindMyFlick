@@ -95,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_movie_warnings_topic ON public.movie_warnings (dt
 -- ===========================================
 -- Convenience view: only movies with warnings
 -- ===========================================
-CREATE OR REPLACE VIEW public.movies_with_warnings AS
+CREATE OR REPLACE VIEW public.v_movies_with_warnings AS
 SELECT m.*
 FROM public.movies m
 WHERE EXISTS (
