@@ -1,0 +1,39 @@
+Required minimal packages:
+•	Microsoft.AspNetCore.Identity.EntityFrameworkCore
+o	Includes functionality for user registration and login, password recovery, roles, email confirmation and potential integration for external providers like google, facebooks, and twitter – something to think about.
+•	Npasql.EntityFrameworkCore.PostgresSQL
+o	Used to connect to the postgreASL database.
+•	Microsoft.AspNetCore.Authenticatio.JwtBearer
+o	JSON web token authentication (think similar to cookies)
+
+Very helpful video tutorial: https://www.youtube.com/watch?v=brxStRVyJiM
+-- Because we are using PostgreSQL, you will want to ignore where he configures with MySQL. Your connection string should look something like this:
+"ConnectionStrings": {
+    "SecurityDb": "User ID=postgres;Password=password_;Host=localhost;Port=5433;Database=AspNetCoreIdentity;Pooling=true;"}
+timestamp 5:39 Password requirements – 
+	Required length: 15
+	All other listed requirements should be set to true.
+timestamp 8:05 Random key – 
+You can generate a random key using this script in powershell:
+[Convert]::ToBase64String((1..64 | ForEach-Object {Get-Random -Maximum 256}))
+	Store the key as a secret and then reference – DO NOT paste directly into code.
+Additional tutorial which addresses dynamic policies and assigning specific controls: https://www.youtube.com/watch?v=beIEysfQxGo
+
+Role Permission Matrix:
+Feature         |	Guest |	User |	Admin
+Search Movies   |	Yes   |	Yes  |	Yes
+View Details    |	Yes   |	Yes  |	Yes
+Recommendations |	Yes   |	Yes  |	Yes
+Watchlist       |	No    |	Yes  |	Yes
+Rate Movies     |	No    |	Yes  |	Yes
+Vote Tags       |	No    |	Yes  |	Yes
+Edit Profile    |	No    |	Yes  |	Yes
+Add Movie       |	No    |	No   |	Yes
+Delete Movie    |	No    |	No   |	Yes
+Edit Users      |	No    |	No   |	Yes
+
+Additional Helpful Resources:
+GitHub - Identity for PostgreSQL: https://github.com/robson-paproski/AspNetCore.Identity.PostgreSQL
+Build Login & Registration API with ASP.NET: https://bhandarisudip.com.np/how-to-build-a-login-and-registration-api-with-aspnet-web-api?
+Overview of ASP.NET Core Authentication | Microsoft Learn: https://learn.microsoft.com/en-us/aspnet/core/security/authentication/?view=aspnetcore-10.0
+ASP.NET Core 7: Using PostgreSQL to store Identity Information: https://www.webnethelper.com/2023/03/aspnet-core-7-using-postgresql-to-store.html
