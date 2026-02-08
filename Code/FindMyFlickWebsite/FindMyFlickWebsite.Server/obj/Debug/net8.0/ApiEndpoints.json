@@ -1,15 +1,41 @@
 [
   {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "GetAllAsync",
-    "RelativePath": "api/Movies",
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "GetAll",
+    "RelativePath": "api/MovieData",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "title",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "tmdbId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[FindMyFlickWebsite.Server.Models.Movies, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[FindMyFlickWebsite.Server.DataModels.Movie, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -18,6 +44,131 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "Create",
+    "RelativePath": "api/MovieData",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "movie",
+        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "GetByImdbId",
+    "RelativePath": "api/MovieData/{imdbId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imdbId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "Update",
+    "RelativePath": "api/MovieData/{imdbId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imdbId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "movie",
+        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "Delete",
+    "RelativePath": "api/MovieData/{imdbId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imdbId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "GetByTmdbId",
+    "RelativePath": "api/MovieData/by-tmdb/{tmdbId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tmdbId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
+    "Method": "GetMoviesView_ParseImdb",
+    "RelativePath": "api/Movies",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
@@ -35,7 +186,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "FindMyFlickWebsite.Server.Models.Movies",
+        "Type": "FindMyFlickWebsite.Server.Models.MoviesView",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -120,7 +271,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[FindMyFlickWebsite.Server.Models.Movies, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[FindMyFlickWebsite.Server.Models.MoviesView, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

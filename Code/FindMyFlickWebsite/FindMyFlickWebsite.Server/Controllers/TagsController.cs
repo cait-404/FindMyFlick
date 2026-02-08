@@ -7,7 +7,7 @@ namespace FindMyFlickWebsite.Server.Controllers
     public class TagsController : Controller
     {
 
-        private readonly List<Tags> _tags;
+        private readonly List<TagsView> _tags;
 
         //public TagsController()
         //{
