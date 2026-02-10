@@ -12,9 +12,6 @@ namespace FindMyFlickWebsite.Server.Models
         [JsonPropertyName("id")]
         public int ID { get; set; }                       // maps to movies.imdb_id
 
-        //[JsonPropertyName("tmdb_id")]
-        //public int? TmdbId { get; set; }                  // maps to movies.tmdb_id
-
         // primary metadata
         [JsonPropertyName("title")]
         public string? Name { get; set; }                 // maps to movies.title
@@ -25,43 +22,25 @@ namespace FindMyFlickWebsite.Server.Models
         [JsonPropertyName("mpaa_rating")]
         public string? AgeRating { get; set; }            // maps to movies.mpaa_rating
 
-        //[JsonPropertyName("runtime_minutes")]
-        //public int? RuntimeMinutes { get; set; }          // maps to movies.runtime_minutes
-
         [JsonPropertyName("plot_summary")]
         public string? Summary { get; set; }              // maps to movies.plot_summary
 
         [JsonPropertyName("poster_url")]
         public string? Poster { get; set; }               // maps to movies.poster_url
 
-        //[JsonPropertyName("original_language")]
-        //public string? OriginalLanguage { get; set; }     // maps to movies.original_language
-
-        //[JsonPropertyName("media_type")]
-        //public string? MediaType { get; set; }            // maps to movies.media_type
-
-        //[JsonPropertyName("tagline")]
-        //public string? Tagline { get; set; }              // maps to movies.tagline
-
-        //[JsonPropertyName("status")]
-        //public string? Status { get; set; }               // maps to movies.status
-
-        //[JsonPropertyName("created_at")]
-        //public DateTime? CreatedAt { get; set; }          // maps to movies.created_at (timestamptz)
-
-        //[JsonPropertyName("updated_at")]
-        //public DateTime? UpdatedAt { get; set; }          // maps to movies.updated_at (timestamptz)
-
         // convenience CLR-only values (backed by owned collections)
+        // "genre" JSON now contains genre names (strings) instead of TMDB ids.
         [NotMapped]
         [JsonPropertyName("genre")]
-        public List<int> Genre
+        public List<string> Genre
         {
-            get => GenreEntries?.Select(g => g.TmdbGenreId).ToList() ?? new List<int>();
-            set => GenreEntries = (value ?? Enumerable.Empty<int>()).Select(v => new GenreEntry { TmdbGenreId = v }).ToList();
+            get => GenreEntries?.Select(g => g.GenreName ?? string.Empty).ToList() ?? new List<string>();
+            set => GenreEntries = (value ?? Enumerable.Empty<string>())
+                        .Select(n => new GenreEntry { GenreName = n }).ToList();
         }
 
         // persisted owned collections (mapped in ApplicationDbContext)
+        // Keep GenreEntries so clients that inspect details can get both id+name when available.
         public List<GenreEntry> GenreEntries { get; set; } = new List<GenreEntry>();
 
         // If you still want a lightweight streaming provider DTO, use a different name:
@@ -91,8 +70,13 @@ namespace FindMyFlickWebsite.Server.Models
         {
             public int Id { get; set; }
 
+            // keep id in the DTO in case consumers still want it
             [JsonPropertyName("tmdb_genre_id")]
             public int TmdbGenreId { get; set; }
+
+            // new: genre display name pulled from genres.genre_name
+            [JsonPropertyName("genre_name")]
+            public string? GenreName { get; set; }
         }
 
         // Renamed DTO to avoid naming collision with DataModels.StreamingProvider

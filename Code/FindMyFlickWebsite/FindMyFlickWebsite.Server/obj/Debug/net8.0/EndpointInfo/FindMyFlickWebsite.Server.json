@@ -667,6 +667,10 @@
           "tmdb_genre_id": {
             "type": "integer",
             "format": "int32"
+          },
+          "genre_name": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1120,8 +1124,7 @@
           "genre": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             },
             "nullable": true
           },
