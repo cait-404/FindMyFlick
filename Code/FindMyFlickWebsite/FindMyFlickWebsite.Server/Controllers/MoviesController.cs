@@ -292,6 +292,80 @@ namespace FindMyFlickWebsite.Server.Controllers
             // Assumes IMDb IDs are in the form "tt1234567"
             var digits = new string(imdbId.Where(char.IsDigit).ToArray());
             return int.TryParse(digits, out var result) ? result : 0;
-        }
+        //tag voting endpoints---------------------------------
+
+        // //upvote tag
+        // //generated using intellisense, no alterations
+        // [HttpPatch("upvote/{movieId:int}/tag/{tagId:int}")]
+        // [ProducesResponseType(typeof(Movies.TagVote), 200)]
+        // [ProducesResponseType(404)]
+        // public ActionResult<Movies.TagVote> UpvoteTag(int movieId, int tagId)
+        // {
+        //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
+        //     if (movie is null) return NotFound();
+        //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
+        //     if (tagVote is null) return NotFound();
+        //     tagVote.Upvotes += 1;
+        //     return Ok(tagVote);
+        // }
+
+        // //downvote tag
+        // //copied from upvote code with alterations
+        // [HttpPatch("downvote/{movieId:int}/tag/{tagId:int}")]
+        // [ProducesResponseType(typeof(Movies.TagVote), 200)]
+        // [ProducesResponseType(404)]
+        // public ActionResult<Movies.TagVote> DownvoteTag(int movieId, int tagId)
+        // {
+        //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
+        //     if (movie is null) return NotFound();
+        //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
+        //     if (tagVote is null) return NotFound();
+        //     tagVote.Downvotes += 1;
+        //     //remove tag from movie if downvotes are equal to upvotes
+        //     if (tagVote.Downvotes == tagVote.Upvotes) RemoveTagFromMovie(movieId, tagId); 
+        //     return Ok(tagVote);
+        // }
+
+        // //add new tag to movie
+        // //mostly generated with intellisense with minor alterations
+        // [HttpPost("{movieId:int}/tag/{tagId:int}")]
+        // [ProducesResponseType(typeof(Movies.TagVote), 201)]
+        // [ProducesResponseType(404)]
+        // public ActionResult<Movies.TagVote> AddTagToMovie(int movieId, int tagId)
+        // {
+        //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
+        //     if (movie is null) return NotFound();
+        //     // Check if tag already exists
+        //     var existingTagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
+        //     if (existingTagVote != null)
+        //     {
+        //         return Conflict("Tag already exists for this movie. Go vote for it intstead!"); //do I want this to instead just add a vote?
+        //     }
+        //     //tag creation counts as an upvote if it becomes equal with the downvotes it is removed
+        //     var newTagVote = new Movies.TagVote
+        //     {
+        //         TagID = tagId,
+        //         Upvotes = 1,
+        //         Downvotes = 0
+        //     };
+        //     movie.TagVotes.Add(newTagVote);
+        //     return CreatedAtAction(nameof(GetById), new { id = movieId }, newTagVote);
+        // }
+
+        // //remove tag from movie
+        // //intellisense generated
+        // [HttpDelete("{movieId:int}/tag/{tagId:int}")]
+        // [ProducesResponseType(204)]
+        // [ProducesResponseType(404)]
+        // public IActionResult RemoveTagFromMovie(int movieId, int tagId)
+        // {
+        //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
+        //     if (movie is null) return NotFound();
+        //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
+        //     if (tagVote is null) return NotFound();
+        //     movie.TagVotes.Remove(tagVote);
+        //     return NoContent();
+        // }
+
     }
 }

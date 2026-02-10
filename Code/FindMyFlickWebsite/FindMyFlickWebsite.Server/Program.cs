@@ -5,6 +5,17 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -33,10 +44,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
+//app.UseHttpsRedirection(); for prod
+app.UseRouting(); 
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.Urls.Clear();
+app.Urls.Add("https://localhost:5002");
+app.Urls.Add("http://localhost:5003");
 app.Run();

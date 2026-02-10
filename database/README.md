@@ -24,7 +24,10 @@ database/
 │   ├── 006_keywords.sql                                    # Keywords + movie-to-keyword tables
 │   ├── 007_collections.sql                                 # Collections + movie-to-collection tables
 │   ├── 008_dtdd.sql                                        # DTDD topic and warning tables (warnings catalog and mappings)
-│   └── 009_dtdd_match_bridge.sql                           # DTDD match bridge table (movies.imdb_id to DTDD media ids)
+│   ├── 009_dtdd_match_bridge.sql                           # DTDD match bridge table (movies.imdb_id to DTDD media ids)
+│   ├── 010_warning_taxonomy.sql                            # Warning taxonomy: umbrella categories + category↔topic mapping tables
+│   ├── 011_warning_subcategories.sql                       # Warning taxonomy extension: subcategories + subcategory↔topic mapping tables
+│   └── 012_plot_tags.sql                                   # User plot tags: tag catalog + movie↔tag bridge + per-user voting table
 │
 ├── seed/                                                   # Seed data for a starter dataset (run after schema)
 │   ├── 000_seed_warnings_catalog.sql                       # Seed the local content warning catalog (baseline taxonomy list)
@@ -35,7 +38,10 @@ database/
 │   ├── 006_seed_us_popular_100_movie_keywords.sql          # Seed keywords for starter movies
 │   ├── 007_seed_us_popular_100_movie_collections.sql       # Seed collections for starter movies
 │   ├── 008_seed_us_popular_100_movie_warnings.sql          # Seed warning triggers for starter movies (non-DTDD baseline)
-│   └── 009_seed_us_streamable_dtdd_media_map.sql           # Seed DTDD media id mapping for streamable US movies
+│   ├── 009_seed_us_streamable_dtdd_media_map.sql           # Seed DTDD media id mapping for streamable US movies
+│   ├── 010_seed_us_streamable_dtdd_warnings.sql            # Seed DTDD results for starter movies (movie_warnings: yes/no + metadata)
+│   ├── 011_seed_warning_taxonomy.sql                       # Seed warning umbrella categories + category↔topic mappings from YAML taxonomy artifacts
+│   └── 012_seed_warning_subcategories.sql                  # Seed warning subcategories + subcategory↔topic mappings from YAML taxonomy artifacts
 │
 ├── views/                                                  # Read-only helper views for the application
 │   ├── _apply_views.sql                                    # Drop and recreate all views in the correct dependency order

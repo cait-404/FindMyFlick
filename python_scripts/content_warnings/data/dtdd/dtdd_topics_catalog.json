@@ -2195,6 +2195,20 @@
       ]
     },
     {
+      "topic_id": 373,
+      "topic_name": "there is a tsunami",
+      "description": "",
+      "hit_count": 0,
+      "example_titles": []
+    },
+    {
+      "topic_id": 378,
+      "topic_name": "there's live gunfire",
+      "description": "",
+      "hit_count": 0,
+      "example_titles": []
+    },
+    {
       "topic_id": 375,
       "topic_name": "someone has a heart attack",
       "description": "",
