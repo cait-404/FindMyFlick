@@ -38,11 +38,17 @@ obj/
 *.exe
 *.pdb
 
-# NuGet / build caches
-project.assets.json
-project.nuget.cache
-*.nuget.g.props
-*.nuget.g.targets
+# Visual Studio / MSBuild / NuGet generated
+**/*.user
+**/*.rsuser
+**/*.suo
+**/*.cache
+**/*.nupkg
+**/project.assets.json
+**/project.nuget.cache
+**/*.nuget.g.props
+**/*.nuget.g.targets
+**/staticwebassets*/
 *.AssemblyInfoInputs.cache
 *.GeneratedMSBuildEditorConfig.editorconfig
 
