@@ -1,4 +1,5 @@
 using FindMyFlickWebsite.Server;
+using FindMyFlickWebsite.Server.DataModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -18,24 +19,24 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// This is your teammate's app DbContext (keep it as-is)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)
-    //.UseSnakeCaseNamingConvention()
+        .UseSnakeCaseNamingConvention()
 );
 
+// This is the scaffolded DB-first context your controllers are using
+builder.Services.AddDbContext<FindmyflickContext>(options =>
+    options.UseNpgsql(connectionString, o => o.CommandTimeout(60))
+        .UseSnakeCaseNamingConvention()
+);
 
 var app = builder.Build();
-////copilot generated code to apply pending migrations at startup generted by inputting the error "ERROR SqlState: 42P01 MessageText: relation "Movies" does not exist "
-//// Apply pending migrations (safe in many scenarios; prefer explicit migrations in production)
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//    db.Database.Migrate();
-//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,9 +45,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 //app.UseHttpsRedirection(); for prod
-app.UseRouting(); 
+app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
 

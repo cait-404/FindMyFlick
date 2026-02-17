@@ -31,7 +31,7 @@ This document describes the Postgres tables in `database/schema/`, what each tab
 
 ## Seed coverage (what works out of the box)
 
-Your seed folder is designed to make the project usable immediately without populating every possible table from the APIs.
+The seed folder is designed to make the project usable immediately without populating every possible table from the APIs.
 
 The following tables are populated by the provided seed scripts:
 
@@ -46,7 +46,6 @@ The following tables are populated by the provided seed scripts:
 - `warning_subcategories` and `warning_subcategory_topics` (subcategory mapping) (`012_seed_warning_subcategories.sql`)
 - `movie_warnings` and `movie_dtdd_titles` (DTDD results + matches) (`008_seed_us_popular_100_movie_warnings.sql`, `009_seed_us_streamable_dtdd_media_map.sql`, `010_seed_us_streamable_dtdd_warnings.sql`)
 
-So, yes: the database includes **seed data intended to support searches immediately**, at least for the seeded movie subset.
 
 ---
 
