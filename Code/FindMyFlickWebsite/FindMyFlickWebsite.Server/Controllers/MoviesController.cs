@@ -7,7 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-
+using System.Net.Http;
+using System.Text.Json;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace FindMyFlickWebsite.Server.Controllers
 {
@@ -26,35 +28,6 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         }
 
-
-
-
-        ///// 
-        ///// Get all movies.
-        ///// 
-        //[HttpGet]
-        //[ProducesResponseType(typeof(IEnumerable<MoviesView>), 200)]
-        //public async Task<ActionResult<IEnumerable<MoviesView>>> GetAllAsync()
-        //{
-        //    List<MoviesView> movies = await _context.Set<MoviesView>().ToListAsync();
-        //    return Ok(movies);
-
-        //}
-
-
-
-
-        /// <summary>
-        /// Advanced search helper that filters a sequence of movies by various optional criteria.
-        /// Any null or empty filter parameter is ignored.
-        /// - name: substring match (case-insensitive)
-        /// - streamingServices: match any (or all if matchAllStreaming true)
-        /// - ageRating: exact case-insensitive match
-        /// - genres: match any (or all if matchAllGenres true)
-        /// - year: exact match
-        /// - tagNamesInclude: tag name match across Plot/Trigger/Person tags (any or all via matchAllTagsIn) to include in search
-        /// - tagNamesExclude: tag name match across Plot/Trigger/Person tag (any or all via matchAllTagsEx (on by default) to exclude from search
-        /// </summary>
         public static IEnumerable<MoviesView> AdvancedSearch(
             IEnumerable<MoviesView> source,
             string? name = null,
@@ -87,16 +60,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                         !m.Name.Contains(name, System.StringComparison.OrdinalIgnoreCase))
                         continue;
                 }
-
-                //// streaming services
-                //if (svcList != null && svcList.Any())
-                //{
-                //    var hasMatches = svcList.All(s => m.StreamingServices.Any(ms => string.Equals(ms, s, System.StringComparison.OrdinalIgnoreCase)))
-                //                     && matchAllStreaming
-                //        || (!matchAllStreaming && svcList.Any(s => m.StreamingServices.Any(ms => string.Equals(ms, s, System.StringComparison.OrdinalIgnoreCase))));
-
-                //    if (!hasMatches) continue;
-                //}
 
                 // age rating (exact, case-insensitive)
                 if (!string.IsNullOrWhiteSpace(ageRating))
@@ -165,9 +128,6 @@ namespace FindMyFlickWebsite.Server.Controllers
         [ProducesResponseType(404)]
         public ActionResult<MoviesView> GetById(int id)
         {
-            //var movie = _movies.FirstOrDefault(m => m.ID == id);
-            //if (movie is null) return NotFound();
-            //return Ok(movie);
             return Ok("wip");
         }
 
@@ -175,8 +135,6 @@ namespace FindMyFlickWebsite.Server.Controllers
         /// Search movies by multiple optional criteria.
         /// Query example:
         /// GET api/movies/search?name=cool&streamingServices=netflix&streamingServices=hulu&genres=action&year=2012&tagNames=Violence&matchAllTags=true
-        /// updated wth copilot query "using GetMoviesView_ParseImdb as a reference make the search endpoint use Movie.cs as a datamodel for the MoviesView view model
-        /// 
         /// </summary>
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<MoviesView>), 200)]
@@ -240,7 +198,107 @@ namespace FindMyFlickWebsite.Server.Controllers
                 tagNamesInclude,
                 tagNamesExclude,
                 matchAllTagsIn,
-                matchAllTagsEx);
+                matchAllTagsEx).ToList();
+
+            // If DB search returned nothing, attempt to call internal MovieSearch API to fetch from external APIs,
+            // upsert into DB, then re-run the database search.
+            if (!results.Any())
+            {
+                try
+                {
+                    // Build query for the MovieSearch endpoint. We'll forward TitleContains (name) and request an API fill.
+                    var queryParams = new List<KeyValuePair<string, string?>>();
+
+                    // Ensure API fallback will run and attempt to add matches for the title.
+                    queryParams.Add(new KeyValuePair<string, string?>("EnableApiFallback", "true"));
+                    queryParams.Add(new KeyValuePair<string, string?>("AlwaysAddFromApis", "true"));
+
+                    if (!string.IsNullOrWhiteSpace(name))
+                        queryParams.Add(new KeyValuePair<string, string?>("TitleContains", name));
+
+                    // Keep reasonable defaults; allow the caller to override via query if desired.
+                    queryParams.Add(new KeyValuePair<string, string?>("Take", "25"));
+                    queryParams.Add(new KeyValuePair<string, string?>("MinMatches", "1"));
+                    queryParams.Add(new KeyValuePair<string, string?>("MaxApiAdds", "10"));
+                    queryParams.Add(new KeyValuePair<string, string?>("WatchRegion", "US"));
+
+                    var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                    var movieSearchUrl = QueryHelpers.AddQueryString($"{baseUrl}/api/MovieSearch", queryParams);
+
+                    using var http = new HttpClient();
+                    // Call internal MovieSearch GET endpoint
+                    var json = await http.GetStringAsync(movieSearchUrl);
+
+                    // Parse addedFromApis from the response (controller returns camelCase JSON)
+                    using var doc = JsonDocument.Parse(json);
+                    var root = doc.RootElement;
+
+                    int addedFromApis = 0;
+                    if (root.TryGetProperty("addedFromApis", out var addedEl) && addedEl.ValueKind == JsonValueKind.Number && addedEl.TryGetInt32(out var addedVal))
+                        addedFromApis = addedVal;
+                    else if (root.TryGetProperty("AddedFromApis", out var addedEl2) && addedEl2.ValueKind == JsonValueKind.Number && addedEl2.TryGetInt32(out var addedVal2))
+                        addedFromApis = addedVal2;
+
+                    // If MovieSearch added any movies, re-load DB and re-run AdvancedSearch so we return DB-backed results.
+                    if (addedFromApis > 0)
+                    {
+                        loaded = await _context.Movies
+                            .Include(m => m.MovieGenres).ThenInclude(mg => mg.TmdbGenre)
+                            .Include(m => m.MovieStreamings).ThenInclude(ms => ms.TmdbProvider)
+                            .AsNoTracking()
+                            .ToListAsync();
+
+                        dtoList = loaded.Select(m => new Models.MoviesView
+                        {
+                            ID = ParseImdbToInt(m.ImdbId),
+                            Name = m.Title,
+                            Year = m.ReleaseYear,
+                            AgeRating = m.MpaaRating,
+                            Summary = m.PlotSummary,
+                            Poster = m.PosterUrl,
+                            GenreEntries = m.MovieGenres
+                                .Select(g => new Models.MoviesView.GenreEntry
+                                {
+                                    TmdbGenreId = g.TmdbGenreId,
+                                    GenreName = g.TmdbGenre?.GenreName ?? string.Empty
+                                })
+                                .ToList(),
+                            StreamingProviders = m.MovieStreamings
+                                .GroupBy(ms => ms.TmdbProviderId)
+                                .Select(g => new Models.MoviesView.StreamingProviderView
+                                {
+                                    Id = g.Key,
+                                    ProviderName = g.First().TmdbProvider.ProviderName
+                                })
+                                .ToList(),
+                            Tags = new Models.TagsView(),
+                            TagVotes = new List<Models.MoviesView.TagVote>()
+                        }).ToList();
+
+                        results = AdvancedSearch(
+                            dtoList,
+                            name,
+                            streamingServices,
+                            matchAllStreaming,
+                            ageRating,
+                            genres,
+                            matchAllGenres,
+                            year,
+                            tagNamesInclude,
+                            tagNamesExclude,
+                            matchAllTagsIn,
+                            matchAllTagsEx).ToList();
+                    }
+                    else
+                    {
+                        // No items added by API; results remain empty.
+                    }
+                }
+                catch
+                {
+                    // Non-fatal: if internal call fails, continue and return empty results.
+                }
+            }
 
             return Ok(results);
         }
@@ -292,81 +350,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             // Assumes IMDb IDs are in the form "tt1234567"
             var digits = new string(imdbId.Where(char.IsDigit).ToArray());
             return int.TryParse(digits, out var result) ? result : 0;
-            //tag voting endpoints---------------------------------
-
-            // //upvote tag
-            // //generated using intellisense, no alterations
-            // [HttpPatch("upvote/{movieId:int}/tag/{tagId:int}")]
-            // [ProducesResponseType(typeof(Movies.TagVote), 200)]
-            // [ProducesResponseType(404)]
-            // public ActionResult<Movies.TagVote> UpvoteTag(int movieId, int tagId)
-            // {
-            //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
-            //     if (movie is null) return NotFound();
-            //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
-            //     if (tagVote is null) return NotFound();
-            //     tagVote.Upvotes += 1;
-            //     return Ok(tagVote);
-            // }
-
-            // //downvote tag
-            // //copied from upvote code with alterations
-            // [HttpPatch("downvote/{movieId:int}/tag/{tagId:int}")]
-            // [ProducesResponseType(typeof(Movies.TagVote), 200)]
-            // [ProducesResponseType(404)]
-            // public ActionResult<Movies.TagVote> DownvoteTag(int movieId, int tagId)
-            // {
-            //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
-            //     if (movie is null) return NotFound();
-            //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
-            //     if (tagVote is null) return NotFound();
-            //     tagVote.Downvotes += 1;
-            //     //remove tag from movie if downvotes are equal to upvotes
-            //     if (tagVote.Downvotes == tagVote.Upvotes) RemoveTagFromMovie(movieId, tagId); 
-            //     return Ok(tagVote);
-            // }
-
-            // //add new tag to movie
-            // //mostly generated with intellisense with minor alterations
-            // [HttpPost("{movieId:int}/tag/{tagId:int}")]
-            // [ProducesResponseType(typeof(Movies.TagVote), 201)]
-            // [ProducesResponseType(404)]
-            // public ActionResult<Movies.TagVote> AddTagToMovie(int movieId, int tagId)
-            // {
-            //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
-            //     if (movie is null) return NotFound();
-            //     // Check if tag already exists
-            //     var existingTagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
-            //     if (existingTagVote != null)
-            //     {
-            //         return Conflict("Tag already exists for this movie. Go vote for it intstead!"); //do I want this to instead just add a vote?
-            //     }
-            //     //tag creation counts as an upvote if it becomes equal with the downvotes it is removed
-            //     var newTagVote = new Movies.TagVote
-            //     {
-            //         TagID = tagId,
-            //         Upvotes = 1,
-            //         Downvotes = 0
-            //     };
-            //     movie.TagVotes.Add(newTagVote);
-            //     return CreatedAtAction(nameof(GetById), new { id = movieId }, newTagVote);
-            // }
-
-            // //remove tag from movie
-            // //intellisense generated
-            // [HttpDelete("{movieId:int}/tag/{tagId:int}")]
-            // [ProducesResponseType(204)]
-            // [ProducesResponseType(404)]
-            // public IActionResult RemoveTagFromMovie(int movieId, int tagId)
-            // {
-            //     var movie = _movies.FirstOrDefault(m => m.ID == movieId);
-            //     if (movie is null) return NotFound();
-            //     var tagVote = movie.TagVotes.FirstOrDefault(tv => tv.TagID == tagId);
-            //     if (tagVote is null) return NotFound();
-            //     movie.TagVotes.Remove(tagVote);
-            //     return NoContent();
-            // }
-
         }
     }
 }

@@ -1,0 +1,56 @@
+/*
+v_movies_streamable_us_agg.sql
+Purpose:
+  US streamable titles aggregated to one row per movie, with providers grouped by offer_type,
+  plus best_offer_type/best_offer_rank for sorting.
+*/
+
+DROP VIEW IF EXISTS public.v_movies_streamable_us_agg;
+
+CREATE VIEW public.v_movies_streamable_us_agg AS
+WITH base AS (
+  SELECT
+    imdb_id,
+    tmdb_id,
+    title,
+    release_year,
+    poster_url,
+    runtime_minutes,
+    plot_summary,
+    original_language,
+    provider_name,
+    offer_type,
+    offer_rank
+  FROM public.v_movies_streamable_us
+)
+SELECT
+  imdb_id,
+  tmdb_id,
+  title,
+  release_year,
+  poster_url,
+  runtime_minutes,
+  plot_summary,
+  original_language,
+
+  string_agg(DISTINCT provider_name, ', ' ORDER BY provider_name)
+    FILTER (WHERE offer_type = 'subscription') AS subscription_providers,
+
+  string_agg(DISTINCT provider_name, ', ' ORDER BY provider_name)
+    FILTER (WHERE offer_type = 'free') AS free_providers,
+
+  string_agg(DISTINCT provider_name, ', ' ORDER BY provider_name)
+    FILTER (WHERE offer_type = 'free_with_ads') AS free_with_ads_providers,
+
+  MIN(offer_rank) AS best_offer_rank,
+
+  CASE MIN(offer_rank)
+    WHEN 1 THEN 'subscription'
+    WHEN 2 THEN 'free'
+    WHEN 3 THEN 'free_with_ads'
+    ELSE NULL
+  END AS best_offer_type
+FROM base
+GROUP BY
+  imdb_id, tmdb_id, title, release_year, poster_url,
+  runtime_minutes, plot_summary, original_language;

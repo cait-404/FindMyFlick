@@ -5,129 +5,92 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/MovieData": {
+    "/api/ApiEnv": {
       "get": {
         "tags": [
-          "MovieData"
+          "ApiEnv"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ExternalApiTest/tmdb/{tmdbId}": {
+      "get": {
+        "tags": [
+          "ExternalApiTest"
         ],
         "parameters": [
           {
-            "name": "title",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
             "name": "tmdbId",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "integer",
               "format": "int32"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Movie"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Movie"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Movie"
-                  }
-                }
-              }
-            }
+            "description": "Success"
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/api/ExternalApiTest/dtdd/title/{dtddTitleId}": {
+      "get": {
         "tags": [
-          "MovieData"
+          "ExternalApiTest"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
+        "parameters": [
+          {
+            "name": "dtddTitleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              }
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ExternalApiTest/tmdb/{tmdbId}/providers/{region}": {
+      "get": {
+        "tags": [
+          "ExternalApiTest"
+        ],
+        "parameters": [
+          {
+            "name": "tmdbId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
+          },
+          {
+            "name": "region",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -149,123 +112,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "MovieData"
-        ],
-        "parameters": [
-          {
-            "name": "imdbId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Movie"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
             "description": "Success"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "MovieData"
-        ],
-        "parameters": [
-          {
-            "name": "imdbId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/api/MovieData/by-tmdb/{tmdbId}": {
-      "get": {
-        "tags": [
-          "MovieData"
-        ],
-        "parameters": [
-          {
-            "name": "tmdbId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Movie"
-                }
-              }
-            }
           }
         }
       }
@@ -464,28 +311,198 @@
         }
       }
     },
-    "/api/Movies/upvote/{movieId}/tag/{tagId}": {
-      "patch": {
+    "/api/Movies": {
+      "get": {
         "tags": [
           "Movies"
         ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/MovieSearch": {
+      "get": {
+        "tags": [
+          "MovieSearch"
+        ],
         "parameters": [
           {
-            "name": "movieId",
-            "in": "path",
-            "required": true,
+            "name": "Take",
+            "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32"
             }
           },
           {
-            "name": "tagId",
-            "in": "path",
-            "required": true,
+            "name": "MinMatches",
+            "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "EnableApiFallback",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "AlwaysAddFromApis",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "MaxApiAdds",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "WatchRegion",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "StreamingProviderIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "ProviderMatchMode",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MatchMode"
+            }
+          },
+          {
+            "name": "GenreIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "KeywordIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "PersonIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "TitleContains",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "IncludeWarningTopicIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "IncludeWarningCategoryIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "IncludeWarningSubcategoryIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "IncludeWarningMatchMode",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/MatchMode"
+            }
+          },
+          {
+            "name": "ExcludeWarningTopicIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "ExcludeWarningCategoryIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "ExcludeWarningSubcategoryIds",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
             }
           }
         ],
@@ -495,225 +512,101 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/TagVote"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TagVote"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Movies/downvote/{movieId}/tag/{tagId}": {
-      "patch": {
-        "tags": [
-          "Movies"
-        ],
-        "parameters": [
-          {
-            "name": "movieId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "tagId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Movies/{movieId}/tag/{tagId}": {
-      "post": {
-        "tags": [
-          "Movies"
-        ],
-        "parameters": [
-          {
-            "name": "movieId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "tagId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagVote"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
                 }
               }
             }
           }
         }
       },
-      "delete": {
+      "post": {
         "tags": [
-          "Movies"
+          "MovieSearch"
         ],
-        "parameters": [
-          {
-            "name": "movieId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "tagId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovieSearchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovieSearchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovieSearchRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
+          "200": {
+            "description": "Success",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/MovieSearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WarningTaxonomy": {
+      "get": {
+        "tags": [
+          "WarningTaxonomy"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
                 }
               }
             }
@@ -763,37 +656,28 @@
   },
   "components": {
     "schemas": {
-      "Collection": {
+      "CategoryDto": {
         "type": "object",
         "properties": {
-          "tmdbCollectionId": {
+          "categoryId": {
             "type": "integer",
             "format": "int32"
           },
-          "collectionName": {
+          "categoryName": {
             "type": "string",
             "nullable": true
           },
-          "posterUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "backdropUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "movieCollections": {
+          "subcategories": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MovieCollection"
+              "$ref": "#/components/schemas/SubcategoryDto"
+            },
+            "nullable": true
+          },
+          "topicsDirect": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopicDto"
             },
             "nullable": true
           }
@@ -844,64 +728,6 @@
         "type": "integer",
         "format": "int32"
       },
-      "DtddOverride": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "dtddMediaId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "note": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Genre": {
-        "type": "object",
-        "properties": {
-          "tmdbGenreId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "genreName": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "movieGenres": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieGenre"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "GenreEntry": {
         "type": "object",
         "properties": {
@@ -920,36 +746,177 @@
         },
         "additionalProperties": false
       },
-      "Keyword": {
+      "MatchMode": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "MovieSearchRequest": {
         "type": "object",
         "properties": {
-          "tmdbKeywordId": {
+          "take": {
             "type": "integer",
             "format": "int32"
           },
-          "keywordName": {
+          "minMatches": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enableApiFallback": {
+            "type": "boolean"
+          },
+          "alwaysAddFromApis": {
+            "type": "boolean"
+          },
+          "maxApiAdds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "watchRegion": {
             "type": "string",
             "nullable": true
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "movieKeywords": {
+          "streamingProviderIds": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MovieKeyword"
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "providerMatchMode": {
+            "$ref": "#/components/schemas/MatchMode"
+          },
+          "genreIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "keywordIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "personIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "titleContains": {
+            "type": "string",
+            "nullable": true
+          },
+          "includeWarningTopicIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "includeWarningCategoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "includeWarningSubcategoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "includeWarningMatchMode": {
+            "$ref": "#/components/schemas/MatchMode"
+          },
+          "excludeWarningTopicIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "excludeWarningCategoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "excludeWarningSubcategoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "Movie": {
+      "MovieSearchResponse": {
+        "type": "object",
+        "properties": {
+          "returned": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minMatchesTarget": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "takeTarget": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "relaxedStepsUsed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieSearchResultCard"
+            },
+            "nullable": true
+          },
+          "includedWarningTopicsExpandedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "excludedWarningTopicsExpandedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "addedFromApis": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MovieSearchResultCard": {
         "type": "object",
         "properties": {
           "imdbId": {
@@ -967,374 +934,12 @@
           },
           "releaseYear": {
             "type": "integer",
-            "format": "int32"
-          },
-          "mpaaRating": {
-            "type": "string",
-            "nullable": true
-          },
-          "runtimeMinutes": {
-            "type": "integer",
             "format": "int32",
-            "nullable": true
-          },
-          "plotSummary": {
-            "type": "string",
             "nullable": true
           },
           "posterUrl": {
             "type": "string",
             "nullable": true
-          },
-          "originalLanguage": {
-            "type": "string",
-            "nullable": true
-          },
-          "mediaType": {
-            "type": "string",
-            "nullable": true
-          },
-          "tagline": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dtddOverride": {
-            "$ref": "#/components/schemas/DtddOverride"
-          },
-          "movieCasts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieCast"
-            },
-            "nullable": true
-          },
-          "movieCollection": {
-            "$ref": "#/components/schemas/MovieCollection"
-          },
-          "movieCrews": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieCrew"
-            },
-            "nullable": true
-          },
-          "movieDtddTitle": {
-            "$ref": "#/components/schemas/MovieDtddTitle"
-          },
-          "movieGenres": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieGenre"
-            },
-            "nullable": true
-          },
-          "movieKeywords": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieKeyword"
-            },
-            "nullable": true
-          },
-          "movieStreamings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieStreaming"
-            },
-            "nullable": true
-          },
-          "movieWarnings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieWarning"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieCast": {
-        "type": "object",
-        "properties": {
-          "tmdbCreditId": {
-            "type": "string",
-            "nullable": true
-          },
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbPersonId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "characterName": {
-            "type": "string",
-            "nullable": true
-          },
-          "castOrder": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbPerson": {
-            "$ref": "#/components/schemas/Person"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieCollection": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbCollectionId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbCollection": {
-            "$ref": "#/components/schemas/Collection"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieCrew": {
-        "type": "object",
-        "properties": {
-          "tmdbCreditId": {
-            "type": "string",
-            "nullable": true
-          },
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbPersonId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "department": {
-            "type": "string",
-            "nullable": true
-          },
-          "job": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbPerson": {
-            "$ref": "#/components/schemas/Person"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieDtddTitle": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "dtddTitleId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "matchMethod": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dtddMediaId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "dtddImdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "dtddTmdbId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "dtddTitle": {
-            "type": "string",
-            "nullable": true
-          },
-          "dtddReleaseYear": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "matchScore": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieGenre": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbGenreId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbGenre": {
-            "$ref": "#/components/schemas/Genre"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieKeyword": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbKeywordId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbKeyword": {
-            "$ref": "#/components/schemas/Keyword"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieStreaming": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "tmdbProviderId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "offerType": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
-          },
-          "tmdbProvider": {
-            "$ref": "#/components/schemas/StreamingProvider"
-          }
-        },
-        "additionalProperties": false
-      },
-      "MovieWarning": {
-        "type": "object",
-        "properties": {
-          "imdbId": {
-            "type": "string",
-            "nullable": true
-          },
-          "dtddTopicId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "source": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "answer": {
-            "type": "string",
-            "nullable": true
-          },
-          "isSpoiler": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "warningComment": {
-            "type": "string",
-            "nullable": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "dtddTopic": {
-            "$ref": "#/components/schemas/Warning"
-          },
-          "imdb": {
-            "$ref": "#/components/schemas/Movie"
           }
         },
         "additionalProperties": false
@@ -1394,50 +999,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TagVote"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "Person": {
-        "type": "object",
-        "properties": {
-          "tmdbPersonId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "personName": {
-            "type": "string",
-            "nullable": true
-          },
-          "knownForDepartment": {
-            "type": "string",
-            "nullable": true
-          },
-          "profileUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "movieCasts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieCast"
-            },
-            "nullable": true
-          },
-          "movieCrews": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieCrew"
             },
             "nullable": true
           }
@@ -1507,44 +1068,6 @@
         },
         "additionalProperties": { }
       },
-      "StreamingProvider": {
-        "type": "object",
-        "properties": {
-          "tmdbProviderId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "providerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "logoPath": {
-            "type": "string",
-            "nullable": true
-          },
-          "displayPriority": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "movieStreamings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieStreaming"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "StreamingProviderView": {
         "type": "object",
         "properties": {
@@ -1554,6 +1077,27 @@
           },
           "provider_name": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubcategoryDto": {
+        "type": "object",
+        "properties": {
+          "subcategoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subcategoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopicDto"
+            },
             "nullable": true
           }
         },
@@ -1604,6 +1148,20 @@
         },
         "additionalProperties": false
       },
+      "TopicDto": {
+        "type": "object",
+        "properties": {
+          "dtddTopicId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "topicName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "TriggerTag": {
         "type": "object",
         "properties": {
@@ -1618,59 +1176,6 @@
           "tagName": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "Warning": {
-        "type": "object",
-        "properties": {
-          "dtddTopicId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "topicName": {
-            "type": "string",
-            "nullable": true
-          },
-          "topicType": {
-            "type": "string",
-            "nullable": true
-          },
-          "parentDtddTopicId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "tier": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "inverseParentDtddTopic": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Warning"
-            },
-            "nullable": true
-          },
-          "movieWarnings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MovieWarning"
-            },
-            "nullable": true
-          },
-          "parentDtddTopic": {
-            "$ref": "#/components/schemas/Warning"
           }
         },
         "additionalProperties": false

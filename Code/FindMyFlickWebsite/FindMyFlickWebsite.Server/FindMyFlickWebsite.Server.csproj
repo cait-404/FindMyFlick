@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="DbPython\database\seed\.vs\VSWorkspaceState.json" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.23">
 		  <PrivateAssets>all</PrivateAssets>
@@ -20,6 +24,11 @@
     <PackageReference Include="Npgsql" Version="8.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DbPython\database\seed\.vs\seed\v15\.ssms_suo" />
+    <None Include="DbPython\database\seed\.vs\slnx.sqlite" />
   </ItemGroup>
 
 </Project>

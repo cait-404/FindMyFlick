@@ -103,8 +103,24 @@ namespace FindMyFlickWebsite.Server.Controllers
             public int AddedFromApis { get; set; } = 0;
         }
 
+        // New: support search via query parameters (GET). Keep POST (body) for backward compatibility.
+        [HttpGet]
+        public async Task<ActionResult<MovieSearchResponse>> Search([FromQuery] MovieSearchRequest req)
+        {
+            var response = await ExecuteSearchAsync(req ?? new MovieSearchRequest());
+            return Ok(response);
+        }
+
+        // Back-compat POST endpoint that still accepts body
         [HttpPost]
-        public async Task<ActionResult<MovieSearchResponse>> Search([FromBody] MovieSearchRequest req)
+        public async Task<ActionResult<MovieSearchResponse>> SearchPost([FromBody] MovieSearchRequest req)
+        {
+            var response = await ExecuteSearchAsync(req ?? new MovieSearchRequest());
+            return Ok(response);
+        }
+
+        // Core search logic extracted so both GET([FromQuery]) and POST([FromBody]) can reuse it.
+        private async Task<MovieSearchResponse> ExecuteSearchAsync(MovieSearchRequest req)
         {
             if (req.Take <= 0) req.Take = 25;
             if (req.Take > 100) req.Take = 100;
@@ -198,30 +214,30 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var (addedCount, stats) = await TryApiFillAsync(effectiveReq);
                 addedFromApis = addedCount;
 
-                    // Always log stats so we can see WHY addedFromApis is 0
-                    relaxedSteps.Add(
-                        $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
-                        $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
-                        $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
-                        $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
-                    );
+                // Always log stats so we can see WHY addedFromApis is 0
+                relaxedSteps.Add(
+                    $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
+                    $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
+                    $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
+                    $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
+                );
 
-                    relaxedSteps.Add(
-                        $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
-                        $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
-                    );
+                relaxedSteps.Add(
+                    $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
+                    $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
+                );
 
 
 
-                    if (addedFromApis > 0)
-                    {
-                        relaxedSteps.Add($"API fill: added {addedFromApis} movies");
-                        results = await RunQuery(effectiveReq, req.Take);
-                    }
-                    else
-                    {
-                        relaxedSteps.Add("API fill: added 0 movies");
-                    }
+                if (addedFromApis > 0)
+                {
+                    relaxedSteps.Add($"API fill: added {addedFromApis} movies");
+                    results = await RunQuery(effectiveReq, req.Take);
+                }
+                else
+                {
+                    relaxedSteps.Add("API fill: added 0 movies");
+                }
             }
 
 
@@ -237,7 +253,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 AddedFromApis = addedFromApis
             };
 
-            return Ok(response);
+            return response;
         }
 
         private MovieSearchRequest Clone(MovieSearchRequest req) => new MovieSearchRequest
@@ -393,11 +409,33 @@ namespace FindMyFlickWebsite.Server.Controllers
             var tmdbKey = Environment.GetEnvironmentVariable("TMDB_API_KEY");
             var dtddKey = Environment.GetEnvironmentVariable("DTDD_API_KEY");
 
-            if (string.IsNullOrWhiteSpace(tmdbKey) || string.IsNullOrWhiteSpace(dtddKey))
-                return (0, new ApiFillStats(0, 0, 0, 0, 0, 0, 0, 0, null, null));
+            // If we don't have external keys we still try the local DbPython service (if configured).
+            var dbPythonUrl = Environment.GetEnvironmentVariable("DBPYTHON_API_URL");
 
-            var candidateTmdbIds = await FetchTmdbCandidateIdsAsync(req, tmdbKey);
-            if (candidateTmdbIds.Count == 0)
+            // Try TMDB/DTDD candidate discovery first (existing behavior)
+            var candidateTmdbIds = new List<int>();
+            if (!string.IsNullOrWhiteSpace(tmdbKey))
+            {
+                candidateTmdbIds = await FetchTmdbCandidateIdsAsync(req, tmdbKey);
+            }
+
+            // If TMDB returned no candidates, fall back to local DbPython endpoints (if configured).
+            if ((candidateTmdbIds == null || candidateTmdbIds.Count == 0) &&
+                !string.IsNullOrWhiteSpace(dbPythonUrl))
+            {
+                try
+                {
+                    var fallback = await FetchTmdbCandidateIdsFromDbPythonAsync(req, dbPythonUrl);
+                    if (fallback != null && fallback.Count > 0)
+                        candidateTmdbIds = fallback;
+                }
+                catch
+                {
+                    // Non-fatal: if DbPython fails, continue and return "no candidates".
+                }
+            }
+
+            if (candidateTmdbIds == null || candidateTmdbIds.Count == 0)
                 return (0, new ApiFillStats(0, 0, 0, 0, 0, 0, 0, 0, null, null));
 
 
@@ -1595,6 +1633,85 @@ WHERE wst.subcategory_id = ANY(@subcategoryIds);";
 
             return set.OrderBy(x => x).ToList();
         }
+
+        private async Task<List<int>> FetchTmdbCandidateIdsFromDbPythonAsync(MovieSearchRequest req, string dbPythonBaseUrl)
+{
+    // dbPythonBaseUrl should be a full URL (e.g. "http://localhost:5001/api/DbPython")
+    // The DbPython endpoints you provide should return either:
+    // - JSON array of TMDB ids: [123, 456, ...]
+    // - JSON array of objects where each object contains "tmdbId": { "tmdbId": 123, ... }
+    // - Or { "results": [ ... ] } with either of the above inside results
+    // This method is intentionally flexible to adapt to the python endpoints you have.
+
+    var ids = new List<int>();
+    using var http = new HttpClient();
+    string url;
+
+    if (!string.IsNullOrWhiteSpace(req.TitleContains))
+    {
+        // Common pattern: a "search by title" endpoint
+        url = $"{dbPythonBaseUrl.TrimEnd('/')}/search/movie?title={Uri.EscapeDataString(req.TitleContains)}";
+    }
+    else
+    {
+        // Common pattern: a discover endpoint
+        url = $"{dbPythonBaseUrl.TrimEnd('/')}/discover/movie";
+    }
+
+    try
+    {
+        var json = await http.GetStringAsync(url);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        // Normalize to an enumerable of candidate nodes
+        IEnumerable<JsonElement> candidates = Enumerable.Empty<JsonElement>();
+
+        if (root.ValueKind == JsonValueKind.Array)
+        {
+            candidates = root.EnumerateArray();
+        }
+        else if (root.ValueKind == JsonValueKind.Object)
+        {
+            if (root.TryGetProperty("results", out var resultsEl) && resultsEl.ValueKind == JsonValueKind.Array)
+                candidates = resultsEl.EnumerateArray();
+            else
+                candidates = new[] { root };
+        }
+
+        foreach (var el in candidates)
+        {
+            if (el.ValueKind == JsonValueKind.Number && el.TryGetInt32(out var nid))
+            {
+                ids.Add(nid);
+                continue;
+            }
+
+            if (el.ValueKind == JsonValueKind.Object)
+            {
+                if (el.TryGetProperty("tmdbId", out var tmdbEl) && tmdbEl.TryGetInt32(out var tid))
+                {
+                    ids.Add(tid);
+                    continue;
+                }
+
+                // Some services might return "id" as TMDB id
+                if (el.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
+                {
+                    ids.Add(idVal);
+                    continue;
+                }
+            }
+        }
+    }
+    catch
+    {
+        // swallow - caller already handles fallback behavior; we return empty list on error
+        return new List<int>();
+    }
+
+    return ids.Distinct().ToList();
+}
     }
 
     // Keep this helper controller in the same file so Swagger always sees it.
@@ -1645,6 +1762,21 @@ WHERE wst.subcategory_id = ANY(@subcategoryIds);";
             var url = $"https://www.doesthedogdie.com/media/{dtddTitleId}";
             var json = await http.GetStringAsync(url);
 
+            return Content(json, "application/json");
+        }
+
+        [HttpGet("tmdb/{tmdbId:int}/providers/{region?}")]
+        public async Task<IActionResult> TestTmdbProviders(int tmdbId, string region = "US")
+        {
+            var apiKey = Environment.GetEnvironmentVariable("TMDB_API_KEY");
+            if (string.IsNullOrWhiteSpace(apiKey))
+                return BadRequest("TMDB_API_KEY is not set for this terminal/session.");
+
+            using var http = new HttpClient();
+            var url = $"https://api.themoviedb.org/3/movie/{tmdbId}/watch/providers?api_key={apiKey}";
+            var json = await http.GetStringAsync(url);
+
+            // Return raw JSON so you can inspect which buckets exist for the requested region.
             return Content(json, "application/json");
         }
     }
