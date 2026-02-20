@@ -31,6 +31,10 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "environmentVariables": {
+      "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334",
+      "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
