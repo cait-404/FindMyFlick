@@ -1,143 +1,34 @@
 [
   {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "GetAll",
-    "RelativePath": "api/MovieData",
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.ApiEnvController",
+    "Method": "Get",
+    "RelativePath": "api/ApiEnv",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.ExternalApiTestController",
+    "Method": "TestDtddTitle",
+    "RelativePath": "api/ExternalApiTest/dtdd/title/{dtddTitleId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "title",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "year",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "tmdbId",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "page",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "pageSize",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[FindMyFlickWebsite.Server.DataModels.Movie, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "Create",
-    "RelativePath": "api/MovieData",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "movie",
-        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "GetByImdbId",
-    "RelativePath": "api/MovieData/{imdbId}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "imdbId",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "Update",
-    "RelativePath": "api/MovieData/{imdbId}",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "imdbId",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "movie",
-        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
+        "Name": "dtddTitleId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "Delete",
-    "RelativePath": "api/MovieData/{imdbId}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "imdbId",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
-    "Method": "GetByTmdbId",
-    "RelativePath": "api/MovieData/by-tmdb/{tmdbId}",
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.ExternalApiTestController",
+    "Method": "TestTmdb",
+    "RelativePath": "api/ExternalApiTest/tmdb/{tmdbId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -148,17 +39,44 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.ExternalApiTestController",
+    "Method": "TestTmdbProviders",
+    "RelativePath": "api/ExternalApiTest/tmdb/{tmdbId}/providers/{region}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
       {
-        "Type": "FindMyFlickWebsite.Server.DataModels.Movie",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
+        "Name": "tmdbId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "region",
+        "Type": "System.String",
+        "IsRequired": false
       }
-    ]
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieDataController",
+    "Method": "GetMovieByImdb",
+    "RelativePath": "api/MovieData/{imdbId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "imdbId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
@@ -187,122 +105,6 @@
     "ReturnTypes": [
       {
         "Type": "FindMyFlickWebsite.Server.Models.MoviesView",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      },
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 404
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "AddTagToMovie",
-    "RelativePath": "api/Movies/{movieId}/tag/{tagId}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "movieId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "tagId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "FindMyFlickWebsite.Server.Models.Movies\u002BTagVote",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 201
-      },
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 404
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "RemoveTagFromMovie",
-    "RelativePath": "api/Movies/{movieId}/tag/{tagId}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "movieId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "tagId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 204
-      },
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 404
-      }
-    ]
-  },
-  {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "DownvoteTag",
-    "RelativePath": "api/Movies/downvote/{movieId}/tag/{tagId}",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "movieId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      },
-      {
-        "Name": "tagId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "FindMyFlickWebsite.Server.Models.Movies\u002BTagVote",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -398,42 +200,164 @@
     ]
   },
   {
-    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MoviesController",
-    "Method": "UpvoteTag",
-    "RelativePath": "api/Movies/upvote/{movieId}/tag/{tagId}",
-    "HttpMethod": "PATCH",
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieSearchController",
+    "Method": "Search",
+    "RelativePath": "api/MovieSearch",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "movieId",
+        "Name": "Take",
         "Type": "System.Int32",
-        "IsRequired": true
+        "IsRequired": false
       },
       {
-        "Name": "tagId",
+        "Name": "MinMatches",
         "Type": "System.Int32",
-        "IsRequired": true
+        "IsRequired": false
+      },
+      {
+        "Name": "EnableApiFallback",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "AlwaysAddFromApis",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "MaxApiAdds",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "WatchRegion",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "StreamingProviderIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ProviderMatchMode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "GenreIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "KeywordIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PersonIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "TitleContains",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "IncludeWarningTopicIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IncludeWarningCategoryIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IncludeWarningSubcategoryIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IncludeWarningMatchMode",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ExcludeWarningTopicIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ExcludeWarningCategoryIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "ExcludeWarningSubcategoryIds",
+        "Type": "System.Collections.Generic.List\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "FindMyFlickWebsite.Server.Models.Movies\u002BTagVote",
+        "Type": "FindMyFlickWebsite.Server.Controllers.MovieSearchController\u002BMovieSearchResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
-      },
+      }
+    ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.MovieSearchController",
+    "Method": "SearchPost",
+    "RelativePath": "api/MovieSearch",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
       {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "Name": "req",
+        "Type": "FindMyFlickWebsite.Server.Controllers.MovieSearchController\u002BMovieSearchRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FindMyFlickWebsite.Server.Controllers.MovieSearchController\u002BMovieSearchResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
-        "StatusCode": 404
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FindMyFlickWebsite.Server.Controllers.WarningTaxonomyController",
+    "Method": "GetTaxonomy",
+    "RelativePath": "api/WarningTaxonomy",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FindMyFlickWebsite.Server.Controllers.WarningTaxonomyController\u002BCategoryDto, FindMyFlickWebsite.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
       }
     ]
   },
