@@ -1,18 +1,6 @@
 using FindMyFlickWebsite.Server.Models;
 using FindMyFlickWebsite.Server.DataModels;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
-=======
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using Microsoft.AspNetCore.WebUtilities;
->>>>>>> 2d8ce8e67402d3574fe5c07ac8d3a4dac232c950
 
 namespace FindMyFlickWebsite.Server.Controllers
 {
@@ -24,11 +12,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         private ApplicationDbContext _context;
 
 
-        public MoviesController(ApplicationDbContext context)
-        {
-<<<<<<< HEAD
-            
-            _movies = new List<Movies>
+        public MoviesController(ApplicationDbContext context) => _movies = new List<Movies>
             {
                 new Movies
                 {
@@ -110,7 +94,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 },
 
-                
+
                 new Movies {
                     ID = 200,
                     Name = "Midnight Chase",
@@ -357,15 +341,10 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             };
 
-            
-
-
-        }
 
 
 
 
- 
 
         /// 
         /// Get all movies.
@@ -388,15 +367,6 @@ namespace FindMyFlickWebsite.Server.Controllers
 /// </summary>
 public static IEnumerable<Movies> AdvancedSearch(
             IEnumerable<Movies> source,
-=======
-
-            _context = context;
-
-        }
-
-        public static IEnumerable<MoviesView> AdvancedSearch(
-            IEnumerable<MoviesView> source,
->>>>>>> 2d8ce8e67402d3574fe5c07ac8d3a4dac232c950
             string? name = null,
             IEnumerable<string>? streamingServices = null,
             bool matchAllStreaming = false,
@@ -717,6 +687,50 @@ public static IEnumerable<Movies> AdvancedSearch(
             // Assumes IMDb IDs are in the form "tt1234567"
             var digits = new string(imdbId.Where(char.IsDigit).ToArray());
             return int.TryParse(digits, out var result) ? result : 0;
+        }
+    }
+
+    internal class Tags
+    {
+        public List<Tags.PlotTag> PlotTags { get; set; }
+        public List<Tags.TriggerTag> TriggerTags { get; set; }
+        public List<Tags.PersonTag> PersonTags { get; set; }
+
+        internal class TriggerTag
+        {
+            public int TagID { get; set; }
+            public string TagType { get; set; }
+            public string TagName { get; set; }
+        }
+
+        internal class PersonTag
+        {
+            public int TagID { get; set; }
+            public string TagType { get; set; }
+            public string TagName { get; set; }
+        }
+    }
+
+    internal class Movies
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public string Summary { get; set; }
+        public double UserRatings { get; set; }
+        public bool UserWatchStatus { get; set; }
+        public string Poster { get; set; }
+        public List<string> StreamingServices { get; set; }
+        public int Year { get; set; }
+        public string AgeRating { get; set; }
+        public List<string> Genre { get; set; }
+        public object Tags { get; set; }
+        public List<Movies.TagVote> TagVotes { get; set; }
+
+        internal class TagVote
+        {
+            public int TagID { get; set; }
+            public int Upvotes { get; set; }
+            public int Downvotes { get; set; }
         }
     }
 }
