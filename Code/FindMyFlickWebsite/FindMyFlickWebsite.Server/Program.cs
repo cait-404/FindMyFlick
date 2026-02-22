@@ -1,3 +1,8 @@
+using FindMyFlickWebsite.Server;
+using FindMyFlickWebsite.Server.DataModels;
+using Microsoft.EntityFrameworkCore;
+using System;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,10 +17,24 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// This is your teammate's app DbContext (keep it as-is)
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString)
+        .UseSnakeCaseNamingConvention()
+);
+
+// This is the scaffolded DB-first context your controllers are using
+builder.Services.AddDbContext<FindmyflickContext>(options =>
+    options.UseNpgsql(connectionString, o => o.CommandTimeout(60))
+        .UseSnakeCaseNamingConvention()
+);
 
 var app = builder.Build();
 
@@ -26,13 +45,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-app.UseHttpsRedirection();
-
+//app.UseHttpsRedirection(); for prod
+app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors("AllowFrontend");
-
+app.Urls.Clear();
+app.Urls.Add("https://localhost:5002");
+app.Urls.Add("http://localhost:5003");
 app.Run();

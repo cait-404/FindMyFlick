@@ -42,6 +42,10 @@ U03: # Violence & Gore
     Gun violence: [232]
     Torture: [203]
     Body horror: [296]
+    Cannibalism: [254]
+    Woman brutalized for spectacle: [367]
+    Live gunfire: [378]
+    Domestic violence: [219]
   Specific Injuries:
     Eye mutilation: [200]
     Finger/toe mutilation: [171]
@@ -61,6 +65,7 @@ U03: # Violence & Gore
     Someone restrained: [274]
     Choking: [309]
     Woman slapped: [342]
+    Someone is abused with a belt: [365]
 
 U04: # Sexual Content & Assault
   Assault:
@@ -228,6 +233,8 @@ U12: # Psychological & Emotional Trauma
     Sacrifice: [289]
     Becomes unconscious: [298]
     Existentialism debated: [341]
+    Anti-abortion themes: [316]
+    Someone is abused with a belt: [365]
 
 U13: # Accidents, Disasters & Situations
   Accidents & Disasters:
@@ -237,6 +244,7 @@ U13: # Accidents, Disasters & Situations
     Nuclear explosion: [221]
     9/11 depictions: [283]
     Falls down stairs: [271]
+    Tsunami: [373]
   Settings & Scenes:
     Shower scenes: [176]
     Incarceration: [345]

@@ -20,11 +20,42 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
 
 # Local environment + Python cache
 .env
 __pycache__/
 **/__pycache__/
+
+# .NET build output
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Compiled artifacts
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio / MSBuild / NuGet generated
+**/*.user
+**/*.rsuser
+**/*.suo
+**/*.cache
+**/*.nupkg
+**/project.assets.json
+**/project.nuget.cache
+**/*.nuget.g.props
+**/*.nuget.g.targets
+**/staticwebassets*/
+*.AssemblyInfoInputs.cache
+*.GeneratedMSBuildEditorConfig.editorconfig
+
+# ASP.NET static web assets
+staticwebassets.build.json
+staticwebassets.build.endpoints.json
+staticwebassets.endpoints.json
+staticwebassets.runtime.json
+
 
