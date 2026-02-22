@@ -1,1 +1,11 @@
-{"Version":1,"Hash":"7fhGAGuaHp3mTsPBoIUXbS2defHHWZxiD321ocX1NYs=","Source":"FindMyFlickWebsite.Server","BasePath":"_content/FindMyFlickWebsite.Server","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
+{
+  "Version": 1,
+  "Hash": "D25taKDT1zaEHuT5Xc5l3nE5dj0CnPHENTwx82f/ydE=",
+  "Source": "FindMyFlickWebsite.Server",
+  "BasePath": "_content/FindMyFlickWebsite.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

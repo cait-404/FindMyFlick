@@ -1,57 +1,140 @@
+import { useState, useEffect } from "react";
+import fmy from "../images/fmy.png";
 
-import trm from "../images/trm.png";
-import thm from "../images/thm.png";
-import wicked from "../images/wicked.png";
-import zoo2 from "../images/zoo2.png";
 
-export default function Home() {
-  const trendingMovies = [trm, thm, wicked, zoo2];
+function MovieGrid({ movies, title }) {
+  if (!movies) return null;
 
   return (
-    <div className="text-white">
-      
-      <header className="relative h-[300px] md:h-[450px] w-full mt-6 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
-        <div className="w-full h-full img-placeholder"></div>
+    <div className="mt-12">
+      {title && (
+        <h3 className="text-2xl md:text-3xl font-bold neon-text mb-6">
+          {title}
+        </h3>
+      )}
 
-        <div className="absolute inset-0 bg-black/40">
-          <div className="absolute top-4 left-4 z-20">
-            <span className="text-lg md:text-2xl font-semibold neon-text">
-              Banner Coming Soon
-            </span>
-          </div>
-
-          <div className="h-full flex items-center justify-center px-6">
-            <div className="text-center">
-              <h2 className="text-3xl md:text-5xl font-bold neon-text">
-                Your Movie Finder Companion
-              </h2>
-              <p className="mt-3 text-lg opacity-90">
-                Search. Discover. Flick through your next favorite movie.
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      
-      <section className="mt-10 px-6 max-w-6xl mx-auto">
-        <h3 className="text-2xl font-semibold mb-3 neon-text">Trending Now</h3>
-
-        <div className="flex gap-4 overflow-x-scroll scrollbar-hide pb-4">
-          {trendingMovies.map((img, i) => (
+      {movies.length === 0 ? (
+        <p className="text-gray-400">No movies found.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {movies.map((movie) => (
             <div
-              key={i}
-              className="relative min-w-[180px] h-[260px] rounded-xl overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-[0_0_20px_#ff6ed0] bg-black"
+              key={movie.id}
+              className="rounded-xl overflow-hidden bg-gray-900/80 
+                         hover:scale-105 transform transition duration-300 
+                         shadow-lg"
             >
               <img
-                src={img}
-                alt={`Movie poster ${i + 1}`}
-                className="absolute inset-0 w-full h-full object-contain"
+                src={movie.poster} 
+                alt={movie.name}
+                className="w-full h-56 object-cover"
               />
+
+              <div className="p-3 text-center">
+                <h4 className="font-semibold text-lg truncate">{movie.name}</h4>
+                <p className="text-sm text-gray-400 mt-1">{movie.Year}</p>
+                <p className="text-sm text-gray-300 mt-1 line-clamp-3">
+                  {movie.summary}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Genres: {movie.genre.join(", ")}
+                </p>
+                <p className="text-xs text-gray-400">
+                  Age Rating: {movie["age rating"]}
+                </p>
+                {movie["streaming services"] && movie["streaming services"].length > 0 && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Available on: {movie["streaming services"].join(", ")}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+
+export default function Home() {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5135/api/movies")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch movies");
+        return res.json();
+      })
+      .then((data) => {
+        console.log("API response:", data)
+        setMovies(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div className="text-white">
+
+      
+      <header className="relative h-[300px] md:h-[450px] w-full mt-6 
+                         rounded-xl overflow-hidden shadow-xl 
+                         mx-auto max-w-6xl">
+        <img
+          src={fmy}
+          alt="Find My Flick banner"
+          className="w-full h-full object-cover"
+        />
+      </header>
+
+     
+      <section className="mt-8 px-6 max-w-6xl mx-auto text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold neon-text">
+          Find Your Next Flick
+        </h1>
+
+        <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
+          Discover movies by genre, tags, triggers, and what actually matters to you — not just what’s trending.
+        </p>
+
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+          <a
+            href="/discover"
+            className="px-6 py-3 rounded-full bg-pink-600 
+                       hover:bg-pink-500 transition 
+                       font-semibold shadow-lg"
+          >
+            Explore Movies →
+          </a>
+
+          <a
+            href="/genres"
+            className="px-6 py-3 rounded-full border 
+                       border-pink-500 text-pink-400 
+                       hover:bg-pink-500/10 transition 
+                       font-semibold"
+          >
+            Browse Genres
+          </a>
+        </div>
       </section>
+
+     
+      <section className="mt-16 px-6 max-w-6xl mx-auto">
+        {loading && <p className="text-gray-400">Loading movies...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+        {!loading && !error && <MovieGrid movies={movies} title="Trending Now" />}
+      </section>
+
+     
+      <div className="h-20" />
     </div>
   );
 }

@@ -1,33 +1,53 @@
 @import "tailwindcss";
 
-
+/* -------------------- Base Styles -------------------- */
 body {
   background: radial-gradient(circle at top, #ff52d9, #3d0099, #000);
   color: white;
   font-family: 'Poppins', sans-serif;
   min-height: 100vh;
   margin: 0;
+  scroll-behavior: smooth;
 }
 
+a {
+  text-decoration: none;
+}
 
+/* -------------------- Neon Text -------------------- */
 .neon-text {
   text-shadow:
     0 0 5px #ff39e1,
     0 0 10px #ff39e1,
     0 0 20px #ff39e1,
     0 0 40px #ff39e1;
+  transition: text-shadow 0.3s ease;
 }
 
+.neon-text:hover {
+  text-shadow:
+    0 0 8px #ff52d9,
+    0 0 16px #ff52d9,
+    0 0 25px #ff52d9,
+    0 0 50px #ff52d9;
+}
 
+/* -------------------- Disco Glow -------------------- */
 .disco-glow {
-  box-shadow: 0 0 20px #d400ff, 0 0 40px #ff008c;
+  box-shadow: 0 0 20px #d400ff, 0 0 40px #ff008c, 0 0 60px #ff52d9;
+  transition: box-shadow 0.3s ease;
 }
 
+.disco-glow:hover {
+  box-shadow: 0 0 30px #ff39e1, 0 0 60px #ff6ed0, 0 0 90px #ff9ce8;
+}
 
+/* -------------------- Navigation -------------------- */
 .nav-link {
   cursor: pointer;
   transition: color 0.3s, transform 0.2s, text-shadow 0.3s;
   position: relative;
+  font-weight: 500;
 }
 
 .nav-link:hover {
@@ -62,7 +82,7 @@ body {
     0 0 25px #ff6ed0 !important;
 }
 
-
+/* Floating animation */
 .nav-float {
   animation: floaty 3s ease-in-out infinite;
 }
@@ -72,7 +92,7 @@ body {
   50% { transform: translateY(-3px); }
 }
 
-
+/* -------------------- Image Placeholder -------------------- */
 .img-placeholder {
   background: linear-gradient(135deg, #2b0055, #550088);
   border: 2px dashed #ff6ed0;
@@ -82,18 +102,57 @@ body {
   color: #ffb3ee;
   font-size: 14px;
   text-align: center;
+  transition: background 0.3s, color 0.3s;
 }
 
+.img-placeholder:hover {
+  background: linear-gradient(135deg, #550088, #ff39e1);
+  color: #ffffff;
+}
 
+/* -------------------- Movie Cards -------------------- */
 .movie-card {
-  @apply min-w-[180px] h-[260px] rounded-xl overflow-hidden transform transition duration-300;
+  box-shadow: 0 0 10px #ff52d9, 0 0 20px #ff6ed0;
 }
 
 .movie-card:hover {
-  @apply scale-105;
+  box-shadow: 0 0 20px #ff39e1, 0 0 40px #ff52d9;
 }
 
+.movie-card img {
+  transition: transform 0.3s, filter 0.3s;
+}
 
+.movie-card:hover img {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* -------------------- Buttons -------------------- */
+button {
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+/* Primary Neon Buttons */
+.btn-neon {
+  background: linear-gradient(45deg, #ff39e1, #ff6ed0);
+  color: white;
+  box-shadow: 0 0 10px #ff39e1, 0 0 20px #ff6ed0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.btn-neon:hover {
+  box-shadow: 0 0 20px #ff39e1, 0 0 40px #ff6ed0, 0 0 60px #ff9ce8;
+}
+
+/* -------------------- Scrollbar -------------------- */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -102,3 +161,111 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* -------------------- Headings & Text -------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  color: white;
+}
+
+p, span, li {
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  line-height: 1.5;
+}
+
+/* -------------------- Misc Enhancements -------------------- */
+.fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Neon borders for inputs */
+input, textarea, select {
+  background: #1a0033;
+  border: 2px solid #550088;
+  padding: 0.5rem;
+  border-radius: 6px;
+  color: white;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border: 2px solid #ff39e1;
+  box-shadow: 0 0 10px #ff39e1, 0 0 20px #ff6ed0;
+}
+/* -------------------- Movie Card Flip (WORKING) -------------------- */
+.movie-card-wrapper {
+  perspective: 1000px;
+}
+
+.movie-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.movie-card-wrapper .movie-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.movie-card-front,
+.movie-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Front */
+.movie-card-front {
+  background: rgba(17, 24, 39, 0.75);
+}
+
+/* Back */
+.movie-card-back {
+  background: rgba(17, 24, 39, 0.95);
+  transform: rotateY(180deg);
+  padding: 1rem;
+  box-shadow: inset 0 0 20px #ff39e1;
+}
+
+
+/* Neon glow when flipped */
+.movie-card-wrapper.glow {
+  box-shadow:
+    0 0 25px #ff39e1,
+    0 0 45px #ff52d9,
+    0 0 70px #ff6ed0;
+}
+
+.movie-card:hover {
+  transform: rotateY(180deg);
+}
+
+/* -------------------- 3D Flip Utilities (FIXED) -------------------- */
+.perspective {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+

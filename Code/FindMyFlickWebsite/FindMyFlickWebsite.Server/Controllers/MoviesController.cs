@@ -1,12 +1,6 @@
 using FindMyFlickWebsite.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 
-using FindMyFlickWebsite.Server.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-
 namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
@@ -17,20 +11,17 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         public MoviesController()
         {
-            //will need to get movie list from api or db here. 
-
-            //generated with copilot using the json schema and DTO 
-            // Seed in-memory sample data matching the DTO shape
+            
             _movies = new List<Movies>
             {
                 new Movies
                 {
-                    ID = 123,
+                    ID = 22740896,
                     Name = "cool movie 1",
                     Summary = "long string",
                     UserRatings = 9.8,
                     UserWatchStatus = true,
-                    Poster = "link",
+                    Poster = "https://image.tmdb.org/t/p/w500/z53D72EAOxGRqdr7KXXWp9dJiDe.jpg",
                     StreamingServices = new List<string> {"hulu" },
                     Year = 2012,
                     AgeRating = "pg-13",
@@ -103,7 +94,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 },
 
-                // Additional 8 movies (each with 2 plot tags, 3 trigger tags, 1 person tag)
+                
                 new Movies {
                     ID = 200,
                     Name = "Midnight Chase",
@@ -350,8 +341,15 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             };
 
+            
+
 
         }
+
+
+
+
+ 
 
         /// 
         /// Get all movies.
