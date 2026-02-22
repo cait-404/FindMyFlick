@@ -198,30 +198,30 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var (addedCount, stats) = await TryApiFillAsync(effectiveReq);
                 addedFromApis = addedCount;
 
-                // Always log stats so we can see WHY addedFromApis is 0
-                relaxedSteps.Add(
-                    $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
-                    $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
-                    $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
-                    $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
-                );
+                    // Always log stats so we can see WHY addedFromApis is 0
+                    relaxedSteps.Add(
+                        $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
+                        $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
+                        $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
+                        $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
+                    );
 
-                relaxedSteps.Add(
-                    $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
-                    $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
-                );
+                    relaxedSteps.Add(
+                        $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
+                        $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
+                    );
 
 
 
-                if (addedFromApis > 0)
-                {
-                    relaxedSteps.Add($"API fill: added {addedFromApis} movies");
-                    results = await RunQuery(effectiveReq, req.Take);
-                }
-                else
-                {
-                    relaxedSteps.Add("API fill: added 0 movies");
-                }
+                    if (addedFromApis > 0)
+                    {
+                        relaxedSteps.Add($"API fill: added {addedFromApis} movies");
+                        results = await RunQuery(effectiveReq, req.Take);
+                    }
+                    else
+                    {
+                        relaxedSteps.Add("API fill: added 0 movies");
+                    }
             }
 
 
@@ -498,7 +498,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (!hasWarnings)
                 {
                     var ok = await TryEnrichWarningsFromDtddAsync(movie, dtddKey);
-                    var ok = await TryEnrichWarningsFromDtddAsync(movie, dtddKey);
                     if (!ok)
                     {
                         skippedWarningsEnrichFailed++;
@@ -560,7 +559,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 ExampleStillNoWarningsImdb: exampleStillNoWarningsImdb,
                 ExampleWarningsEnrichFailedImdb: exampleWarningsEnrichFailedImdb
             );
-
+            
 
             return (added, stats);
         }
@@ -773,68 +772,68 @@ namespace FindMyFlickWebsite.Server.Controllers
             };
         }
 
-        private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId, string apiKey)
+private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId, string apiKey)
+{
+    var details = await FetchTmdbDetailsAsync(tmdbId, apiKey);
+    if (details == null)
+        return false;
+
+    // FIX: runtime_minutes must satisfy the DB constraint.
+    // Treat 0/negative/absurd values as "unknown" and store NULL.
+    int? runtimeSafe = null;
+    if (details.RuntimeMinutes != null)
+    {
+        var rt = details.RuntimeMinutes.Value;
+        if (rt > 0 && rt <= 600)
+            runtimeSafe = rt;
+    }
+
+    var now = DateTime.UtcNow;
+    var existing = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
+
+    if (existing == null)
+    {
+        if (string.IsNullOrWhiteSpace(details.Title) || details.ReleaseYear == null)
+            return false;
+
+        _context.Movies.Add(new Movie
         {
-            var details = await FetchTmdbDetailsAsync(tmdbId, apiKey);
-            if (details == null)
-                return false;
+            ImdbId = imdbId,
+            TmdbId = tmdbId,
+            Title = details.Title!,
+            ReleaseYear = details.ReleaseYear.Value,
+            RuntimeMinutes = runtimeSafe,
+            PlotSummary = details.PlotSummary,
+            PosterUrl = details.PosterUrl,
+            OriginalLanguage = details.OriginalLanguage,
+            MediaType = "movie",
+            Tagline = details.Tagline,
+            Status = details.Status,
+            MpaaRating = null,
+            CreatedAt = now,
+            UpdatedAt = now
+        });
 
-            // FIX: runtime_minutes must satisfy the DB constraint.
-            // Treat 0/negative/absurd values as "unknown" and store NULL.
-            int? runtimeSafe = null;
-            if (details.RuntimeMinutes != null)
-            {
-                var rt = details.RuntimeMinutes.Value;
-                if (rt > 0 && rt <= 600)
-                    runtimeSafe = rt;
-            }
+        await _context.SaveChangesAsync();
+        return true;
+    }
 
-            var now = DateTime.UtcNow;
-            var existing = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
+    // Minimal update (don't blow away teammate’s other enrichment paths)
+    existing.TmdbId = tmdbId;
+    if (!string.IsNullOrWhiteSpace(details.Title)) existing.Title = details.Title;
+    if (details.ReleaseYear != null) existing.ReleaseYear = details.ReleaseYear.Value;
 
-            if (existing == null)
-            {
-                if (string.IsNullOrWhiteSpace(details.Title) || details.ReleaseYear == null)
-                    return false;
+    existing.RuntimeMinutes = runtimeSafe;
+    existing.PlotSummary = details.PlotSummary;
+    existing.PosterUrl = details.PosterUrl;
+    existing.OriginalLanguage = details.OriginalLanguage;
+    existing.Tagline = details.Tagline;
+    existing.Status = details.Status;
+    existing.UpdatedAt = now;
 
-                _context.Movies.Add(new Movie
-                {
-                    ImdbId = imdbId,
-                    TmdbId = tmdbId,
-                    Title = details.Title!,
-                    ReleaseYear = details.ReleaseYear.Value,
-                    RuntimeMinutes = runtimeSafe,
-                    PlotSummary = details.PlotSummary,
-                    PosterUrl = details.PosterUrl,
-                    OriginalLanguage = details.OriginalLanguage,
-                    MediaType = "movie",
-                    Tagline = details.Tagline,
-                    Status = details.Status,
-                    MpaaRating = null,
-                    CreatedAt = now,
-                    UpdatedAt = now
-                });
-
-                await _context.SaveChangesAsync();
-                return true;
-            }
-
-            // Minimal update (don't blow away teammate’s other enrichment paths)
-            existing.TmdbId = tmdbId;
-            if (!string.IsNullOrWhiteSpace(details.Title)) existing.Title = details.Title;
-            if (details.ReleaseYear != null) existing.ReleaseYear = details.ReleaseYear.Value;
-
-            existing.RuntimeMinutes = runtimeSafe;
-            existing.PlotSummary = details.PlotSummary;
-            existing.PosterUrl = details.PosterUrl;
-            existing.OriginalLanguage = details.OriginalLanguage;
-            existing.Tagline = details.Tagline;
-            existing.Status = details.Status;
-            existing.UpdatedAt = now;
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    await _context.SaveChangesAsync();
+    return true;
+}
 
 
         // -------------------------
@@ -852,10 +851,8 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             var tmdbId = movie.TmdbId;
             if (!tmdbId.HasValue || tmdbId.Value <= 0)
-            if (!tmdbId.HasValue || tmdbId.Value <= 0)
                 return false;
 
-            var providers = (await FetchTmdbWatchProvidersAsync(tmdbId.Value, apiKey, watchRegion))?.ToList();
             var providers = (await FetchTmdbWatchProvidersAsync(tmdbId.Value, apiKey, watchRegion))?.ToList();
             if (providers == null || providers.Count == 0)
                 return false;
@@ -1000,15 +997,6 @@ namespace FindMyFlickWebsite.Server.Controllers
         //
         // Store computed answer per topic ("yes"/"no"/"unknown").
         // Include/exclude filters rely on "yes" checks, so storing non-yes answers is fine.
-        // Warnings enrichment (DTDD)
-        //
-        // Matching order (3-stage):
-        //  1) IMDb ID
-        //  2) TMDB ID
-        //  3) Title + release year
-        //
-        // Store computed answer per topic ("yes"/"no"/"unknown").
-        // Include/exclude filters rely on "yes" checks, so storing non-yes answers is fine.
         // -------------------------
 
         private sealed class DtddTopicStatRow
@@ -1053,49 +1041,6 @@ namespace FindMyFlickWebsite.Server.Controllers
 
                 if (dtddMediaId == null || string.IsNullOrWhiteSpace(imdbId))
                     return false;
-        private async Task<bool> TryEnrichWarningsFromDtddAsync(Movie movie, string apiKey)
-        {
-            var imdbId = movie.ImdbId;
-            var tmdbId = movie.TmdbId;           // int? in your model
-            var title = movie.Title;
-            var releaseYear = movie.ReleaseYear; // int in your model
-
-            int? dtddMediaId = null;
-
-            // Optional manual override (lets you fix edge cases without changing code)
-            var overrideRow = await _context.DtddOverrides.AsNoTracking()
-                .FirstOrDefaultAsync(o => o.ImdbId == imdbId);
-
-            if (overrideRow != null && overrideRow.DtddMediaId > 0)
-                dtddMediaId = overrideRow.DtddMediaId;
-
-            List<DtddTopicStatRow> stats;
-
-            try
-            {
-                // 1) IMDb
-                if (dtddMediaId == null && !string.IsNullOrWhiteSpace(imdbId))
-                    dtddMediaId = await FetchDtddMediaIdByImdbAsync(imdbId, apiKey);
-
-                // 2) TMDB
-                if (dtddMediaId == null && tmdbId.HasValue && tmdbId.Value > 0)
-                    dtddMediaId = await FetchDtddMediaIdByTmdbAsync(tmdbId.Value, apiKey);
-
-                // 3) Title + release year
-                if (dtddMediaId == null && !string.IsNullOrWhiteSpace(title) && releaseYear > 0)
-                    dtddMediaId = await FetchDtddMediaIdByTitleYearAsync(title, releaseYear, apiKey);
-
-                if (dtddMediaId == null || string.IsNullOrWhiteSpace(imdbId))
-                    return false;
-
-                stats = await FetchDtddTopicStatsAsync(dtddMediaId.Value, apiKey);
-            }
-            catch
-            {
-                // DTDD sometimes returns HTML / blocks requests / etc.
-                // Treat as "no enrichment" instead of crashing MovieSearch.
-                return false;
-            }
 
                 stats = await FetchDtddTopicStatsAsync(dtddMediaId.Value, apiKey);
             }
@@ -1136,7 +1081,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                     ImdbId = imdbId,
                     DtddTopicId = s.TopicId,
                     Answer = s.Answer,
-                    Answer = s.Answer,
                     IsSpoiler = s.IsSpoiler,
                     WarningComment = s.Comment,
                     CreatedAt = now
@@ -1163,143 +1107,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (!root.TryGetProperty("items", out var itemsEl) || itemsEl.ValueKind != JsonValueKind.Array)
                 return null;
 
-            foreach (var item in itemsEl.EnumerateArray())
-            {
-                if (item.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
-                    return idVal;
-            }
-
-            return null;
-        }
-
-        private async Task<int?> FetchDtddMediaIdBySearchAsync(string query, string apiKey, int? matchTmdbId, int? matchReleaseYear)
-        {
-            using var http = new HttpClient();
-            http.DefaultRequestHeaders.Add("Accept", "application/json");
-            http.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
-
-            var url = $"https://www.doesthedogdie.com/dddsearch?q={Uri.EscapeDataString(query)}";
-            var json = await http.GetStringAsync(url);
-
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
-                return null;
-
-            int? bestId = null;
-
-            foreach (var item in items.EnumerateArray())
-            {
-                // DTDD item shape varies; these fields are usually present but not guaranteed
-                int? id = null;
-                if (item.TryGetProperty("id", out var idEl) && idEl.ValueKind == JsonValueKind.Number)
-                    id = idEl.GetInt32();
-
-                int? tmdb = null;
-                if (item.TryGetProperty("tmdbId", out var tmdbEl) && tmdbEl.ValueKind == JsonValueKind.Number)
-                    tmdb = tmdbEl.GetInt32();
-
-                int? year = null;
-                if (item.TryGetProperty("releaseYear", out var yearEl) && yearEl.ValueKind == JsonValueKind.Number)
-                    year = yearEl.GetInt32();
-
-                if (!id.HasValue)
-                    continue;
-
-                // Prefer an exact TMDB match if we have one
-                if (matchTmdbId.HasValue && tmdb.HasValue && tmdb.Value == matchTmdbId.Value)
-                    return id.Value;
-
-                // Otherwise, accept a year match (if requested), but keep scanning in case a TMDB match appears later
-                if (bestId == null && matchReleaseYear.HasValue && year.HasValue && year.Value == matchReleaseYear.Value)
-                    bestId = id.Value;
-            }
-
-            return bestId;
-        }
-
-        private async Task<int?> FetchDtddMediaIdByTmdbAsync(int tmdbId, string apiKey)
-        {
-            using var http = new HttpClient();
-            http.DefaultRequestHeaders.Add("Accept", "application/json");
-            http.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
-
-            var url = $"https://www.doesthedogdie.com/dddsearch?tmdb={tmdbId}";
-
-            HttpResponseMessage resp;
-            try
-            {
-                resp = await http.GetAsync(url);
-            }
-            catch
-            {
-                return null; // network issue, don’t crash search
-            }
-
-            if (!resp.IsSuccessStatusCode)
-                return null;
-
-            var contentType = resp.Content.Headers.ContentType?.MediaType ?? "";
-            var text = await resp.Content.ReadAsStringAsync();
-
-            // DTDD sometimes returns HTML error pages (Cloudflare, etc.)
-            if (!contentType.Contains("json", StringComparison.OrdinalIgnoreCase))
-            {
-                // Fallback heuristic: if it starts with '<' it's almost certainly HTML
-                if (!string.IsNullOrWhiteSpace(text) && text.TrimStart().StartsWith("<", StringComparison.Ordinal))
-                    return null;
-                // If it’s not JSON but also not HTML, still play it safe
-                return null;
-            }
-
-            using var doc = JsonDocument.Parse(text);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("items", out var itemsEl) || itemsEl.ValueKind != JsonValueKind.Array)
-                return null;
-
-            foreach (var item in itemsEl.EnumerateArray())
-            {
-                if (item.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
-                    return idVal;
-            }
-
-            return null;
-        }
-
-        private async Task<int?> FetchDtddMediaIdByTitleYearAsync(string title, int releaseYear, string apiKey)
-        {
-            using var http = new HttpClient();
-            http.DefaultRequestHeaders.Add("Accept", "application/json");
-            http.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
-
-            // DTDD supports title searching; year helps disambiguate.
-            // If your DTDD response shape differs, we can adjust parsing after you run 1 request and paste the JSON.
-            var q = Uri.EscapeDataString(title);
-            var url = $"https://www.doesthedogdie.com/dddsearch?q={q}";
-            var json = await http.GetStringAsync(url);
-
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("items", out var itemsEl) || itemsEl.ValueKind != JsonValueKind.Array)
-                return null;
-
-            foreach (var item in itemsEl.EnumerateArray())
-            {
-                // Try to match year if present
-                if (item.TryGetProperty("releaseYear", out var yEl) && yEl.ValueKind == JsonValueKind.Number)
-                {
-                    if (yEl.GetInt32() != releaseYear)
-                        continue;
-                }
-
-                if (item.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
-                    return idVal;
-            }
-
-            // If no year match, fall back to first id if any
             foreach (var item in itemsEl.EnumerateArray())
             {
                 if (item.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
@@ -1476,41 +1283,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                 {
                     if (topicEl.TryGetProperty("isSpoiler", out var spEl) &&
                         (spEl.ValueKind == JsonValueKind.True || spEl.ValueKind == JsonValueKind.False))
-                    if (topicEl.TryGetProperty("isSpoiler", out var spEl) &&
-                        (spEl.ValueKind == JsonValueKind.True || spEl.ValueKind == JsonValueKind.False))
                         isSpoiler = spEl.GetBoolean();
                 }
 
-                // Prefer vote sums when available; otherwise fall back to isYes; otherwise unknown
-                int? yesSum = null;
-                int? noSum = null;
-                int? isYes = null;
-
-                if (s.TryGetProperty("yesSum", out var yesSumEl) && yesSumEl.ValueKind == JsonValueKind.Number)
-                    yesSum = yesSumEl.GetInt32();
-                if (s.TryGetProperty("noSum", out var noSumEl) && noSumEl.ValueKind == JsonValueKind.Number)
-                    noSum = noSumEl.GetInt32();
-                if (s.TryGetProperty("isYes", out var isYesEl) && isYesEl.ValueKind == JsonValueKind.Number)
-                    isYes = isYesEl.GetInt32();
-
-                string answer;
-                if (yesSum.HasValue || noSum.HasValue)
-                {
-                    var y = yesSum ?? 0;
-                    var n = noSum ?? 0;
-                    if (y == 0 && n == 0)
-                        answer = "unknown";
-                    else
-                        answer = (y >= n && y > 0) ? "yes" : "no";
-                }
-                else if (isYes.HasValue)
-                {
-                    answer = isYes.Value == 1 ? "yes" : "no";
-                }
-                else
-                {
-                    answer = "unknown";
-                }
                 // Prefer vote sums when available; otherwise fall back to isYes; otherwise unknown
                 int? yesSum = null;
                 int? noSum = null;
@@ -1564,7 +1339,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (!tmdbId.HasValue || tmdbId.Value <= 0)
                 return false;
 
-            var genreIds = (await FetchTmdbGenreIdsAsync(tmdbId.Value, apiKey))?.ToList() ?? new List<int>();
             var genreIds = (await FetchTmdbGenreIdsAsync(tmdbId.Value, apiKey))?.ToList() ?? new List<int>();
             if (genreIds.Count == 0)
                 return false;
@@ -1628,10 +1402,8 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             var tmdbId = movie.TmdbId;
             if (!tmdbId.HasValue || tmdbId.Value <= 0)
-            if (!tmdbId.HasValue || tmdbId.Value <= 0)
                 return false;
 
-            var keywords = (await FetchTmdbKeywordsAsync(tmdbId.Value, apiKey))?.ToList() ?? new List<TmdbKeywordRow>();
             var keywords = (await FetchTmdbKeywordsAsync(tmdbId.Value, apiKey))?.ToList() ?? new List<TmdbKeywordRow>();
             if (keywords.Count == 0)
                 return false;
@@ -1868,11 +1640,9 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             var tmdbId = movie.TmdbId;
             if (!tmdbId.HasValue || tmdbId.Value <= 0)
-            if (!tmdbId.HasValue || tmdbId.Value <= 0)
                 return false;
 
             var credits = await FetchTmdbCreditsAsync(tmdbId.Value, apiKey);
-            if (credits == null || credits.Cast == null || credits.Cast.Count == 0)
             if (credits == null || credits.Cast == null || credits.Cast.Count == 0)
                 return false;
 
@@ -1892,8 +1662,6 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             foreach (var c in credits.Cast)
             {
-                // CastOrder expects int?; c.Order must be an int? property (not a method)
-                var castOrder = c.Order;
                 // CastOrder expects int?; c.Order must be an int? property (not a method)
                 var castOrder = c.Order;
                 if (c.PersonId <= 0 || string.IsNullOrWhiteSpace(c.CreditId))
@@ -1924,7 +1692,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                 return false;
 
             var credits = await FetchTmdbCreditsAsync(tmdbId.Value, apiKey);
-            if (credits == null || credits.Crew == null || credits.Crew.Count == 0)
             if (credits == null || credits.Crew == null || credits.Crew.Count == 0)
                 return false;
 
