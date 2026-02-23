@@ -1,6 +1,7 @@
 using FindMyFlickWebsite.Server.Models;
 using FindMyFlickWebsite.Server.DataModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FindMyFlickWebsite.Server.Controllers
 {
@@ -12,7 +13,10 @@ namespace FindMyFlickWebsite.Server.Controllers
         private ApplicationDbContext _context;
 
 
-        public MoviesController(ApplicationDbContext context) => _movies = new List<Movies>
+        public MoviesController(ApplicationDbContext context)
+        {
+            
+            _movies = new List<Movies>
             {
                 new Movies
                 {
@@ -94,7 +98,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 },
 
-
+                
                 new Movies {
                     ID = 200,
                     Name = "Midnight Chase",
@@ -341,10 +345,15 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             };
 
+            
+
+
+        }
 
 
 
 
+ 
 
         /// 
         /// Get all movies.
@@ -694,13 +703,13 @@ public static IEnumerable<Movies> AdvancedSearch(
     {
         public List<Tags.PlotTag> PlotTags { get; set; }
         public List<Tags.TriggerTag> TriggerTags { get; set; }
-        public List<Tags.PersonTag> PersonTags { get; set; }
+        public required List<Tags.PersonTag> PersonTags { get; set; }
 
         internal class TriggerTag
         {
             public int TagID { get; set; }
-            public string TagType { get; set; }
-            public string TagName { get; set; }
+            public required string TagType { get; set; }
+            public required string TagName { get; set; }
         }
 
         internal class PersonTag
