@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FindMyFlickWebsite.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8afd004d11183e502573dcd5a7b9194cc01a2d33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a8d3d5bf1e06caeb461aea6078e5876fcec82b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("FindMyFlickWebsite.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FindMyFlickWebsite.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

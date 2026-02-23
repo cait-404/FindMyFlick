@@ -37,7 +37,7 @@ function MovieGrid({ movies, title }) {
                   {movie.summary}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Genres: {movie.genre.join(", ")}
+                  Genres: {movie.genre ? movie.genre.join(", ") : "N/A"}
                 </p>
                 <p className="text-xs text-gray-400">
                   Age Rating: {movie["age rating"]}
@@ -63,7 +63,7 @@ export default function Home() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5135/api/movies")
+    fetch("https://localhost:5002/api/Movies")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch movies");
         return res.json();

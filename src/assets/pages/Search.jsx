@@ -10,7 +10,7 @@ function Search() {
   useEffect(() => {
     if (!query) return;
 
-    fetch(`http://localhost:5135/api/movies/search?query=${query}`)
+    fetch(`http://localhost:5002/api/movies/search?query=${query}`)
       .then(res => res.json())
       .then(data => setMovies(data.results || data))
       .catch(err => console.error("Error fetching movies:", err));

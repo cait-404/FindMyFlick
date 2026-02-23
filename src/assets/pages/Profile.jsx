@@ -21,7 +21,7 @@ export default function Profile() {
   ================================ */
   useEffect(() => {
     // Replace with your real endpoint later
-    fetch("http://localhost:5135/api/profile")
+    fetch("http://localhost:5002/api/profile")
       .then((res) => {
         if (!res.ok) throw new Error("No profile found");
         return res.json();
@@ -77,7 +77,7 @@ export default function Profile() {
           HEADER
       ================================ */}
       <div className="flex items-center gap-6 mb-10">
-        <div className="w-28 h-28 rounded-full bg-gradient-to-br from-pink-500 to-purple-700 
+        <div className="w-28 h-28 rounded-full bg-linear-to-br from-pink-500 to-purple-700 
                         flex items-center justify-center text-4xl font-bold neon-text">
           {(profile?.name || formData.name || "U")[0]?.toUpperCase()}
         </div>

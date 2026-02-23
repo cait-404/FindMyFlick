@@ -11,7 +11,7 @@ export default function Discover() {
   useEffect(() => {
     setLoading(true);
 
-    let url = "http://localhost:5135/api/Movies/search";
+    let url = "http://localhost:5002/api/Movies/search";
 
     if (genre) {
       url += `?genres=${genre}`;
@@ -27,7 +27,7 @@ export default function Discover() {
   }, [genre]);
 
   return (
-    <div className="min-h-screen p-8 text-white bg-gradient-to-b from-black via-[#12001a] to-black">
+    <div className="min-h-screen p-8 text-white bg-linear-to-b from-black via-[#12001a] to-black">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <h1 className="text-4xl font-extrabold neon-text capitalize">

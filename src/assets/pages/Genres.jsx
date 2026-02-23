@@ -34,7 +34,7 @@ export default function Genres() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5135/api/Movies")
+    fetch("http://localhost:5002/api/Movies")
       .then(res => res.json())
       .then(movies => {
         const genreMap = {};
@@ -56,7 +56,7 @@ export default function Genres() {
   }, []);
 
   return (
-    <div className="min-h-screen px-6 py-12 bg-gradient-to-b from-black via-[#12001a] to-black text-white">
+    <div className="min-h-screen px-6 py-12 bg-linear-to-b from-black via-[#12001a] to-black text-white">
       
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-12 text-center relative">
@@ -68,7 +68,7 @@ export default function Genres() {
           From epic adventures to heartwarming comedies, every story awaits.
         </p>
         {/* Optional particle/glow effect */}
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle,_rgba(255,0,255,0.1)_0%,_transparent_80%)] animate-pulse opacity-20"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle,rgba(255,0,255,0.1)_0%,transparent_80%)] animate-pulse opacity-20"></div>
       </div>
 
       {/* Genre Grid */}
@@ -79,7 +79,7 @@ export default function Genres() {
             onClick={() => navigate(`/discover?genre=${genre.name}`)}
             className={`
               group relative rounded-2xl h-52 p-6 text-left
-              bg-gradient-to-br ${genreColors[genre.name] || "from-fuchsia-600/90 to-purple-900/90"}
+              bg-linear-to-br ${genreColors[genre.name] || "from-fuchsia-600/90 to-purple-900/90"}
               shadow-xl transition-transform duration-300
               hover:scale-105 hover:shadow-2xl hover:-translate-y-1
               focus:outline-none
@@ -112,7 +112,7 @@ export default function Genres() {
             </div>
 
             {/* Decorative glow effect */}
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 opacity-30 blur-2xl animate-pulse pointer-events-none"></div>
+            <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-pink-500 to-purple-600 opacity-30 blur-2xl animate-pulse pointer-events-none"></div>
           </button>
         ))}
       </div>

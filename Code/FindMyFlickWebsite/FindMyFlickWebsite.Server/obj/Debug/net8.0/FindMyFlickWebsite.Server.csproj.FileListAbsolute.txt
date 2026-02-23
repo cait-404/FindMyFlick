@@ -104,3 +104,9 @@ C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsi
 C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\FindMyFlickWebsite.Server.dll
 C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\refint\FindMyFlickWebsite.Server.dll
 C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\FindMyFlickWebsite.Server.pdb
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\FindMyFlickWebsite.Server.deps.json
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\FindMyFlickWebsite.Server.runtimeconfig.json
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\FindMyFlickWebsite.Server.dll
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\bin\Debug\net8.0\FindMyFlickWebsite.Server.pdb
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\FindMyFlickWebsite.Server.genruntimeconfig.cache
+C:\Users\emman\source\repos\FindMyFlick\Code\FindMyFlickWebsite\FindMyFlickWebsite.Server\obj\Debug\net8.0\ref\FindMyFlickWebsite.Server.dll
