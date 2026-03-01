@@ -20,6 +20,13 @@ namespace FindMyFlickWebsite.Server.Controllers
         // When a Person filter is used, we need credits. Crew can explode.
         private const int CrewLimit = 25;
 
+        // How many days before we re-check warnings for a movie that already has them.
+        // Movies with no warnings at all (but released) are always re-checked.
+        private const int WarningStalenessDays = 30;
+
+        // How many days before we re-check streaming availability.
+        private const int StreamingStalenessDays = 7;
+
         private sealed record ApiFillStats(
             int Candidates,
             int SkippedMissingImdb,
@@ -33,7 +40,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             string? ExampleWarningsEnrichFailedImdb
         );
 
-
         public MovieSearchController(FindmyflickContext context)
         {
             _context = context;
@@ -45,36 +51,87 @@ namespace FindMyFlickWebsite.Server.Controllers
             All = 1
         }
 
+        // -------------------------------------------------------------------------
+        // REQUEST
+        // All name-based fields accept plain-language strings (case-insensitive).
+        // ID-based fields still work for callers that already know the IDs.
+        // -------------------------------------------------------------------------
         public sealed class MovieSearchRequest
         {
             public int Take { get; set; } = 25;
             public int MinMatches { get; set; } = 5;
 
-            // Optional switches (do not break existing clients)
             public bool EnableApiFallback { get; set; } = true;
             public bool AlwaysAddFromApis { get; set; } = false;
             public int MaxApiAdds { get; set; } = DefaultMaxApiAdds;
 
-            // TMDB discover needs a region for providers. Keep it simple.
             public string WatchRegion { get; set; } = "US";
 
-            // Hard constraints
+            // ------------------------------------------------------------------
+            // TEXT-BASED filters (plain language, case-insensitive partial match)
+            // ------------------------------------------------------------------
+
+            /// <summary>Partial name match against streaming_providers.provider_name (e.g. "disney", "netflix").</summary>
+            public List<string> StreamingProviderNames { get; set; } = new();
+
+            /// <summary>Partial name match against genres.genre_name (e.g. "action", "rom").</summary>
+            public List<string> GenreNames { get; set; } = new();
+
+            /// <summary>Partial name match against keywords.keyword_name (e.g. "time travel", "heist").</summary>
+            public List<string> KeywordNames { get; set; } = new();
+
+            /// <summary>Partial name match against people.person_name (e.g. "nolan", "meryl streep").</summary>
+            public List<string> PersonNames { get; set; } = new();
+
+            /// <summary>
+            /// Restricts which credits count for person filtering.
+            /// Accepted values (case-insensitive):
+            ///   "cast"               — only acting credits
+            ///   "crew"               — all crew credits
+            ///   "director"           — crew where job == Director
+            ///   "writer"             — crew where job is Writer/Screenplay/Story
+            ///   "producer"           — crew where job is Producer/Executive Producer
+            /// Multiple values are combined with OR (e.g. ["cast", "director"]).
+            /// When empty, both cast and all crew are included (original behaviour).
+            /// </summary>
+            public List<string> PersonRoles { get; set; } = new();
+
+            /// <summary>Partial name match against warnings.topic_name (e.g. "dog", "suicide").</summary>
+            public List<string> IncludeWarningNames { get; set; } = new();
+
+            /// <summary>Partial name match against warning_categories.category_name (e.g. "violence", "animal").</summary>
+            public List<string> IncludeWarningCategoryNames { get; set; } = new();
+
+            /// <summary>Partial name match against warning_subcategories.subcategory_name.</summary>
+            public List<string> IncludeWarningSubcategoryNames { get; set; } = new();
+
+            /// <summary>Partial name match against warnings.topic_name for exclusion.</summary>
+            public List<string> ExcludeWarningNames { get; set; } = new();
+
+            /// <summary>Partial name match against warning_categories.category_name for exclusion.</summary>
+            public List<string> ExcludeWarningCategoryNames { get; set; } = new();
+
+            /// <summary>Partial name match against warning_subcategories.subcategory_name for exclusion.</summary>
+            public List<string> ExcludeWarningSubcategoryNames { get; set; } = new();
+
+            // ------------------------------------------------------------------
+            // ID-BASED filters (kept for backward compatibility / internal use)
+            // ------------------------------------------------------------------
             public List<int> StreamingProviderIds { get; set; } = new();
             public MatchMode ProviderMatchMode { get; set; } = MatchMode.Any;
 
-            // Soft constraints (may relax later)
             public List<int> GenreIds { get; set; } = new();
             public List<int> KeywordIds { get; set; } = new();
             public List<int> PersonIds { get; set; } = new();
+
+            /// <summary>Plain-language title search (case-insensitive partial match).</summary>
             public string? TitleContains { get; set; }
 
-            // INCLUDE warnings (hard)
             public List<int> IncludeWarningTopicIds { get; set; } = new();
             public List<int> IncludeWarningCategoryIds { get; set; } = new();
             public List<int> IncludeWarningSubcategoryIds { get; set; } = new();
             public MatchMode IncludeWarningMatchMode { get; set; } = MatchMode.Any;
 
-            // EXCLUDE warnings (hard)
             public List<int> ExcludeWarningTopicIds { get; set; } = new();
             public List<int> ExcludeWarningCategoryIds { get; set; } = new();
             public List<int> ExcludeWarningSubcategoryIds { get; set; } = new();
@@ -101,7 +158,20 @@ namespace FindMyFlickWebsite.Server.Controllers
             public int ExcludedWarningTopicsExpandedCount { get; set; }
 
             public int AddedFromApis { get; set; } = 0;
+            public int StaleWarningsRefreshed { get; set; } = 0;
+
+            /// <summary>
+            /// Names that were provided but could not be resolved even after
+            /// attempting a TMDB lookup (e.g. typos, or people/genres genuinely
+            /// absent from all streaming movies in the database).
+            /// These filters are silently skipped so the search still returns results.
+            /// </summary>
+            public List<string> UnresolvedNames { get; set; } = new();
         }
+
+        // =========================================================================
+        // MAIN ENDPOINT
+        // =========================================================================
 
         [HttpPost]
         public async Task<ActionResult<MovieSearchResponse>> Search([FromBody] MovieSearchRequest req)
@@ -110,10 +180,18 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (req.Take > 100) req.Take = 100;
             if (req.MinMatches <= 0) req.MinMatches = 5;
             if (req.MaxApiAdds <= 0) req.MaxApiAdds = DefaultMaxApiAdds;
-            if (req.MaxApiAdds > 50) req.MaxApiAdds = 50; // guardrail
+            if (req.MaxApiAdds > 50) req.MaxApiAdds = 50;
             if (string.IsNullOrWhiteSpace(req.WatchRegion)) req.WatchRegion = "US";
 
-            // Expand umbrella tiers into leaf topic ids.
+            // ------------------------------------------------------------------
+            // STEP 1: Resolve plain-language names → IDs and merge with any
+            //         ID lists the caller already provided.
+            // ------------------------------------------------------------------
+            var unresolvedNames = await ResolveNamesToIdsAsync(req);
+
+            // ------------------------------------------------------------------
+            // STEP 2: Expand umbrella tiers (category/subcategory → topic IDs).
+            // ------------------------------------------------------------------
             var expandedIncludeTopicIds = await ResolveTopicIdsAsync(
                 req.IncludeWarningTopicIds,
                 req.IncludeWarningCategoryIds,
@@ -132,11 +210,25 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             var relaxedSteps = new List<string>();
 
-            // Track which version of the request produced the current result set.
+            // ------------------------------------------------------------------
+            // STEP 3: Background refresh of stale/missing warnings (fire-and-
+            //         forget-style — we kick it off but don't block the query).
+            // ------------------------------------------------------------------
+            int staleRefreshed = 0;
+            var dtddKey = Environment.GetEnvironmentVariable("DTDD_API_KEY");
+            if (!string.IsNullOrWhiteSpace(dtddKey))
+            {
+                staleRefreshed = await RefreshStaleWarningsAsync(dtddKey);
+                if (staleRefreshed > 0)
+                    relaxedSteps.Add($"Stale warnings refreshed: {staleRefreshed} movie(s) updated");
+            }
+
+            // ------------------------------------------------------------------
+            // STEP 4: Run the primary query and progressive relaxation.
+            // ------------------------------------------------------------------
             var effectiveReq = Clone(baseReq);
             var results = await RunQuery(effectiveReq, take: req.Take);
 
-            // Relax only soft filters (keywords -> people -> genres).
             if (results.Count < req.MinMatches)
             {
                 if (effectiveReq.KeywordIds.Count > 0)
@@ -152,39 +244,13 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 }
 
-                if (results.Count < req.MinMatches && effectiveReq.PersonIds.Count > 0)
-                {
-                    var clone = Clone(effectiveReq);
-                    clone.PersonIds.Clear();
-                    var r = await RunQuery(clone, req.Take);
-                    if (r.Count >= results.Count)
-                    {
-                        results = r;
-                        effectiveReq = clone;
-                        relaxedSteps.Add("Relax: removed PersonIds");
-                    }
-                }
-
-                if (results.Count < req.MinMatches && effectiveReq.GenreIds.Count > 0)
-                {
-                    var clone = Clone(effectiveReq);
-                    clone.GenreIds.Clear();
-                    var r = await RunQuery(clone, req.Take);
-                    if (r.Count >= results.Count)
-                    {
-                        results = r;
-                        effectiveReq = clone;
-                        relaxedSteps.Add("Relax: removed GenreIds");
-                    }
-                }
             }
 
+            // ------------------------------------------------------------------
+            // STEP 5: API fallback (same logic as before).
+            // ------------------------------------------------------------------
             int addedFromApis = 0;
 
-
-            // API fallback
-            // - default behavior: only fill if results < MinMatches
-            // - AlwaysAddFromApis behavior: fill if results < Take (so we can grow results even after MinMatches is satisfied)
             var shouldApiFill =
                 req.EnableApiFallback &&
                 (
@@ -198,32 +264,28 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var (addedCount, stats) = await TryApiFillAsync(effectiveReq);
                 addedFromApis = addedCount;
 
-                    // Always log stats so we can see WHY addedFromApis is 0
-                    relaxedSteps.Add(
-                        $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
-                        $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
-                        $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
-                        $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
-                    );
+                relaxedSteps.Add(
+                    $"API fill stats: candidates={stats.Candidates}, added={stats.Added}, " +
+                    $"skipMissingImdb={stats.SkippedMissingImdb}, skipAlreadyEligible={stats.SkippedAlreadyEligible}, " +
+                    $"skipStreamingEnrichFailed={stats.SkippedStreamingEnrichFailed}, skipStillNotStreamable={stats.SkippedStillNotStreamable}, " +
+                    $"skipWarningsEnrichFailed={stats.SkippedWarningsEnrichFailed}, skipStillNoWarnings={stats.SkippedStillNoWarnings}"
+                );
 
-                    relaxedSteps.Add(
-                        $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
-                        $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
-                    );
+                relaxedSteps.Add(
+                    $"API fill examples: stillNoWarningsImdb={stats.ExampleStillNoWarningsImdb ?? "(none)"}, " +
+                    $"warningsEnrichFailedImdb={stats.ExampleWarningsEnrichFailedImdb ?? "(none)"}"
+                );
 
-
-
-                    if (addedFromApis > 0)
-                    {
-                        relaxedSteps.Add($"API fill: added {addedFromApis} movies");
-                        results = await RunQuery(effectiveReq, req.Take);
-                    }
-                    else
-                    {
-                        relaxedSteps.Add("API fill: added 0 movies");
-                    }
+                if (addedFromApis > 0)
+                {
+                    relaxedSteps.Add($"API fill: added {addedFromApis} movies");
+                    results = await RunQuery(effectiveReq, req.Take);
+                }
+                else
+                {
+                    relaxedSteps.Add("API fill: added 0 movies");
+                }
             }
-
 
             var response = new MovieSearchResponse
             {
@@ -234,11 +296,273 @@ namespace FindMyFlickWebsite.Server.Controllers
                 Results = results,
                 IncludedWarningTopicsExpandedCount = expandedIncludeTopicIds.Count,
                 ExcludedWarningTopicsExpandedCount = expandedExcludeTopicIds.Count,
-                AddedFromApis = addedFromApis
+                AddedFromApis = addedFromApis,
+                StaleWarningsRefreshed = staleRefreshed,
+                UnresolvedNames = unresolvedNames
             };
 
             return Ok(response);
         }
+
+        // =========================================================================
+        // NAME → ID RESOLUTION
+        // Each name list does a case-insensitive partial match (ILike '%term%')
+        // against the appropriate lookup table and appends the resolved IDs to the
+        // corresponding ID list. Duplicates are removed before the query runs.
+        // =========================================================================
+
+        private async Task<List<string>> ResolveNamesToIdsAsync(MovieSearchRequest req)
+        {
+            var unresolved = new List<string>();
+            // Streaming providers (hard constraint — track unresolved names)
+            foreach (var name in req.StreamingProviderNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.StreamingProviders
+                    .AsNoTracking()
+                    .Where(sp => EF.Functions.ILike(sp.ProviderName, $"%{name.Trim()}%"))
+                    .Select(sp => sp.TmdbProviderId)
+                    .ToListAsync();
+                if (ids.Count == 0)
+                    unresolved.Add($"streaming provider: '{name.Trim()}'");
+                req.StreamingProviderIds.AddRange(ids);
+            }
+            req.StreamingProviderIds = req.StreamingProviderIds.Distinct().ToList();
+
+            // Genres (hard constraint — track unresolved names)
+            foreach (var name in req.GenreNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.Genres
+                    .AsNoTracking()
+                    .Where(g => EF.Functions.ILike(g.GenreName, $"%{name.Trim()}%"))
+                    .Select(g => g.TmdbGenreId)
+                    .ToListAsync();
+                if (ids.Count == 0)
+                    unresolved.Add($"genre: '{name.Trim()}'");
+                req.GenreIds.AddRange(ids);
+            }
+            req.GenreIds = req.GenreIds.Distinct().ToList();
+
+            // Keywords
+            foreach (var name in req.KeywordNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.Keywords
+                    .AsNoTracking()
+                    .Where(k => EF.Functions.ILike(k.KeywordName, $"%{name.Trim()}%"))
+                    .Select(k => k.TmdbKeywordId)
+                    .ToListAsync();
+                req.KeywordIds.AddRange(ids);
+            }
+            req.KeywordIds = req.KeywordIds.Distinct().ToList();
+
+            // People (hard constraint — fall back to TMDB person search if not in DB)
+            var tmdbKeyForPeople = Environment.GetEnvironmentVariable("TMDB_API_KEY");
+            foreach (var name in req.PersonNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.People
+                    .AsNoTracking()
+                    .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
+                    .Select(p => p.TmdbPersonId)
+                    .ToListAsync();
+
+                if (ids.Count == 0 && !string.IsNullOrWhiteSpace(tmdbKeyForPeople))
+                {
+                    // Not in our DB yet — search TMDB, upsert any matches, then retry
+                    var tmdbPersonIds = await FetchAndUpsertTmdbPersonsByNameAsync(name.Trim(), tmdbKeyForPeople);
+                    if (tmdbPersonIds.Count > 0)
+                    {
+                        // Re-query our DB now that we've upserted them
+                        ids = await _context.People
+                            .AsNoTracking()
+                            .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
+                            .Select(p => p.TmdbPersonId)
+                            .ToListAsync();
+                    }
+                }
+
+                if (ids.Count == 0)
+                    unresolved.Add($"person: '{name.Trim()}'");
+
+                req.PersonIds.AddRange(ids);
+            }
+            req.PersonIds = req.PersonIds.Distinct().ToList();
+
+            // Include warning topic names → topic IDs
+            foreach (var name in req.IncludeWarningNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.Warnings
+                    .AsNoTracking()
+                    .Where(w => EF.Functions.ILike(w.TopicName, $"%{name.Trim()}%"))
+                    .Select(w => w.DtddTopicId)
+                    .ToListAsync();
+                req.IncludeWarningTopicIds.AddRange(ids);
+            }
+            req.IncludeWarningTopicIds = req.IncludeWarningTopicIds.Distinct().ToList();
+
+            // Include warning category names → category IDs
+            foreach (var name in req.IncludeWarningCategoryNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var conn = _context.Database.GetDbConnection();
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+                const string sql = @"
+SELECT category_id FROM public.warning_categories
+WHERE category_name ILIKE @name;";
+                await using var cmd = new NpgsqlCommand(sql, (NpgsqlConnection)conn);
+                cmd.Parameters.AddWithValue("@name", $"%{name.Trim()}%");
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                    req.IncludeWarningCategoryIds.Add(reader.GetInt32(0));
+                await reader.CloseAsync();
+            }
+            req.IncludeWarningCategoryIds = req.IncludeWarningCategoryIds.Distinct().ToList();
+
+            // Include warning subcategory names → subcategory IDs
+            foreach (var name in req.IncludeWarningSubcategoryNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var conn = _context.Database.GetDbConnection();
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+                const string sql = @"
+SELECT subcategory_id FROM public.warning_subcategories
+WHERE subcategory_name ILIKE @name;";
+                await using var cmd = new NpgsqlCommand(sql, (NpgsqlConnection)conn);
+                cmd.Parameters.AddWithValue("@name", $"%{name.Trim()}%");
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                    req.IncludeWarningSubcategoryIds.Add(reader.GetInt32(0));
+                await reader.CloseAsync();
+            }
+            req.IncludeWarningSubcategoryIds = req.IncludeWarningSubcategoryIds.Distinct().ToList();
+
+            // Exclude warning topic names → topic IDs
+            foreach (var name in req.ExcludeWarningNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var ids = await _context.Warnings
+                    .AsNoTracking()
+                    .Where(w => EF.Functions.ILike(w.TopicName, $"%{name.Trim()}%"))
+                    .Select(w => w.DtddTopicId)
+                    .ToListAsync();
+                req.ExcludeWarningTopicIds.AddRange(ids);
+            }
+            req.ExcludeWarningTopicIds = req.ExcludeWarningTopicIds.Distinct().ToList();
+
+            // Exclude warning category names → category IDs
+            foreach (var name in req.ExcludeWarningCategoryNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var conn = _context.Database.GetDbConnection();
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+                const string sql = @"
+SELECT category_id FROM public.warning_categories
+WHERE category_name ILIKE @name;";
+                await using var cmd = new NpgsqlCommand(sql, (NpgsqlConnection)conn);
+                cmd.Parameters.AddWithValue("@name", $"%{name.Trim()}%");
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                    req.ExcludeWarningCategoryIds.Add(reader.GetInt32(0));
+                await reader.CloseAsync();
+            }
+            req.ExcludeWarningCategoryIds = req.ExcludeWarningCategoryIds.Distinct().ToList();
+
+            // Exclude warning subcategory names → subcategory IDs
+            foreach (var name in req.ExcludeWarningSubcategoryNames.Where(n => !string.IsNullOrWhiteSpace(n)))
+            {
+                var conn = _context.Database.GetDbConnection();
+                if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+                const string sql = @"
+SELECT subcategory_id FROM public.warning_subcategories
+WHERE subcategory_name ILIKE @name;";
+                await using var cmd = new NpgsqlCommand(sql, (NpgsqlConnection)conn);
+                cmd.Parameters.AddWithValue("@name", $"%{name.Trim()}%");
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                    req.ExcludeWarningSubcategoryIds.Add(reader.GetInt32(0));
+                await reader.CloseAsync();
+            }
+            req.ExcludeWarningSubcategoryIds = req.ExcludeWarningSubcategoryIds.Distinct().ToList();
+
+            return unresolved;
+        }
+
+        // =========================================================================
+        // STALE WARNING REFRESH
+        //
+        // Two cases we fix:
+        //   1. Released movies that have ZERO warnings at all → always re-check DTDD.
+        //   2. Movies whose most-recent movie_warning.updated_at is older than
+        //      WarningStalenessDays → re-check DTDD.
+        //
+        // We cap the batch per search call to avoid adding latency on busy searches.
+        // =========================================================================
+
+        private const int StaleRefreshBatchSize = 5;
+
+        private async Task<int> RefreshStaleWarningsAsync(string dtddKey)
+        {
+            var now = DateTime.UtcNow;
+            var staleThreshold = now.AddDays(-WarningStalenessDays);
+            var refreshed = 0;
+
+            // Case 1: Released movies with NO warning rows at all.
+            // "Released" = release_year <= current year AND status is Released (or null, which we treat as released).
+            var noWarningMovies = await _context.Movies
+                .AsNoTracking()
+                .Where(m =>
+                    m.ReleaseYear <= now.Year &&
+                    (m.Status == null || EF.Functions.ILike(m.Status, "released")) &&
+                    !m.MovieWarnings.Any())
+                .OrderBy(m => m.UpdatedAt) // oldest first
+                .Take(StaleRefreshBatchSize)
+                .ToListAsync();
+
+            foreach (var movie in noWarningMovies)
+            {
+                try
+                {
+                    var ok = await TryEnrichWarningsFromDtddAsync(movie, dtddKey);
+                    if (ok) refreshed++;
+                }
+                catch { /* never crash the search endpoint */ }
+            }
+
+            // Case 2: Movies whose warnings haven't been updated recently.
+            // Find imdb_ids where the newest updated_at on movie_warnings is older than threshold.
+            if (refreshed < StaleRefreshBatchSize)
+            {
+                var remaining = StaleRefreshBatchSize - refreshed;
+
+                var staleImdbIds = await _context.MovieWarnings
+                    .AsNoTracking()
+                    .GroupBy(mw => mw.ImdbId)
+                    .Where(g => g.Max(mw => mw.UpdatedAt) < staleThreshold)
+                    .OrderBy(g => g.Max(mw => mw.UpdatedAt))
+                    .Take(remaining)
+                    .Select(g => g.Key)
+                    .ToListAsync();
+
+                foreach (var imdbId in staleImdbIds)
+                {
+                    var movie = await _context.Movies.AsNoTracking()
+                        .FirstOrDefaultAsync(m => m.ImdbId == imdbId);
+
+                    if (movie == null) continue;
+
+                    try
+                    {
+                        var ok = await TryEnrichWarningsFromDtddAsync(movie, dtddKey);
+                        if (ok) refreshed++;
+                    }
+                    catch { /* never crash the search endpoint */ }
+                }
+            }
+
+            return refreshed;
+        }
+
+        // =========================================================================
+        // CLONE
+        // =========================================================================
 
         private MovieSearchRequest Clone(MovieSearchRequest req) => new MovieSearchRequest
         {
@@ -254,6 +578,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             GenreIds = req.GenreIds.ToList(),
             KeywordIds = req.KeywordIds.ToList(),
             PersonIds = req.PersonIds.ToList(),
+            PersonRoles = req.PersonRoles.ToList(),
             TitleContains = req.TitleContains,
 
             IncludeWarningTopicIds = req.IncludeWarningTopicIds.ToList(),
@@ -263,25 +588,44 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             ExcludeWarningTopicIds = req.ExcludeWarningTopicIds.ToList(),
             ExcludeWarningCategoryIds = req.ExcludeWarningCategoryIds.ToList(),
-            ExcludeWarningSubcategoryIds = req.ExcludeWarningSubcategoryIds.ToList()
+            ExcludeWarningSubcategoryIds = req.ExcludeWarningSubcategoryIds.ToList(),
+
+            // Name lists don't need to carry forward — IDs are already resolved.
+            StreamingProviderNames = new(),
+            GenreNames = new(),
+            KeywordNames = new(),
+            PersonNames = new(),
+            IncludeWarningNames = new(),
+            IncludeWarningCategoryNames = new(),
+            IncludeWarningSubcategoryNames = new(),
+            ExcludeWarningNames = new(),
+            ExcludeWarningCategoryNames = new(),
+            ExcludeWarningSubcategoryNames = new()
         };
+
+        // =========================================================================
+        // QUERY
+        // TitleContains is case-insensitive via ILike (unchanged behaviour, now also
+        // applies the same ILike approach consistently across all text comparisons).
+        // =========================================================================
 
         private async Task<List<MovieSearchResultCard>> RunQuery(MovieSearchRequest req, int take)
         {
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
             // GLOBAL RULES:
-            // 1) Must have populated warnings (otherwise users get "no warnings" movies).
+            // 1) Must have populated warnings.
             q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null));
 
-            // 2) Must be streamable NOT rent/buy.
+            // 2) Must be streamable (not rent/buy).
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")
             ));
 
+            // Title (case-insensitive partial match via ILike)
             if (!string.IsNullOrWhiteSpace(req.TitleContains))
-                q = q.Where(m => EF.Functions.ILike(m.Title!, $"%{req.TitleContains}%"));
+                q = q.Where(m => EF.Functions.ILike(m.Title!, $"%{req.TitleContains.Trim()}%"));
 
             // Providers (hard)
             if (req.StreamingProviderIds.Count > 0)
@@ -308,7 +652,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             }
 
-            // Genres (soft)
+            // Genres (hard)
             if (req.GenreIds.Count > 0)
                 q = q.Where(m => m.MovieGenres.Any(mg => req.GenreIds.Contains(mg.TmdbGenreId)));
 
@@ -316,12 +660,38 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (req.KeywordIds.Count > 0)
                 q = q.Where(m => m.MovieKeywords.Any(mk => req.KeywordIds.Contains(mk.TmdbKeywordId)));
 
-            // People (soft)
+            // People (hard) — role-aware filtering
             if (req.PersonIds.Count > 0)
             {
+                var roleSet = (req.PersonRoles ?? new List<string>())
+                    .Select(r => r.Trim().ToLowerInvariant())
+                    .Where(r => !string.IsNullOrWhiteSpace(r))
+                    .ToHashSet();
+
+                var includeCast = roleSet.Count == 0 || roleSet.Contains("cast");
+                var includeCrew = roleSet.Count == 0 || roleSet.Contains("crew")
+                    || roleSet.Contains("director") || roleSet.Contains("writer")
+                    || roleSet.Contains("producer");
+
+                // Build the job name sets for specific roles
+                var directorJobs = new List<string> { "Director" };
+                var writerJobs   = new List<string> { "Writer", "Screenplay", "Story", "Characters", "Screenstory" };
+                var producerJobs = new List<string> { "Producer", "Executive Producer", "Co-Producer" };
+
                 q = q.Where(m =>
-                    m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId)) ||
-                    m.MovieCrews.Any(c => req.PersonIds.Contains(c.TmdbPersonId)));
+                    (includeCast && m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId)))
+                    ||
+                    (includeCrew && m.MovieCrews.Any(c =>
+                        req.PersonIds.Contains(c.TmdbPersonId) &&
+                        (
+                            // "crew" with no further restriction = any crew role
+                            roleSet.Count == 0 || roleSet.Contains("crew")
+                            || (roleSet.Contains("director") && c.Job != null && directorJobs.Contains(c.Job))
+                            || (roleSet.Contains("writer")   && c.Job != null && writerJobs.Contains(c.Job))
+                            || (roleSet.Contains("producer") && c.Job != null && producerJobs.Contains(c.Job))
+                        )
+                    ))
+                );
             }
 
             // INCLUDE warnings (hard)
@@ -374,16 +744,13 @@ namespace FindMyFlickWebsite.Server.Controllers
                 .ToListAsync();
         }
 
-        // -----------------------------------------
-        // API Fallback: fetch candidates + upsert
-        // -----------------------------------------
+        // =========================================================================
+        // API FALLBACK (unchanged from original — only internal helper methods)
+        // =========================================================================
 
         private static bool IsNonRentBuyOffer(string offerType)
         {
-            // TMDB watch/providers typically uses: flatrate, free, ads, rent, buy
-            // We only treat flatrate/free/ads as "streamable" for search eligibility.
             if (string.IsNullOrWhiteSpace(offerType)) return false;
-
             var t = offerType.Trim().ToLowerInvariant();
             return t == "flatrate" || t == "free" || t == "ads";
         }
@@ -400,7 +767,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (candidateTmdbIds.Count == 0)
                 return (0, new ApiFillStats(0, 0, 0, 0, 0, 0, 0, 0, null, null));
 
-
             int skippedMissingImdb = 0;
             int skippedAlreadyEligible = 0;
             int skippedStreamingEnrichFailed = 0;
@@ -409,7 +775,6 @@ namespace FindMyFlickWebsite.Server.Controllers
             int skippedStillNoWarnings = 0;
             string? exampleStillNoWarningsImdb = null;
             string? exampleWarningsEnrichFailedImdb = null;
-
 
             int added = 0;
 
@@ -425,21 +790,16 @@ namespace FindMyFlickWebsite.Server.Controllers
                     continue;
                 }
 
-                // eligibility BEFORE
                 var hadWarningsBefore = await _context.MovieWarnings.AnyAsync(mw => mw.ImdbId == imdbId && mw.Answer != null);
 
-                // streamable BEFORE (SQL-translatable)
                 var hadStreamableBefore = await _context.MovieStreamings.AnyAsync(ms =>
                     ms.ImdbId == imdbId &&
                     ms.OfferType != null &&
                     !EF.Functions.ILike(ms.OfferType, "rent") &&
-                    !EF.Functions.ILike(ms.OfferType, "buy")
-                    );
+                    !EF.Functions.ILike(ms.OfferType, "buy"));
 
                 var eligibleBefore = hadWarningsBefore && hadStreamableBefore;
 
-                // If it's already eligible, it won't "add" anything new for your search experience.
-                // Skip it so we focus on genuinely new/previously-ineligible titles.
                 if (eligibleBefore)
                 {
                     skippedAlreadyEligible++;
@@ -452,23 +812,19 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (movie == null)
                 {
                     var upserted = await UpsertMovieCoreFromTmdbAsync(tmdbId, imdbId, tmdbKey);
-                    if (!upserted)
-                        continue;
+                    if (!upserted) continue;
 
                     movie = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
-                    if (movie == null)
-                        continue;
+                    if (movie == null) continue;
 
                     wasNew = true;
                 }
 
-                // STREAMING: must become streamable (flatrate/free/ads)
                 var hasStreamable = await _context.MovieStreamings.AnyAsync(ms =>
                     ms.ImdbId == imdbId &&
                     ms.OfferType != null &&
-                !EF.Functions.ILike(ms.OfferType, "rent") &&
-                !EF.Functions.ILike(ms.OfferType, "buy")
-                );
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy"));
 
                 if (!hasStreamable)
                 {
@@ -483,8 +839,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                         ms.ImdbId == imdbId &&
                         ms.OfferType != null &&
                         !EF.Functions.ILike(ms.OfferType, "rent") &&
-                        !EF.Functions.ILike(ms.OfferType, "buy")
-                        );
+                        !EF.Functions.ILike(ms.OfferType, "buy"));
 
                     if (!hasStreamable)
                     {
@@ -493,7 +848,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 }
 
-                // WARNINGS: must have warning rows with non-null answers
                 var hasWarnings = await _context.MovieWarnings.AnyAsync(mw => mw.ImdbId == imdbId && mw.Answer != null);
                 if (!hasWarnings)
                 {
@@ -514,7 +868,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 }
 
-                // optional enrichments (unchanged logic)
                 if (req.GenreIds.Count > 0)
                 {
                     var hasGenres = await _context.MovieGenres.AnyAsync(mg => mg.ImdbId == imdbId);
@@ -542,7 +895,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 }
 
-                // now eligible; count as added if new OR became eligible (eligibleBefore is false here)
                 if (wasNew || !eligibleBefore)
                     added++;
             }
@@ -559,25 +911,137 @@ namespace FindMyFlickWebsite.Server.Controllers
                 ExampleStillNoWarningsImdb: exampleStillNoWarningsImdb,
                 ExampleWarningsEnrichFailedImdb: exampleWarningsEnrichFailedImdb
             );
-            
 
             return (added, stats);
         }
 
         private async Task<List<int>> FetchTmdbCandidateIdsAsync(MovieSearchRequest req, string apiKey)
         {
-            // Use title search if TitleContains is provided; otherwise use discover.
+            // Title search takes priority
             if (!string.IsNullOrWhiteSpace(req.TitleContains))
                 return await FetchTmdbSearchMovieIdsAsync(req.TitleContains!, apiKey);
 
+            // When filtering by people, use the person credits endpoint instead of
+            // discover — discover's with_people only matches crew, not cast members.
+            if (req.PersonIds.Count > 0)
+            {
+                var personMovieIds = new List<int>();
+                foreach (var personId in req.PersonIds.Distinct())
+                {
+                    var credits = await FetchTmdbPersonMovieCreditsAsync(personId, apiKey, req.PersonRoles);
+                    personMovieIds.AddRange(credits);
+                }
+
+                // If we also have genre/provider filters, intersect with a discover
+                // call so we don't flood the DB with every movie a person has ever
+                // appeared in.
+                if (req.GenreIds.Count > 0 || req.StreamingProviderIds.Count > 0)
+                {
+                    var discoverIds = await FetchTmdbDiscoverMovieIdsAsync(req, apiKey);
+                    var discoverSet = new HashSet<int>(discoverIds);
+                    return personMovieIds.Distinct().Where(id => discoverSet.Contains(id)).ToList();
+                }
+
+                return personMovieIds.Distinct().Take(150).ToList();
+            }
+
             return await FetchTmdbDiscoverMovieIdsAsync(req, apiKey);
+        }
+
+        /// <summary>
+        /// Fetches movie IDs for a given TMDB person, optionally filtered by role.
+        /// roles: empty = all cast + crew; "cast" = acting only; "crew" = all crew;
+        ///        "director"/"writer"/"producer" = specific crew jobs.
+        /// </summary>
+        private async Task<List<int>> FetchTmdbPersonMovieCreditsAsync(
+            int tmdbPersonId, string apiKey, List<string>? roles = null)
+        {
+            try
+            {
+                using var http = new HttpClient();
+                var url = $"https://api.themoviedb.org/3/person/{tmdbPersonId}/movie_credits?api_key={apiKey}";
+
+                using var resp = await http.GetAsync(url);
+                if (!resp.IsSuccessStatusCode) return new List<int>();
+
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                var ids = new List<int>();
+
+                // Normalise role filters to lowercase for comparison
+                var roleSet = (roles ?? new List<string>())
+                    .Select(r => r.Trim().ToLowerInvariant())
+                    .Where(r => !string.IsNullOrWhiteSpace(r))
+                    .ToHashSet();
+
+                var includeCast = roleSet.Count == 0 || roleSet.Contains("cast");
+                var includeCrew = roleSet.Count == 0 || roleSet.Contains("crew")
+                    || roleSet.Contains("director") || roleSet.Contains("writer")
+                    || roleSet.Contains("producer");
+
+                // Specific job sets used when caller asks for a named role
+                var directorJobs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    { "Director" };
+                var writerJobs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    { "Writer", "Screenplay", "Story", "Characters", "Screenstory" };
+                var producerJobs = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    { "Producer", "Executive Producer", "Co-Producer" };
+
+                // Cast credits (acting roles)
+                if (includeCast &&
+                    root.TryGetProperty("cast", out var castEl) &&
+                    castEl.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var m in castEl.EnumerateArray())
+                    {
+                        if (m.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
+                            ids.Add(idVal);
+                    }
+                }
+
+                // Crew credits — apply job filter if specific roles were requested
+                if (includeCrew &&
+                    root.TryGetProperty("crew", out var crewEl) &&
+                    crewEl.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var m in crewEl.EnumerateArray())
+                    {
+                        if (!m.TryGetProperty("id", out var idEl) || !idEl.TryGetInt32(out var idVal))
+                            continue;
+
+                        // If caller asked for "crew" broadly or no filter, include everything
+                        if (roleSet.Count == 0 || roleSet.Contains("crew"))
+                        {
+                            ids.Add(idVal);
+                            continue;
+                        }
+
+                        // Otherwise only include if the job matches a requested role
+                        var job = m.TryGetProperty("job", out var jobEl) ? jobEl.GetString() ?? "" : "";
+
+                        if (roleSet.Contains("director") && directorJobs.Contains(job))
+                            ids.Add(idVal);
+                        else if (roleSet.Contains("writer") && writerJobs.Contains(job))
+                            ids.Add(idVal);
+                        else if (roleSet.Contains("producer") && producerJobs.Contains(job))
+                            ids.Add(idVal);
+                    }
+                }
+
+                return ids.Distinct().ToList();
+            }
+            catch
+            {
+                return new List<int>();
+            }
         }
 
         private async Task<List<int>> FetchTmdbSearchMovieIdsAsync(string query, string apiKey)
         {
             using var http = new HttpClient();
 
-            // Small: only first 2 pages, max 40 candidates.
             var ids = new List<int>();
             for (int page = 1; page <= 2; page++)
             {
@@ -610,17 +1074,14 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             using var http = new HttpClient();
 
-            // Only released movies (DTDD coverage is much better)
             var cutoff = DateTime.UtcNow.AddMonths(-5).ToString("yyyy-MM-dd");
 
             var ids = new List<int>();
 
-            // Pull several pages to get enough candidates with IMDb IDs + DTDD coverage
             for (int page = 1; page <= 5; page++)
             {
                 var baseUrl = "https://api.themoviedb.org/3/discover/movie";
 
-                // Build query as key/value pairs so we can properly escape delimiters like '|'
                 var query = new List<KeyValuePair<string, string>>
                 {
                     new("api_key", apiKey),
@@ -643,18 +1104,10 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (req.StreamingProviderIds.Count > 0)
                 {
                     query.Add(new("watch_region", req.WatchRegion));
-
-                    // TMDB expects providers separated by '|' for OR.
-                    // We will URL-encode it by letting Uri.EscapeDataString handle it.
-                    var providers = string.Join("|", req.StreamingProviderIds.Distinct());
-                    query.Add(new("with_watch_providers", providers));
-
-                    // Only subscription/free/ads (exclude rent/buy)
-                    // Use '|' here too, but again let the URL encoding handle it.
+                    query.Add(new("with_watch_providers", string.Join("|", req.StreamingProviderIds.Distinct())));
                     query.Add(new("with_watch_monetization_types", "flatrate|free|ads"));
                 }
 
-                // Build the final URL with proper escaping
                 var qs = string.Join("&", query.Select(kvp =>
                     $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
 
@@ -662,14 +1115,9 @@ namespace FindMyFlickWebsite.Server.Controllers
 
                 try
                 {
-                    // Do NOT throw on non-success; just stop/fallback gracefully
                     using var resp = await http.GetAsync(url);
                     if (!resp.IsSuccessStatusCode)
-                    {
-                        // TMDB sometimes returns 500 for malformed combinations.
-                        // Treat as "no candidates" instead of crashing the whole search endpoint.
                         return ids.Distinct().Take(150).ToList();
-                    }
 
                     var json = await resp.Content.ReadAsStringAsync();
                     using var doc = JsonDocument.Parse(json);
@@ -688,14 +1136,12 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
                 catch
                 {
-                    // Network/timeout/parse errors should not crash the endpoint.
                     return ids.Distinct().Take(150).ToList();
                 }
             }
 
             return ids.Distinct().Take(150).ToList();
         }
-
 
         private async Task<string?> FetchTmdbImdbIdAsync(int tmdbId, string apiKey)
         {
@@ -772,79 +1218,75 @@ namespace FindMyFlickWebsite.Server.Controllers
             };
         }
 
-private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId, string apiKey)
-{
-    var details = await FetchTmdbDetailsAsync(tmdbId, apiKey);
-    if (details == null)
-        return false;
-
-    // FIX: runtime_minutes must satisfy the DB constraint.
-    // Treat 0/negative/absurd values as "unknown" and store NULL.
-    int? runtimeSafe = null;
-    if (details.RuntimeMinutes != null)
-    {
-        var rt = details.RuntimeMinutes.Value;
-        if (rt > 0 && rt <= 600)
-            runtimeSafe = rt;
-    }
-
-    var now = DateTime.UtcNow;
-    var existing = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
-
-    if (existing == null)
-    {
-        if (string.IsNullOrWhiteSpace(details.Title) || details.ReleaseYear == null)
-            return false;
-
-        _context.Movies.Add(new Movie
+        private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId, string apiKey)
         {
-            ImdbId = imdbId,
-            TmdbId = tmdbId,
-            Title = details.Title!,
-            ReleaseYear = details.ReleaseYear.Value,
-            RuntimeMinutes = runtimeSafe,
-            PlotSummary = details.PlotSummary,
-            PosterUrl = details.PosterUrl,
-            OriginalLanguage = details.OriginalLanguage,
-            MediaType = "movie",
-            Tagline = details.Tagline,
-            Status = details.Status,
-            MpaaRating = null,
-            CreatedAt = now,
-            UpdatedAt = now
-        });
+            var details = await FetchTmdbDetailsAsync(tmdbId, apiKey);
+            if (details == null)
+                return false;
 
-        await _context.SaveChangesAsync();
-        return true;
-    }
+            int? runtimeSafe = null;
+            if (details.RuntimeMinutes != null)
+            {
+                var rt = details.RuntimeMinutes.Value;
+                if (rt > 0 && rt <= 600)
+                    runtimeSafe = rt;
+            }
 
-    // Minimal update (don't blow away teammate’s other enrichment paths)
-    existing.TmdbId = tmdbId;
-    if (!string.IsNullOrWhiteSpace(details.Title)) existing.Title = details.Title;
-    if (details.ReleaseYear != null) existing.ReleaseYear = details.ReleaseYear.Value;
+            var now = DateTime.UtcNow;
+            var existing = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
 
-    existing.RuntimeMinutes = runtimeSafe;
-    existing.PlotSummary = details.PlotSummary;
-    existing.PosterUrl = details.PosterUrl;
-    existing.OriginalLanguage = details.OriginalLanguage;
-    existing.Tagline = details.Tagline;
-    existing.Status = details.Status;
-    existing.UpdatedAt = now;
+            if (existing == null)
+            {
+                if (string.IsNullOrWhiteSpace(details.Title) || details.ReleaseYear == null)
+                    return false;
 
-    await _context.SaveChangesAsync();
-    return true;
-}
+                _context.Movies.Add(new Movie
+                {
+                    ImdbId = imdbId,
+                    TmdbId = tmdbId,
+                    Title = details.Title!,
+                    ReleaseYear = details.ReleaseYear.Value,
+                    RuntimeMinutes = runtimeSafe,
+                    PlotSummary = details.PlotSummary,
+                    PosterUrl = details.PosterUrl,
+                    OriginalLanguage = details.OriginalLanguage,
+                    MediaType = "movie",
+                    Tagline = details.Tagline,
+                    Status = details.Status,
+                    MpaaRating = null,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
 
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            existing.TmdbId = tmdbId;
+            if (!string.IsNullOrWhiteSpace(details.Title)) existing.Title = details.Title;
+            if (details.ReleaseYear != null) existing.ReleaseYear = details.ReleaseYear.Value;
+
+            existing.RuntimeMinutes = runtimeSafe;
+            existing.PlotSummary = details.PlotSummary;
+            existing.PosterUrl = details.PosterUrl;
+            existing.OriginalLanguage = details.OriginalLanguage;
+            existing.Tagline = details.Tagline;
+            existing.Status = details.Status;
+            existing.UpdatedAt = now;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         // -------------------------
-        // Streaming enrichment (TMDB) - based on your MovieDataController pattern
+        // Streaming enrichment (TMDB)
         // -------------------------
 
         private sealed class TmdbWatchProviderRow
         {
             public int ProviderId { get; set; }
             public string? ProviderName { get; set; }
-            public string? OfferType { get; set; } // subscription, free, free_with_ads, rent, buy
+            public string? OfferType { get; set; }
         }
 
         private async Task<bool> TryEnrichStreamingFromTmdbAsync(Movie movie, string apiKey, string watchRegion)
@@ -861,7 +1303,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
             await using var tx = await _context.Database.BeginTransactionAsync();
 
-            // Remove existing streaming links for this movie (we re-insert from TMDB)
             var existingLinks = await _context.MovieStreamings
                 .Where(ms => ms.ImdbId == movie.ImdbId)
                 .ToListAsync();
@@ -869,21 +1310,16 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             if (existingLinks.Count > 0)
                 _context.MovieStreamings.RemoveRange(existingLinks);
 
-            // IMPORTANT FIX:
-            // TMDB returns same provider_id across multiple offer types.
-            // We must upsert StreamingProvider ONCE per provider_id, then add MovieStreaming rows per offer type.
             var providerIds = providers
                 .Where(p => p.ProviderId > 0 && !string.IsNullOrWhiteSpace(p.ProviderName))
                 .Select(p => p.ProviderId)
                 .Distinct()
                 .ToList();
 
-            // Load existing providers from DB in one go
             var existingProviders = await _context.StreamingProviders
                 .Where(sp => providerIds.Contains(sp.TmdbProviderId))
                 .ToDictionaryAsync(sp => sp.TmdbProviderId);
 
-            // Upsert provider master rows once per provider_id
             foreach (var pid in providerIds)
             {
                 var name = providers.First(p => p.ProviderId == pid).ProviderName!;
@@ -899,7 +1335,7 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
                     };
 
                     _context.StreamingProviders.Add(sp);
-                    existingProviders[pid] = sp; // prevents duplicate Add in this same request
+                    existingProviders[pid] = sp;
                 }
                 else
                 {
@@ -910,7 +1346,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
                 }
             }
 
-            // Add the movie-provider links (one per provider+offerType)
             foreach (var p in providers)
             {
                 if (p.ProviderId <= 0 || string.IsNullOrWhiteSpace(p.ProviderName) || string.IsNullOrWhiteSpace(p.OfferType))
@@ -931,7 +1366,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             await tx.CommitAsync();
             return true;
         }
-
 
         private async Task<List<TmdbWatchProviderRow>?> FetchTmdbWatchProvidersAsync(int tmdbId, string apiKey, string watchRegion)
         {
@@ -989,14 +1423,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
         // -------------------------
         // Warnings enrichment (DTDD)
-        //
-        // Matching order (3-stage):
-        //  1) IMDb ID
-        //  2) TMDB ID
-        //  3) Title + release year
-        //
-        // Store computed answer per topic ("yes"/"no"/"unknown").
-        // Include/exclude filters rely on "yes" checks, so storing non-yes answers is fine.
         // -------------------------
 
         private sealed class DtddTopicStatRow
@@ -1010,13 +1436,12 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
         private async Task<bool> TryEnrichWarningsFromDtddAsync(Movie movie, string apiKey)
         {
             var imdbId = movie.ImdbId;
-            var tmdbId = movie.TmdbId;           // int? in your model
+            var tmdbId = movie.TmdbId;
             var title = movie.Title;
-            var releaseYear = movie.ReleaseYear; // int in your model
+            var releaseYear = movie.ReleaseYear;
 
             int? dtddMediaId = null;
 
-            // Optional manual override (lets you fix edge cases without changing code)
             var overrideRow = await _context.DtddOverrides.AsNoTracking()
                 .FirstOrDefaultAsync(o => o.ImdbId == imdbId);
 
@@ -1027,15 +1452,12 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
             try
             {
-                // 1) IMDb
                 if (dtddMediaId == null && !string.IsNullOrWhiteSpace(imdbId))
                     dtddMediaId = await FetchDtddMediaIdByImdbAsync(imdbId, apiKey);
 
-                // 2) TMDB
                 if (dtddMediaId == null && tmdbId.HasValue && tmdbId.Value > 0)
                     dtddMediaId = await FetchDtddMediaIdByTmdbAsync(tmdbId.Value, apiKey);
 
-                // 3) Title + release year
                 if (dtddMediaId == null && !string.IsNullOrWhiteSpace(title) && releaseYear > 0)
                     dtddMediaId = await FetchDtddMediaIdByTitleYearAsync(title, releaseYear, apiKey);
 
@@ -1046,8 +1468,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             }
             catch
             {
-                // DTDD sometimes returns HTML / blocks requests / etc.
-                // Treat as "no enrichment" instead of crashing MovieSearch.
                 return false;
             }
 
@@ -1083,7 +1503,8 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
                     Answer = s.Answer,
                     IsSpoiler = s.IsSpoiler,
                     WarningComment = s.Comment,
-                    CreatedAt = now
+                    CreatedAt = now,
+                    UpdatedAt = now
                 });
             }
 
@@ -1116,53 +1537,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             return null;
         }
 
-        private async Task<int?> FetchDtddMediaIdBySearchAsync(string query, string apiKey, int? matchTmdbId, int? matchReleaseYear)
-        {
-            using var http = new HttpClient();
-            http.DefaultRequestHeaders.Add("Accept", "application/json");
-            http.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
-
-            var url = $"https://www.doesthedogdie.com/dddsearch?q={Uri.EscapeDataString(query)}";
-            var json = await http.GetStringAsync(url);
-
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-
-            if (!root.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
-                return null;
-
-            int? bestId = null;
-
-            foreach (var item in items.EnumerateArray())
-            {
-                // DTDD item shape varies; these fields are usually present but not guaranteed
-                int? id = null;
-                if (item.TryGetProperty("id", out var idEl) && idEl.ValueKind == JsonValueKind.Number)
-                    id = idEl.GetInt32();
-
-                int? tmdb = null;
-                if (item.TryGetProperty("tmdbId", out var tmdbEl) && tmdbEl.ValueKind == JsonValueKind.Number)
-                    tmdb = tmdbEl.GetInt32();
-
-                int? year = null;
-                if (item.TryGetProperty("releaseYear", out var yearEl) && yearEl.ValueKind == JsonValueKind.Number)
-                    year = yearEl.GetInt32();
-
-                if (!id.HasValue)
-                    continue;
-
-                // Prefer an exact TMDB match if we have one
-                if (matchTmdbId.HasValue && tmdb.HasValue && tmdb.Value == matchTmdbId.Value)
-                    return id.Value;
-
-                // Otherwise, accept a year match (if requested), but keep scanning in case a TMDB match appears later
-                if (bestId == null && matchReleaseYear.HasValue && year.HasValue && year.Value == matchReleaseYear.Value)
-                    bestId = id.Value;
-            }
-
-            return bestId;
-        }
-
         private async Task<int?> FetchDtddMediaIdByTmdbAsync(int tmdbId, string apiKey)
         {
             using var http = new HttpClient();
@@ -1178,7 +1552,7 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             }
             catch
             {
-                return null; // network issue, don’t crash search
+                return null;
             }
 
             if (!resp.IsSuccessStatusCode)
@@ -1187,13 +1561,10 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             var contentType = resp.Content.Headers.ContentType?.MediaType ?? "";
             var text = await resp.Content.ReadAsStringAsync();
 
-            // DTDD sometimes returns HTML error pages (Cloudflare, etc.)
             if (!contentType.Contains("json", StringComparison.OrdinalIgnoreCase))
             {
-                // Fallback heuristic: if it starts with '<' it's almost certainly HTML
                 if (!string.IsNullOrWhiteSpace(text) && text.TrimStart().StartsWith("<", StringComparison.Ordinal))
                     return null;
-                // If it’s not JSON but also not HTML, still play it safe
                 return null;
             }
 
@@ -1218,8 +1589,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             http.DefaultRequestHeaders.Add("Accept", "application/json");
             http.DefaultRequestHeaders.Add("X-API-KEY", apiKey);
 
-            // DTDD supports title searching; year helps disambiguate.
-            // If your DTDD response shape differs, we can adjust parsing after you run 1 request and paste the JSON.
             var q = Uri.EscapeDataString(title);
             var url = $"https://www.doesthedogdie.com/dddsearch?q={q}";
             var json = await http.GetStringAsync(url);
@@ -1232,7 +1601,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
             foreach (var item in itemsEl.EnumerateArray())
             {
-                // Try to match year if present
                 if (item.TryGetProperty("releaseYear", out var yEl) && yEl.ValueKind == JsonValueKind.Number)
                 {
                     if (yEl.GetInt32() != releaseYear)
@@ -1243,7 +1611,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
                     return idVal;
             }
 
-            // If no year match, fall back to first id if any
             foreach (var item in itemsEl.EnumerateArray())
             {
                 if (item.TryGetProperty("id", out var idEl) && idEl.TryGetInt32(out var idVal))
@@ -1286,7 +1653,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
                         isSpoiler = spEl.GetBoolean();
                 }
 
-                // Prefer vote sums when available; otherwise fall back to isYes; otherwise unknown
                 int? yesSum = null;
                 int? noSum = null;
                 int? isYes = null;
@@ -1335,7 +1701,7 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
         private async Task<bool> TryEnrichGenresFromTmdbAsync(Movie movie, string apiKey)
         {
-           var tmdbId = movie.TmdbId;
+            var tmdbId = movie.TmdbId;
             if (!tmdbId.HasValue || tmdbId.Value <= 0)
                 return false;
 
@@ -1515,8 +1881,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             public string? Character { get; set; }
             public int? Order { get; set; }
             public string? CreditId { get; set; }
-            public string? KnownForDepartment { get; set; }
-            public string? ProfilePath { get; set; }
         }
 
         private sealed class TmdbCrewRow
@@ -1526,8 +1890,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             public string? Department { get; set; }
             public string? Job { get; set; }
             public string? CreditId { get; set; }
-            public string? KnownForDepartment { get; set; }
-            public string? ProfilePath { get; set; }
         }
 
         private async Task<TmdbCredits?> FetchTmdbCreditsAsync(int tmdbId, string apiKey)
@@ -1610,7 +1972,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
             foreach (var id in ids)
             {
-                // Find a name from cast/crew rows (good enough for search matching).
                 var name = credits.Cast.FirstOrDefault(x => x.PersonId == id)?.Name
                            ?? credits.Crew.FirstOrDefault(x => x.PersonId == id)?.Name;
 
@@ -1662,8 +2023,6 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
 
             foreach (var c in credits.Cast)
             {
-                // CastOrder expects int?; c.Order must be an int? property (not a method)
-                var castOrder = c.Order;
                 if (c.PersonId <= 0 || string.IsNullOrWhiteSpace(c.CreditId))
                     continue;
 
@@ -1751,9 +2110,90 @@ private async Task<bool> UpsertMovieCoreFromTmdbAsync(int tmdbId, string imdbId,
             return true;
         }
 
-        // -----------------------------------------
-        // Umbrella tier expansion: category/subcategory -> topic ids
-        // -----------------------------------------
+        // =========================================================================
+        // TMDB PERSON SEARCH + UPSERT
+        // Called when a personName isn't found in our local people table.
+        // Searches TMDB, upserts matching people rows, returns the TMDB person IDs
+        // that were added so the caller can re-query our DB.
+        // =========================================================================
+
+        private async Task<List<int>> FetchAndUpsertTmdbPersonsByNameAsync(string name, string apiKey)
+        {
+            try
+            {
+                using var http = new HttpClient();
+                var url = $"https://api.themoviedb.org/3/search/person?api_key={apiKey}" +
+                          $"&query={Uri.EscapeDataString(name)}&include_adult=false&page=1";
+
+                using var resp = await http.GetAsync(url);
+                if (!resp.IsSuccessStatusCode) return new List<int>();
+
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                if (!root.TryGetProperty("results", out var resultsEl) || resultsEl.ValueKind != JsonValueKind.Array)
+                    return new List<int>();
+
+                var now = DateTime.UtcNow;
+                var upsertedIds = new List<int>();
+
+                foreach (var r in resultsEl.EnumerateArray())
+                {
+                    if (!r.TryGetProperty("id", out var idEl) || !idEl.TryGetInt32(out var tmdbPersonId))
+                        continue;
+
+                    var personName = r.TryGetProperty("name", out var nameEl) ? nameEl.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(personName)) continue;
+
+                    var knownFor = r.TryGetProperty("known_for_department", out var kfEl) ? kfEl.GetString() : null;
+                    var profilePath = r.TryGetProperty("profile_path", out var ppEl) ? ppEl.GetString() : null;
+                    string? profileUrl = !string.IsNullOrWhiteSpace(profilePath)
+                        ? $"https://image.tmdb.org/t/p/w185{profilePath}"
+                        : null;
+
+                    var existing = await _context.People
+                        .FirstOrDefaultAsync(p => p.TmdbPersonId == tmdbPersonId);
+
+                    if (existing == null)
+                    {
+                        _context.People.Add(new Person
+                        {
+                            TmdbPersonId = tmdbPersonId,
+                            PersonName = personName!,
+                            KnownForDepartment = knownFor,
+                            ProfileUrl = profileUrl,
+                            CreatedAt = now,
+                            UpdatedAt = now
+                        });
+                    }
+                    else
+                    {
+                        existing.PersonName = personName!;
+                        existing.KnownForDepartment = knownFor;
+                        if (!string.IsNullOrWhiteSpace(profileUrl))
+                            existing.ProfileUrl = profileUrl;
+                        existing.UpdatedAt = now;
+                    }
+
+                    upsertedIds.Add(tmdbPersonId);
+                }
+
+                if (upsertedIds.Count > 0)
+                    await _context.SaveChangesAsync();
+
+                return upsertedIds;
+            }
+            catch
+            {
+                // Never crash the search endpoint over a person lookup
+                return new List<int>();
+            }
+        }
+
+                // =========================================================================
+        // UMBRELLA TIER EXPANSION: category/subcategory → topic IDs
+        // =========================================================================
 
         private async Task<List<int>> ResolveTopicIdsAsync(
             List<int> topicIds,
@@ -1805,7 +2245,9 @@ WHERE wst.subcategory_id = ANY(@subcategoryIds);";
         }
     }
 
-    // Keep this helper controller in the same file so Swagger always sees it.
+    // =========================================================================
+    // EXTERNAL API TEST CONTROLLER (kept in the same file so Swagger sees it)
+    // =========================================================================
     [ApiController]
     [Route("api/[controller]")]
     public class ExternalApiTestController : ControllerBase
