@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\FindMyFlickWebsite.Server.props" />
-</Project>
