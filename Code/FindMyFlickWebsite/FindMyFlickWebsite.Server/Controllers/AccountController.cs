@@ -75,17 +75,15 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         //add role
         [HttpPost("add-role")]
-        public async Task<IActionResult> AddRole([FromBody] UserRole model)
+        public async Task<IActionResult> AddRole([FromBody] string role)
         {
-            var user = await _userManager.FindByNameAsync(model.Username);
-            if (user == null)
-                return NotFound("User not found!");
-            if (!await _roleManager.RoleExistsAsync(model.Role))
-                return NotFound("Role not found!");
-            var result = await _userManager.AddToRoleAsync(user, model.Role);
-            if (result.Succeeded)
-                return Ok("Role added to user successfully!");
-            return BadRequest(result.Errors);
+            if(!await _roleManager.RoleExistsAsync(role))
+            {   var result = await _roleManager.CreateAsync(new IdentityRole(role));
+                if (result.Succeeded)
+                    return Ok("Role created successfully!");
+                return BadRequest(result.Errors);
+            }
+            return Conflict("Role already exists!");
 
         }
 
