@@ -1,16 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsAspireHost>true</IsAspireHost>
-    <UserSecretsId>1c6d781b-1d1c-45cd-9c5e-eef7958f7483</UserSecretsId>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0" />
-  </ItemGroup>
-
+<Project Sdk="Microsoft.Net.Sdk">
+<PropertyGroup>   
+	<OutputType>Exe</OutputType>   
+	<TargetFramework>net8.0</TargetFramework>   
+	<ImplicitUsings>enable</ImplicitUsings>   
+	<Nullable>enable</Nullable>   
+	<IsAspireHost>true</IsAspireHost>   
+	<UserSecretsId>1c6d781b-1d1c-45cd-9c5e-eef7958f7483</UserSecretsId> 
+</PropertyGroup>
+ 
+<ItemGroup>   
+	<PackageReference Include="Aspire.Hosting.AppHost" Version="8.1.0" /> 
+</ItemGroup>
+ 
+<ItemGroup>   
+	<ProjectReference Include="..\FindMyFlickWebsite.Server\FindMyFlickWebsite.Server.csproj"                    		IsAspireProjectResource="true" /> 
+</ItemGroup>
 </Project>

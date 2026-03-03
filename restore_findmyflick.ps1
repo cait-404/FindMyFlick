@@ -7,7 +7,7 @@ psql -h localhost -p 5432 -U postgres -c "CREATE DATABASE findmyflick;"
 if ($LASTEXITCODE -ne 0) { throw "Create failed." }
 
 Write-Host "Step 3/4: Restoring dump (this can take a few minutes)..." -ForegroundColor Cyan
-pg_restore -h localhost -p 5432 -U postgres -d findmyflick -c "database/assets/findmyflick_starter.backup"
+pg_restore -h localhost -p 5432 -U postgres -d findmyflick -d "database/assets/findmyflick_starter.backup"
 if ($LASTEXITCODE -ne 0) { throw "Restore failed." }
 
 Write-Host "Step 4/4: Verifying row counts..." -ForegroundColor Cyan

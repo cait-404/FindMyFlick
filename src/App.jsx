@@ -1,99 +1,121 @@
 import './App.css';
+import { Routes, Route, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
-import Search from './assets/pages/Search';
- 
+
 import Home from './assets/pages/Home';
 import Discover from './assets/pages/Discover';
 import Genres from './assets/pages/Genres';
 import About from './assets/pages/About';
 import Profile from './assets/pages/Profile';
- 
-function App() {
+import Search from './assets/pages/Search';
+import LoginSignup from './assets/pages/LoginSignup';
+
+export default function App() {
+
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
- 
+
   const handleSearch = () => {
-    if (searchTerm.trim() !== '') {
-      //navigate(`/search?query=${searchTerm}`);
-      navigate(`/search?query=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchTerm('');
-    }
+    if (!searchTerm.trim()) return;
+
+    navigate(`/search?query=${encodeURIComponent(searchTerm.trim())}`);
+    setSearchTerm('');
   };
- 
+
   return (
     <>
-      <nav className="w-full bg-black text-white px-6 py-4 flex justify-between items-center disco-glow">
-        <h1 className="text-2xl font-bold tracking-wider neon-text">
+      {/* NAVBAR */}
+      <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
+
+        <h1 className="text-2xl font-bold text-pink-500">
           FindMyFlick
         </h1>
- 
-        <ul className="flex gap-6 text-lg font-medium items-center">
-          <li>
-            <NavLink to="/" className={({ isActive }) =>
-              isActive ? "nav-link active-nav" : "nav-link"
-            }>
-              Home
-            </NavLink>
-          </li>
- 
-          <li>
-            <NavLink to="/discover" className={({ isActive }) =>
-              isActive ? "nav-link active-nav" : "nav-link"
-            }>
-              Discover
-            </NavLink>
-          </li>
- 
-          <li>
-            <NavLink to="/genres" className={({ isActive }) =>
-              isActive ? "nav-link active-nav" : "nav-link"
-            }>
-              Genres
-            </NavLink>
-          </li>
- 
-          <li>
-            <NavLink to="/about" className={({ isActive }) =>
-              isActive ? "nav-link active-nav" : "nav-link"
-            }>
-              About
-            </NavLink>
-          </li>
- 
-          <li>
-            <NavLink to="/profile" className={({ isActive }) =>
-              isActive ? "nav-link active-nav" : "nav-link"
-            }>
-              Profile
-            </NavLink>
-          </li>
- 
-          <li className="flex gap-1 items-center">
+
+        <div className="flex gap-6 items-center flex-wrap">
+
+      <NavLink
+  to="/"
+  className={({ isActive }) =>
+    isActive ? "nav-link active-nav" : "nav-link"
+  }
+>
+  Home
+</NavLink>
+
+<NavLink
+  to="/discover"
+  className={({ isActive }) =>
+    isActive ? "nav-link active-nav" : "nav-link"
+  }
+>
+  Discover
+</NavLink>
+
+<NavLink
+  to="/genres"
+  className={({ isActive }) =>
+    isActive ? "nav-link active-nav" : "nav-link"
+  }
+>
+  Genres
+</NavLink>
+
+<NavLink
+  to="/about"
+  className={({ isActive }) =>
+    isActive ? "nav-link active-nav" : "nav-link"
+  }
+>
+  About
+</NavLink>
+
+<NavLink
+  to="/profile"
+  className={({ isActive }) =>
+    isActive ? "nav-link active-nav" : "nav-link"
+  }
+>
+  Profile
+</NavLink>
+
+          {/* SEARCH BAR */}
+          <div className="flex gap-2 items-center">
+
             <input
               type="text"
+              placeholder="Search movies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              className="p-1 rounded-md text-black text-sm"
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearch();
-                }
+                if (e.key === "Enter") handleSearch();
               }}
+              className="p-2 rounded-md text-black text-sm"
             />
- 
-            <button
-              onClick={handleSearch}
-              className="bg-white/10 hover:bg-white/20 px-2 py-1 rounded-md text-white text-sm flex items-center justify-center"
-            >
-              <FaSearch />
-            </button>
-          </li>
-        </ul>
+
+          <button
+  onClick={handleSearch}
+  className="btn-neon disco-glow px-3 py-2 rounded-md flex items-center justify-center"
+>
+  <FaSearch />
+</button>
+          </div>
+
+          <Link
+  to="/auth"
+  className="px-5 py-2 rounded-full font-semibold transition
+             bg-linear-to-r from-[#ff39e1] to-[#ff6ed0]
+             shadow-[0_0_15px_#ff39e1]
+             hover:shadow-[0_0_30px_#ff6ed0]
+             hover:scale-105"
+>
+  Login / Signup
+</Link>
+
+        </div>
       </nav>
- 
+
+      {/* ROUTES */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/discover" element={<Discover />} />
@@ -101,9 +123,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/auth" element={<LoginSignup />} />
       </Routes>
     </>
   );
 }
- 
-export default App;
