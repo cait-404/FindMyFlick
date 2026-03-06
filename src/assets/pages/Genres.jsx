@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa";
 
 const genreColors = {
@@ -36,11 +36,13 @@ export default function Genres() {
   useEffect(() => {
     fetch("http://localhost:5002/api/Movies")
       .then(res => res.json())
-      .then(movies => {
-        const genreMap = {};
+      .then(movies => console.log(movies[0])) //{
+        //const genreMap = {};
+      console.log("Fetched movies for genres:", movies[0]);
+        
 
         movies.forEach(movie => {
-          movie.genre.forEach(g => {
+          movie.genres.forEach(g => {
             const key = g.toLowerCase();
             genreMap[key] = (genreMap[key] || 0) + 1;
           });
@@ -53,7 +55,7 @@ export default function Genres() {
           }))
         );
       });
-  }, []);
+ // }, []);
 
   return (
     <div className="min-h-screen px-6 py-12 bg-linear-to-b from-black via-[#12001a] to-black text-white">
