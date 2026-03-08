@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt; 
 using System.Security.Claims;
 
+//all of the code here is based on this tutorial https://www.youtube.com/watch?v=brxStRVyJiM . this also includes the code for the admin and user controllers, plus their datamodels and the code for the jwt authentication in the program.cs file.
 namespace FindMyFlickWebsite.Server.Controllers
 {
     [Route("api/[controller]")]
