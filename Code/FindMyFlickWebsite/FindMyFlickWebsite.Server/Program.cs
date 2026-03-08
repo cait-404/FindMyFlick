@@ -1,4 +1,5 @@
 using FindMyFlickWebsite.Server;
+using FindMyFlickWebsite.Server.DataModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)
     //.UseSnakeCaseNamingConvention()
+);
+
+builder.Services.AddDbContext<FindmyflickContext>(options =>
+    options.UseNpgsql(connectionString)
 );
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
