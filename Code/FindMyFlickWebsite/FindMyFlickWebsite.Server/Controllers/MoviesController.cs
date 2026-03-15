@@ -333,15 +333,109 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // ============================================================
         // DEFAULT GET (GET /api/Movies)
+        // Added optional paging via ?page=1 (page size is fixed to PageSize)
+        // Added optional ordering via ?order={release_year|none|title_asc|title_desc}
         // ============================================================
 
         [HttpGet]
-        public async Task<IActionResult> GetMoviesView_ParseImdb()
+        public async Task<IActionResult> GetMoviesView_ParseImdb(
+            [FromQuery] int page = 1,
+            [FromQuery] string? order = "release_year")
         {
             try
             {
-                var (dto, _) = await LoadMovieDtosAsync();
-                return Ok(dto);
+                if (page <= 0) page = 1;
+                const int PageSize = 50;
+
+                // Build base query (no ordering yet)
+                IQueryable<Movie> query = _context.Movies
+                    .Include(m => m.MovieGenres).ThenInclude(g => g.TmdbGenre)
+                    .Include(m => m.MovieStreamings).ThenInclude(s => s.TmdbProvider)
+                    .Include(m => m.MovieWarnings).ThenInclude(w => w.DtddTopic)
+                    .AsNoTracking();
+
+                // Normalise order param
+                var ord = (order ?? "release_year").Trim().ToLowerInvariant();
+
+                // Apply ordering based on query parameter:
+                // - "release_year" (default): release year desc, then title asc
+                // - "none": no ordering (database default)
+                // - "title_asc": order by title ascending
+                // - "title_desc": order by title descending
+                switch (ord)
+                {
+                    case "none":
+                        // leave unordered
+                        break;
+                    case "title_asc":
+                        query = query.OrderBy(m => m.Title);
+                        break;
+                    case "title_desc":
+                        query = query.OrderByDescending(m => m.Title);
+                        break;
+                    case "release_year":
+                    default:
+                        query = query.OrderByDescending(m => m.ReleaseYear).ThenBy(m => m.Title);
+                        break;
+                }
+
+                var total = await query.CountAsync();
+
+                var loaded = await query
+                    .Skip((page - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToListAsync();
+
+                var dtoList = loaded.Select(m => new MoviesView
+                {
+                    ID = ParseImdbToInt(m.ImdbId),
+                    Name = m.Title ?? "(Untitled)",
+                    Year = m.ReleaseYear,
+                    AgeRating = m.MpaaRating,
+                    Summary = m.PlotSummary ?? "",
+                    Poster = m.PosterUrl,
+                    GenreEntries = m.MovieGenres?.Select(g => new MoviesView.GenreEntry
+                    {
+                        TmdbGenreId = g.TmdbGenreId,
+                        GenreName = g.TmdbGenre?.GenreName ?? string.Empty
+                    }).ToList() ?? [],
+                    Genre = m.MovieGenres?
+                        .Select(g => g.TmdbGenre?.GenreName ?? string.Empty)
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .ToList() ?? [],
+                    StreamingProviders = m.MovieStreamings?
+                        .GroupBy(ms => ms.TmdbProviderId)
+                        .Select(g => new MoviesView.StreamingProviderView
+                        {
+                            Id = g.Key,
+                            ProviderName = g.First().TmdbProvider?.ProviderName ?? string.Empty
+                        })
+                        .ToList() ?? [],
+                    Tags = new TagsView
+                    {
+                        TriggerTags = (m.MovieWarnings ?? [])
+                            .Where(w => string.Equals(w.Answer?.Trim(), "yes", StringComparison.OrdinalIgnoreCase))
+                            .Select(w => new TagsView.TriggerTag
+                            {
+                                TagID = w.DtddTopicId,
+                                TagName = w.DtddTopic?.TopicName ?? string.Empty
+                            })
+                          .GroupBy(t => t.TagName?.ToLowerInvariant() ?? string.Empty)
+                            .Select(g => g.First())
+                            .ToList(),
+                        PlotTags = new List<TagsView.PlotTag>(),
+                        PersonTags = new List<TagsView.PersonTag>()
+                    },
+                    TagVotes = new List<MoviesView.TagVote>()
+                }).ToList();
+
+                // Expose simple pagination + ordering headers (optional for clients)
+                Response.Headers["X-Total-Count"] = total.ToString();
+                Response.Headers["X-Page"] = page.ToString();
+                Response.Headers["X-Page-Size"] = PageSize.ToString();
+                Response.Headers["X-Order"] = ord;
+
+                return Ok(dtoList);
             }
             catch (Exception ex)
             {
@@ -351,6 +445,7 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // ============================================================
         // GET BY ID (GET /api/Movies/{id})
+        // Returns core movie information only (title, poster, year, summary) to avoid timeouts.
         // ============================================================
 
         [HttpGet("{id}")]
@@ -358,11 +453,16 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(id))
+                    return BadRequest(new { message = "id cannot be empty." });
+
+                if (!id.StartsWith("tt", StringComparison.OrdinalIgnoreCase))
+                    id = "tt" + id; // ensure it starts with 'tt' for consistent searching
+
                 //half copilot gnerated via asking it to create a get by id method using imdb ids ex. tt31227572, but then refactored for preformance by me
                 if (string.IsNullOrWhiteSpace(id))
                     return BadRequest(new { message = "id cannot be empty." });
-                if (!id.StartsWith("tt", StringComparison.OrdinalIgnoreCase))
-                    id = "tt" + id; // ensure it starts with 'tt' for consistent searching
+
                 var movie = await _context.Movies
                     .AsNoTracking()
                     .Select(m => m)

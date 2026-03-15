@@ -26,11 +26,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// keep ApplicationDbContext for Identity migrations / tooling
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)
     //.UseSnakeCaseNamingConvention()
 );
 
+// ===== ADDED: DbContextFactory for FindmyflickContext =====
+builder.Services.AddDbContextFactory<FindmyflickContext>(options =>
+    options.UseNpgsql(connectionString)
+);
+
+// Existing registration for direct FindmyflickContext (you may keep or remove if fully migrating to factory)
 builder.Services.AddDbContext<FindmyflickContext>(options =>
     options.UseNpgsql(connectionString)
 );
