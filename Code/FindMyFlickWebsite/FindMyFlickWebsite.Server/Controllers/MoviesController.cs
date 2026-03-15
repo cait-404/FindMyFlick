@@ -240,6 +240,34 @@ namespace FindMyFlickWebsite.Server.Controllers
         }
 
         // ============================================================
+        // GET BY ID (GET /api/Movies/{id})
+        // ============================================================
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMovieById(string id)
+        {
+            try
+            {
+                //half copilot gnerated via asking it to create a get by id method using imdb ids ex. tt31227572, but then refactored for preformance by me
+                if (string.IsNullOrWhiteSpace(id))
+                    return BadRequest(new { message = "id cannot be empty." });
+
+                var movie = await _context.Movies
+                    .AsNoTracking()
+                    .Select(m => m)
+                    .Where(m => m.ImdbId == id)
+                    .Take(1)
+                    .ToListAsync();
+                if (movie == null) return NotFound(new { message = $"Movie with ID '{id}' not found." });
+                return Ok(movie);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message, stack = ex.StackTrace });
+            }
+        }
+
+        // ============================================================
         // HELPERS
         // ============================================================
 
