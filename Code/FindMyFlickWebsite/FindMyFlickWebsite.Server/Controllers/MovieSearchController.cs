@@ -144,6 +144,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         // =========================================================================
 
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<ActionResult<MovieSearchResponse>> Search([FromBody] MovieSearchRequest req)
         {
             if (req.Take <= 0) req.Take = 25;
