@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]  # seed_fix -> python_scripts -> repo
 load_dotenv(ROOT / ".env")
 
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
-DB_CONN_STR = "host=localhost port=5432 dbname=findmyflick user=postgres"
+DB_CONN_STR = os.getenv("DB_CONN_STR", "host=localhost port=5432 dbname=findmyflick user=postgres password=p@ssw0rd")
 
 if not OMDB_API_KEY:
     raise SystemExit("Missing OMDB_API_KEY env var. Add it to .env, then rerun.")
