@@ -976,28 +976,29 @@ namespace FindMyFlickWebsite.Server.Controllers
                     }
                 }
 
-                if (req.KeywordIds.Count > 0 && !await _context.MovieKeywords.AnyAsync(mk => mk.ImdbId == imdbId))
+                // Always enrich all data for every movie regardless of search criteria
+                if (!await _context.MovieGenres.AnyAsync(mg => mg.ImdbId == imdbId))
+                    await TryEnrichGenresFromTmdbAsync(movie, tmdbKey);
+
+                if (!await _context.MovieKeywords.AnyAsync(mk => mk.ImdbId == imdbId))
                     await TryEnrichKeywordsFromTmdbAsync(movie, tmdbKey);
 
-                if (req.PersonIds.Count > 0)
+                var hasCastOrCrew =
+                    await _context.MovieCasts.AnyAsync(mc => mc.ImdbId == imdbId) ||
+                    await _context.MovieCrews.AnyAsync(mc => mc.ImdbId == imdbId);
+                if (!hasCastOrCrew)
                 {
-                    var hasCastOrCrew =
-                        await _context.MovieCasts.AnyAsync(mc => mc.ImdbId == imdbId) ||
-                        await _context.MovieCrews.AnyAsync(mc => mc.ImdbId == imdbId);
-                    if (!hasCastOrCrew)
-                    {
-                        await TryEnrichCastFromTmdbAsync(movie, tmdbKey);
-                        await TryEnrichCrewFromTmdbAsync(movie, tmdbKey);
-                    }
+                    await TryEnrichCastFromTmdbAsync(movie, tmdbKey);
+                    await TryEnrichCrewFromTmdbAsync(movie, tmdbKey);
                 }
 
-                // Enrich MPAA rating from OMDB if not already set
                 if (string.IsNullOrWhiteSpace(movie.MpaaRating))
                 {
                     var omdbKey = Environment.GetEnvironmentVariable("OMDB_API_KEY");
                     if (!string.IsNullOrWhiteSpace(omdbKey))
                         await TryEnrichMpaaRatingFromOmdbAsync(movie, omdbKey);
                 }
+
 
                 if (wasNew || !(hadWarningsBefore && hadStreamableBefore)) added++;
             }
