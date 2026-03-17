@@ -7,7 +7,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566",
-        "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334"
+        "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334",
+        "OMDB_API_KEY": "f5e67b85"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5135"
@@ -19,7 +20,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334",
-        "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566"
+        "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566",
+        "OMDB_API_KEY": "f5e67b85"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7225;http://localhost:5135"
@@ -29,12 +31,16 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334",
+        "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566",
+        "OMDB_API_KEY": "f5e67b85"
       }
     },
     "environmentVariables": {
       "TMDB_API_KEY": "7ed4bca7d883014fada9ad34e4b50334",
-      "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566"
+      "DTDD_API_KEY": "9c752d7cd2e70711aed62f99c1e22566",
+      "OMDB_API_KEY": "f5e67b85"
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
