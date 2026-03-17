@@ -10,6 +10,8 @@ namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
+    [IgnoreAntiforgeryToken]
     public class MovieSearchController : ControllerBase
     {
         private readonly FindmyflickContext _context;
