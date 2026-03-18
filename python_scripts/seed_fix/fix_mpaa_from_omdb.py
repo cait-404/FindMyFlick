@@ -19,7 +19,42 @@ if not OMDB_API_KEY:
 MARK_UNRATED = "--mark-unrated" in sys.argv
 
 
+def normalize_rating(rated: str) -> str | None:
+    """
+    Normalize an OMDB rating string to a standard MPAA value.
+    Returns None only when the caller should decide (i.e. no rating found at all).
+    Legacy mappings:
+      GP, M/PG, M  -> PG  (pre-1972 MPAA ratings)
+      X            -> NC-17 (pre-1990 MPAA rating)
+      AO, 13+, etc -> Not Rated (non-US or non-standard ratings)
+    """
+    r = rated.strip().upper()
+
+    if r in ("NOT RATED", "UNRATED", "NR", "N/A", "PASSED", "APPROVED"):
+        return "Not Rated"
+    if r == "G":
+        return "G"
+    if r in ("PG", "GP", "M/PG", "M"):
+        return "PG"
+    if r == "PG-13":
+        return "PG-13"
+    if r == "R":
+        return "R"
+    if r in ("NC-17", "X"):
+        return "NC-17"
+    if r.startswith("TV-"):
+        return rated.strip()
+
+    # Anything else (AO, 13+, foreign ratings, etc.) -> Not Rated
+    return "Not Rated"
+
+
 def fetch_omdb_rating(imdb_id: str) -> str | None:
+    """
+    Fetch MPAA rating from OMDB.
+    Returns a normalized rating string, or None if OMDB had no data at all
+    (so the caller can decide whether to write 'Not Rated' or skip).
+    """
     url = "https://www.omdbapi.com/"
     params = {"apikey": OMDB_API_KEY, "i": imdb_id}
     headers = {"User-Agent": "FindMyFlick/seed-fix (mpaa backfill)"}
@@ -35,15 +70,7 @@ def fetch_omdb_rating(imdb_id: str) -> str | None:
     if not rated:
         return None
 
-    rated = " ".join(rated.strip().split())
-
-    if rated.upper() in ("N/A", "PASSED", "APPROVED"):
-        return "Not Rated"
-
-    if rated.upper() in ("NOT RATED", "UNRATED", "NR"):
-        return "Not Rated"
-
-    return rated
+    return normalize_rating(rated)
 
 
 def main() -> None:

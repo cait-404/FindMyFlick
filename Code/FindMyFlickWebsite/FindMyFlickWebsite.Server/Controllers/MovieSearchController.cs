@@ -291,8 +291,13 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             // If no genre and no person, nothing meaningful to relax —
             // return recent streamable movies that respect all strict filters.
+            // If streaming providers are specified, return empty rather than
+            // showing unrelated movies that just happen to be on that service.
             if (!hasGenre && !hasPerson)
             {
+                if (hasProvider)
+                    return new List<MovieSearchResultCard>();
+
                 return await RunRecommendationSegment(
                     req, excludeImdbIds,
                     useGenre: false, usePerson: false, useRating: false,
@@ -995,7 +1000,15 @@ namespace FindMyFlickWebsite.Server.Controllers
                     await TryEnrichCrewFromTmdbAsync(movie, tmdbKey);
                 }
 
-                if (string.IsNullOrWhiteSpace(movie.MpaaRating))
+                // Always attempt OMDB rating enrichment for newly added or unrated movies.
+                // Check the database directly rather than the in-memory object since
+                // multiple SaveChanges calls may cause EF tracking inconsistencies.
+                var currentRating = await _context.Movies
+                    .Where(m => m.ImdbId == imdbId)
+                    .Select(m => m.MpaaRating)
+                    .FirstOrDefaultAsync();
+
+                if (string.IsNullOrWhiteSpace(currentRating))
                 {
                     var omdbKey = Environment.GetEnvironmentVariable("OMDB_API_KEY");
                     if (!string.IsNullOrWhiteSpace(omdbKey))
@@ -1020,17 +1033,43 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             if (req.PersonIds.Count > 0)
             {
+                // Always fetch the full person credits first — this is much more
+                // comprehensive than TMDB discover's with_people filter, which
+                // misses many valid credits especially for cast members.
                 var personMovieIds = new List<int>();
                 foreach (var personId in req.PersonIds.Distinct())
                     personMovieIds.AddRange(await FetchTmdbPersonMovieCreditsAsync(personId, apiKey, req.PersonRoles));
 
+                var personSet = personMovieIds.Distinct().ToHashSet();
+
+                // If we also have genre or provider filters, fetch a broad discover
+                // result set using ONLY those filters (not with_people) and intersect
+                // locally. This avoids TMDB's overly strict AND behaviour when
+                // combining with_people + with_genres + with_watch_providers.
                 if (req.GenreIds.Count > 0 || req.StreamingProviderIds.Count > 0)
                 {
-                    var discoverSet = new HashSet<int>(await FetchTmdbDiscoverMovieIdsAsync(req, apiKey));
-                    return personMovieIds.Distinct().Where(id => discoverSet.Contains(id)).ToList();
+                    // Build a discover request without the person filter
+                    var discoverReq = Clone(req);
+                    discoverReq.PersonIds = new List<int>();
+
+                    var discoverIds = await FetchTmdbDiscoverMovieIdsAsync(discoverReq, apiKey);
+                    var discoverSet = new HashSet<int>(discoverIds);
+
+                    // Return movies that appear in BOTH the person credits AND
+                    // the genre/provider discover results
+                    var intersection = personSet.Where(id => discoverSet.Contains(id)).ToList();
+
+                    // If the intersection is very small (TMDB discover may not have
+                    // all movies for older or less popular titles), fall back to
+                    // returning all person credits and let the DB query filter by
+                    // genre/provider from our local data.
+                    if (intersection.Count < 10)
+                        return personSet.Take(150).ToList();
+
+                    return intersection;
                 }
 
-                return personMovieIds.Distinct().Take(150).ToList();
+                return personSet.Take(150).ToList();
             }
 
             return await FetchTmdbDiscoverMovieIdsAsync(req, apiKey);
@@ -1740,12 +1779,23 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var root = doc.RootElement;
 
                 if (!root.TryGetProperty("Response", out var respEl) || respEl.GetString() != "True")
-                    return false;
+                {
+                    movie.MpaaRating = "Not Rated";
+                    movie.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
 
                 if (!root.TryGetProperty("Rated", out var ratedEl)) return false;
 
                 var rated = ratedEl.GetString();
-                if (string.IsNullOrWhiteSpace(rated) || rated == "N/A") return false;
+                if (string.IsNullOrWhiteSpace(rated) || rated == "N/A")
+                {
+                    movie.MpaaRating = "Not Rated";
+                    movie.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
 
                 rated = rated.Trim();
 
@@ -1753,16 +1803,16 @@ namespace FindMyFlickWebsite.Server.Controllers
                 // normalize here so the in-memory object stays consistent.
                 rated = rated.ToUpperInvariant() switch
                 {
-                    "NOT RATED" or "UNRATED" or "NR" => "Not Rated",
-                    "G"     => "G",
-                    "PG"    => "PG",
-                    "PG-13" => "PG-13",
-                    "R"     => "R",
-                    "NC-17" => "NC-17",
-                    _       => rated.StartsWith("TV-", StringComparison.OrdinalIgnoreCase) ? rated : null!
+                    "NOT RATED" or "UNRATED" or "NR" or "N/A" => "Not Rated",
+                    "G"      => "G",
+                    "PG"     => "PG",
+                    "GP" or "M/PG" or "M" => "PG",
+                    "PG-13"  => "PG-13",
+                    "R"      => "R",
+                    "NC-17" or "X" => "NC-17",
+                    "PASSED" or "APPROVED" or "AO" => "Not Rated",
+                    _        => rated.StartsWith("TV-", StringComparison.OrdinalIgnoreCase) ? rated : "Not Rated"
                 };
-
-                if (string.IsNullOrWhiteSpace(rated)) return false;
 
                 movie.MpaaRating = rated;
                 movie.UpdatedAt = DateTime.UtcNow;
