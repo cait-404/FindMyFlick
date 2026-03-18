@@ -1000,7 +1000,15 @@ namespace FindMyFlickWebsite.Server.Controllers
                     await TryEnrichCrewFromTmdbAsync(movie, tmdbKey);
                 }
 
-                if (string.IsNullOrWhiteSpace(movie.MpaaRating))
+                // Always attempt OMDB rating enrichment for newly added or unrated movies.
+                // Check the database directly rather than the in-memory object since
+                // multiple SaveChanges calls may cause EF tracking inconsistencies.
+                var currentRating = await _context.Movies
+                    .Where(m => m.ImdbId == imdbId)
+                    .Select(m => m.MpaaRating)
+                    .FirstOrDefaultAsync();
+
+                if (string.IsNullOrWhiteSpace(currentRating))
                 {
                     var omdbKey = Environment.GetEnvironmentVariable("OMDB_API_KEY");
                     if (!string.IsNullOrWhiteSpace(omdbKey))
@@ -1771,12 +1779,23 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var root = doc.RootElement;
 
                 if (!root.TryGetProperty("Response", out var respEl) || respEl.GetString() != "True")
-                    return false;
+                {
+                    movie.MpaaRating = "Not Rated";
+                    movie.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
 
                 if (!root.TryGetProperty("Rated", out var ratedEl)) return false;
 
                 var rated = ratedEl.GetString();
-                if (string.IsNullOrWhiteSpace(rated) || rated == "N/A") return false;
+                if (string.IsNullOrWhiteSpace(rated) || rated == "N/A")
+                {
+                    movie.MpaaRating = "Not Rated";
+                    movie.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
 
                 rated = rated.Trim();
 
@@ -1784,16 +1803,16 @@ namespace FindMyFlickWebsite.Server.Controllers
                 // normalize here so the in-memory object stays consistent.
                 rated = rated.ToUpperInvariant() switch
                 {
-                    "NOT RATED" or "UNRATED" or "NR" => "Not Rated",
-                    "G"     => "G",
-                    "PG"    => "PG",
-                    "PG-13" => "PG-13",
-                    "R"     => "R",
-                    "NC-17" => "NC-17",
-                    _       => rated.StartsWith("TV-", StringComparison.OrdinalIgnoreCase) ? rated : null!
+                    "NOT RATED" or "UNRATED" or "NR" or "N/A" => "Not Rated",
+                    "G"      => "G",
+                    "PG"     => "PG",
+                    "GP" or "M/PG" or "M" => "PG",
+                    "PG-13"  => "PG-13",
+                    "R"      => "R",
+                    "NC-17" or "X" => "NC-17",
+                    "PASSED" or "APPROVED" or "AO" => "Not Rated",
+                    _        => rated.StartsWith("TV-", StringComparison.OrdinalIgnoreCase) ? rated : "Not Rated"
                 };
-
-                if (string.IsNullOrWhiteSpace(rated)) return false;
 
                 movie.MpaaRating = rated;
                 movie.UpdatedAt = DateTime.UtcNow;
