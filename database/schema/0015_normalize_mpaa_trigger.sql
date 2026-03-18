@@ -1,6 +1,11 @@
 -- 0015_normalize_mpaa_trigger.sql
 -- Automatically normalizes mpaa_rating on insert or update to prevent
--- inconsistent values like "Unrated", "NOT RATED", "NR" from entering the DB.
+-- inconsistent values from entering the DB.
+--
+-- Legacy rating mappings:
+--   GP, M/PG, M  -> PG  (pre-1972 MPAA ratings)
+--   X            -> NC-17 (pre-1990 MPAA rating)
+--   AO, 13+, etc -> Not Rated (non-US or non-standard ratings)
 
 CREATE OR REPLACE FUNCTION normalize_mpaa_rating()
 RETURNS TRIGGER AS $$
@@ -10,11 +15,12 @@ BEGIN
         WHEN TRIM(UPPER(NEW.mpaa_rating)) IN ('NOT RATED', 'UNRATED', 'NR') THEN 'Not Rated'
         WHEN TRIM(UPPER(NEW.mpaa_rating)) = 'G' THEN 'G'
         WHEN TRIM(UPPER(NEW.mpaa_rating)) = 'PG' THEN 'PG'
+        WHEN TRIM(UPPER(NEW.mpaa_rating)) IN ('GP', 'M/PG', 'M') THEN 'PG'
         WHEN TRIM(UPPER(NEW.mpaa_rating)) = 'PG-13' THEN 'PG-13'
         WHEN TRIM(UPPER(NEW.mpaa_rating)) = 'R' THEN 'R'
-        WHEN TRIM(UPPER(NEW.mpaa_rating)) = 'NC-17' THEN 'NC-17'
+        WHEN TRIM(UPPER(NEW.mpaa_rating)) IN ('NC-17', 'X') THEN 'NC-17'
         WHEN TRIM(UPPER(NEW.mpaa_rating)) LIKE 'TV-%' THEN TRIM(NEW.mpaa_rating)
-        ELSE NULL
+        ELSE 'Not Rated'
     END;
     RETURN NEW;
 END;
