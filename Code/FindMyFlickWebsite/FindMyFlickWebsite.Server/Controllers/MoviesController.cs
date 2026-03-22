@@ -17,10 +17,12 @@ namespace FindMyFlickWebsite.Server.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly FindmyflickContext _context;
+        private readonly IDbContextFactory<FindmyflickContext> _dbContextFactory;
 
-        public MoviesController(FindmyflickContext context)
+        public MoviesController(FindmyflickContext context, IDbContextFactory<FindmyflickContext> dbContextFactory)
         {
             _context = context;
+            _dbContextFactory = dbContextFactory;
         }
 
         // ============================================================
@@ -189,20 +191,41 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // ============================================================
         // SEARCH (GET /api/Movies/search)
-        // Refactored to delegate identification to MovieSearchController.Search,
-        // then load and map matching Movies into MoviesView and apply the
-        // existing AdvancedSearch post-filters (matchAll flags, year, age rating).
-        // refactored with copilot to avoid making external API calls during a simple GET search by disabling API fallback in the MovieSearchRequest, and to handle the various possible shapes of the ActionResult returned by MovieSearchController.Search.
+        // Refactored: accept the new MovieSearchRequest query fields,
+        // build a MovieSearchRequest and delegate entirely to MovieSearchController.Search.
         // ============================================================
+
+        //My search endpoint in MoviesController uses the MovieSearchController's logic to return search results. The logic in MovieSearchController
+        //recently changed to use the queries Like this:
+        //{ "genreNames": ["thriller", "comedy"], "personNames": ["Tom Hanks"], "mpaaRatings": ["PG-13"], "streamingProviderNames": ["netflix", "hulu"], "excludeWarningNames": ["graphic violence"], "take": 10, "recommendationTake": 10, "enableApiFallback": true }
+        //    and
+        //{ "genreNames": ["comedy"], "mpaaRatings": ["PG", "PG-13"], "streamingProviderNames": ["disney", "amazon"], "includeWarningNames": ["animal death"], "take": 10, "recommendationTake": 10, "enableApiFallback": true }
+        //refactor my search endpoint in Movies Controller to utalize the new logic
 
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<MoviesView>), 200)]
         public async Task<ActionResult<IEnumerable<MoviesView>>> Search(
-            [FromQuery] string? name = null,
-            [FromQuery] List<string>? streamingServices = null,
+            // Primary free-text / legacy name
+            [FromQuery(Name = "titleContains")] string? titleContains = null,
+            [FromQuery(Name = "name")] string? name = null,
+
+            // New structured search fields
+            [FromQuery(Name = "genreNames")] List<string>? genreNames = null,
+            [FromQuery(Name = "personNames")] List<string>? personNames = null,
+            [FromQuery(Name = "mpaaRatings")] List<string>? mpaaRatings = null,
+            [FromQuery(Name = "streamingProviderNames")] List<string>? streamingProviderNames = null,
+            [FromQuery(Name = "includeWarningNames")] List<string>? includeWarningNames = null,
+            [FromQuery(Name = "excludeWarningNames")] List<string>? excludeWarningNames = null,
+
+            // Control flags
+            [FromQuery(Name = "take")] int take = 25,
+            [FromQuery(Name = "recommendationTake")] int recommendationTake = 0,
+            [FromQuery(Name = "enableApiFallback")] bool enableApiFallback = false,
+            [FromQuery(Name = "maxApiAdds")] int maxApiAdds = 25,
+            [FromQuery(Name = "watchRegion")] string? watchRegion = "US",
+
+            // Backwards-compatible advanced in-memory filters (optional)
             [FromQuery] bool matchAllStreaming = false,
-            [FromQuery] string? ageRating = null,
-            [FromQuery] List<string>? genres = null,
             [FromQuery] bool matchAllGenres = false,
             [FromQuery] int? year = null,
             [FromQuery] List<string>? tagNamesInclude = null,
@@ -212,26 +235,58 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             try
             {
-                // Build a MovieSearchRequest from the incoming query parameters.
-                // Use name -> TitleContains, streamingServices -> StreamingProviderNames,
-                // genres -> GenreNames, tag includes/excludes -> Include/ExcludeWarningNames.
-                // Disable API fallback here to avoid external calls during a simple GET.
+                // Prefer explicit titleContains param, fall back to legacy 'name'
+                var titleFilter = string.IsNullOrWhiteSpace(titleContains) ? name : titleContains;
+
+                // Normalize inputs (trim, remove empties)
+                genreNames = genreNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+                personNames = personNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+                mpaaRatings = mpaaRatings?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+                streamingProviderNames = streamingProviderNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+                includeWarningNames = includeWarningNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+                excludeWarningNames = excludeWarningNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
+
+                // Backwards compatibility: if callers used the old params (genres/streamingServices/tagNamesInclude/tagNamesExclude),
+                // prefer those when provided. This keeps existing clients working.
+                if ((genreNames == null || genreNames.Count == 0) && Request.Query.ContainsKey("genres"))
+                {
+                    var legacyGenres = Request.Query["genres"].ToList().Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
+                    if (legacyGenres.Any()) genreNames = legacyGenres.ToList();
+                }
+
+                if ((streamingProviderNames == null || streamingProviderNames.Count == 0) && Request.Query.ContainsKey("streamingServices"))
+                {
+                    var legacyS = Request.Query["streamingServices"].ToList().Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
+                    if (legacyS.Any()) streamingProviderNames = legacyS.ToList();
+                }
+
+                if ((includeWarningNames == null || includeWarningNames.Count == 0) && tagNamesInclude != null && tagNamesInclude.Count > 0)
+                    includeWarningNames = tagNamesInclude;
+
+                if ((excludeWarningNames == null || excludeWarningNames.Count == 0) && tagNamesExclude != null && tagNamesExclude.Count > 0)
+                    excludeWarningNames = tagNamesExclude;
+
+                // Build the MovieSearchRequest using the MovieSearchController contract.
                 var movieSearchReq = new MovieSearchController.MovieSearchRequest
                 {
-                    TitleContains = name,
-                    StreamingProviderNames = streamingServices ?? new List<string>(),
-                    GenreNames = genres ?? new List<string>(),
-                    IncludeWarningNames = tagNamesInclude ?? new List<string>(),
-                    ExcludeWarningNames = tagNamesExclude ?? new List<string>(),
-                    Take = 200, // fetch a reasonably large candidate set
-                    MinMatches = 1,
-                    EnableApiFallback = false,
-                    MaxApiAdds = 0,
-                    WatchRegion = "US"
+                    TitleContains = titleFilter,
+                    GenreNames = genreNames ?? new List<string>(),
+                    PersonNames = personNames ?? new List<string>(),
+                    MpaaRatings = (mpaaRatings ?? new List<string>()),
+                    StreamingProviderNames = streamingProviderNames ?? new List<string>(),
+                    IncludeWarningNames = includeWarningNames ?? new List<string>(),
+                    ExcludeWarningNames = excludeWarningNames ?? new List<string>(),
+                    Take = Math.Clamp(take, 1, 200),
+                    RecommendationTake = Math.Clamp(recommendationTake, 0, 50),
+                    EnableApiFallback = enableApiFallback,
+                    MaxApiAdds = Math.Clamp(maxApiAdds, 0, 50),
+                    WatchRegion = string.IsNullOrWhiteSpace(watchRegion) ? "US" : watchRegion!
                 };
 
-                // Delegate the core matching to MovieSearchController.
-                var searchController = new MovieSearchController(_context);
+                // Use a NEW DbContext instance for the delegated controller call to avoid optimistic concurrency
+                // between this controller's _context and the mutating work that MovieSearchController may perform.
+                await using var ctxForSearch = _dbContextFactory.CreateDbContext();
+                var searchController = new MovieSearchController(ctxForSearch);
                 var searchActionResult = await searchController.Search(movieSearchReq);
 
                 // Extract the MovieSearchResponse from ActionResult.
@@ -318,10 +373,18 @@ namespace FindMyFlickWebsite.Server.Controllers
                     TagVotes = new List<MoviesView.TagVote>()
                 }).ToList();
 
-                // Apply any remaining advanced in-memory filtering (matchAll flags, year, age rating, exact streaming/genre match logic)
-                var final = AdvancedSearch(dtoList, name, streamingServices, matchAllStreaming,
-                    ageRating, genres, matchAllGenres, year,
+                // Apply any remaining advanced in-memory filtering if the caller supplied legacy advanced params.
+                var final = AdvancedSearch(dtoList, titleFilter ?? name, streamingProviderNames, matchAllStreaming,
+                    // ageRating is not in this signature any more, but mpaaRatings was passed to MovieSearchRequest.
+                    // We leave ageRating null here so AdvancedSearch doesn't double-filter incorrectly.
+                    null, genreNames, matchAllGenres, year,
                     tagNamesInclude, tagNamesExclude, matchAllTagsIn, matchAllTagsEx).ToList();
+
+                // Preserve order from searchResp.Results where possible by ordering final list by the position in imdbIds
+                var position = imdbIds.Select((id, idx) => (id, idx)).ToDictionary(x => x.id, x => x.idx);
+                final = final.OrderBy(m => position.TryGetValue("tt" + m.ID.ToString().TrimStart('0'), out var p) ? p : (position.TryGetValue(m.ID.ToString(), out var p2) ? p2 : int.MaxValue))
+                             .ThenByDescending(m => m.Year)
+                             .ToList();
 
                 return Ok(final);
             }
