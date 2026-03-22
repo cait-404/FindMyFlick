@@ -2,7 +2,7 @@
 
 /* -------------------- Base Styles -------------------- */
 body {
-  background: radial-gradient(circle at top, #ff52d9, #3d0099, #000);
+  background: radial-gradient(circle at top, #c026a3, #3d0099, #000);
   color: white;
   font-family: 'Poppins', sans-serif;
   min-height: 100vh;
@@ -269,3 +269,34 @@ input:focus, textarea:focus, select:focus {
   transform: rotateY(180deg);
 }
 
+.footer-link {
+  transition: all 0.25s ease;
+}
+
+.footer-link:hover {
+  color: #ff39e1;
+  text-shadow:
+    0 0 6px #ff39e1,
+    0 0 12px #ff39e1,
+    0 0 20px #ff6ed0;
+}
+
+.footer-link.active {
+  color: #ff39e1;
+  text-shadow:
+    0 0 8px #ff39e1,
+    0 0 16px #ff6ed0;
+}
+
+.footer-heading {
+  transition: all 0.25s ease;
+}
+
+.footer-heading:hover {
+  color: #ff39e1;
+  text-shadow:
+    0 0 6px #ff39e1,
+    0 0 12px #ff39e1,
+    0 0 20px #ff6ed0;
+  transform: scale(1.05);
+}
