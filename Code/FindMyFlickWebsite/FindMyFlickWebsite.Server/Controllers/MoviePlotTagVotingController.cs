@@ -32,7 +32,7 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         private string? GetCurrentUserId()
         {
-            // Return raw string claim (GUID or other) — your DB stores user ids as string.
+            // Return raw string claim (GUID or other) â€” your DB stores user ids as string.
             var claim =
                 User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                 ?? User.FindFirst("sub")?.Value
@@ -58,7 +58,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         // Body: { "vote": 1 } or { "vote": 0 }
         // Only authenticated users. Each user may vote once per (movie, tag) pair.
         [HttpPost("{tagId:int}/vote")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> VotePlotTag(string id, int tagId, [FromBody] VoteRequest req)
         {
             id = NormalizeImdb(id);
@@ -68,7 +68,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (req == null || (req.Vote != 0 && req.Vote != 1))
                 return BadRequest(new { message = "Vote must be 1 (agree) or 0 (disagree)." });
 
-            var userId = "2e1cb5b6-43a9-4be0-a81e-a21007343e9d"; // GetCurrentUserId();
+            var userId = GetCurrentUserId();
             if (userId == null)
                 return Unauthorized(new { message = "Unable to determine authenticated user id." });
 
