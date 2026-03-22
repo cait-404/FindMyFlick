@@ -35,9 +35,9 @@ namespace FindMyFlickWebsite.Server.Controllers
         }
 
         // GET /api/movies/{id}/plot-tags
-        // Returns Keyword model rows associated with the movie
+        // Returns Plot tags associated with the movie (from movie_plot_tags -> plot_tags).
         [HttpGet("plot-tags")]
-        public async Task<ActionResult<IEnumerable<Keyword>>> GetPlotTags(string id)
+        public async Task<ActionResult<IEnumerable<Models.TagsView.PlotTag>>> GetPlotTags(string id)
         {
             id = NormalizeImdb(id);
             if (string.IsNullOrWhiteSpace(id)) return BadRequest(new { message = "id cannot be empty." });
@@ -47,21 +47,38 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             await using var ctx = _dbFactory.CreateDbContext();
 
-            var keywordIds = await ctx.MovieKeywords
-                .AsNoTracking()
-                .Where(mk => mk.ImdbId == id)
-                .Select(mk => mk.TmdbKeywordId)
-                .Distinct()
-                .ToListAsync();
+            var conn = ctx.Database.GetDbConnection();
+            if (conn.State != System.Data.ConnectionState.Open)
+                await conn.OpenAsync();
 
-            if (!keywordIds.Any()) return Ok(Array.Empty<Keyword>());
+            const string sql = @"
+SELECT pt.plot_tag_id, pt.tag_text, mpt.created_at, mpt.created_by_user_id, mpt.status
+FROM public.movie_plot_tags mpt
+JOIN public.plot_tags pt ON pt.plot_tag_id = mpt.plot_tag_id
+WHERE mpt.imdb_id = @imdbId
+  AND mpt.status = 'approved'
+ORDER BY pt.tag_text;";
 
-            var keywords = await ctx.Keywords
-                .AsNoTracking()
-                .Where(k => keywordIds.Contains(k.TmdbKeywordId))
-                .ToListAsync();
+            await using var cmd = new Npgsql.NpgsqlCommand(sql, (Npgsql.NpgsqlConnection)conn);
+            cmd.Parameters.AddWithValue("@imdbId", id);
 
-            return Ok(keywords);
+            var list = new List<Models.TagsView.PlotTag>();
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var plotTag = new Models.TagsView.PlotTag
+                {
+                    TagType = "plot",
+                    TagID = reader.IsDBNull(0) ? 0 : reader.GetInt32(0),
+                    TagName = reader.IsDBNull(1) ? null : reader.GetString(1)
+                };
+
+                list.Add(plotTag);
+            }
+
+            await reader.CloseAsync();
+            return Ok(list);
         }
 
         [HttpGet("collections")]

@@ -25,10 +25,48 @@ namespace FindMyFlickWebsite.Server.Controllers
             _dbContextFactory = dbContextFactory;
         }
 
+        // Normalizes a user-supplied tag name into the DB's tag_text_norm form:
+        // - lower-case
+        // - non-alphanumerics removed
+        // - spaces -> underscores
+        // - collapse multiple underscores / trim leading/trailing underscores
+        private static string NormalizeToTagTextNorm(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            var sb = new StringBuilder();
+            var prevWasUnderscore = false;
+            foreach (var ch in input.Trim().ToLowerInvariant())
+            {
+                if (char.IsLetterOrDigit(ch))
+                {
+                    sb.Append(ch);
+                    prevWasUnderscore = false;
+                    continue;
+                }
+
+                if (char.IsWhiteSpace(ch) || ch == '_' || ch == '-')
+                {
+                    if (!prevWasUnderscore)
+                    {
+                        sb.Append('_');
+                        prevWasUnderscore = true;
+                    }
+                    continue;
+                }
+
+                // drop other punctuation/symbols
+            }
+
+            var s = sb.ToString().Trim('_');
+            // collapse repeat underscores (in case)
+            while (s.Contains("__")) s = s.Replace("__", "_");
+            return s;
+        }
+
         // ============================================================
         // ADVANCED FILTERING LOGIC
         // ============================================================
-
         public static IEnumerable<MoviesView> AdvancedSearch(
             IEnumerable<MoviesView> source,
             string? name = null,
@@ -47,20 +85,34 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             var svcList = streamingServices?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
             var genreList = genres?.Where(g => !string.IsNullOrWhiteSpace(g)).ToList();
-            var tagNameListInclude = tagNamesInclude?.Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToList();
-            var tagNameListExclude = tagNamesExclude?.Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).ToList();
+
+            // tagNamesInclude will be provided as raw user strings; normalize them to tag_text_norm form
+            var tagNameListIncludeNorm = (tagNamesInclude ?? Enumerable.Empty<string>())
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => NormalizeToTagTextNorm(t))
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct()
+                .ToList();
+
+            // tagNamesExclude remains legacy: we use it across all tag types (plot/trigger/person),
+            // but we normalize for case-insensitive comparison (not to tag_text_norm).
+            var tagNameListExclude = (tagNamesExclude ?? Enumerable.Empty<string>())
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t.Trim().ToLowerInvariant())
+                .Distinct()
+                .ToList();
 
             foreach (var m in source)
             {
                 if (m == null) continue;
 
                 // Name (substring)
-                if (!string.IsNullOrWhiteSpace(name) && 
+                if (!string.IsNullOrWhiteSpace(name) &&
                     (string.IsNullOrWhiteSpace(m.Name) || !m.Name.Contains(name, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
                 // Age rating (exact)
-                if (!string.IsNullOrWhiteSpace(ageRating) && 
+                if (!string.IsNullOrWhiteSpace(ageRating) &&
                     (string.IsNullOrWhiteSpace(m.AgeRating) || !string.Equals(m.AgeRating, ageRating, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
@@ -93,34 +145,36 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (year.HasValue && m.Year != year.Value)
                     continue;
 
-                // Tags include
-                if (tagNameListInclude?.Any() == true)
+                // Plot tag include (NEW behavior) — operates on normalized values stored in DTO PlotTags.TagName
+                if (tagNameListIncludeNorm.Any())
                 {
-                    var movieTagNames = new HashSet<string>(
-                        (m.Tags?.TriggerTags ?? Enumerable.Empty<TagsView.TriggerTag>())
-                        .Select(t => t.TagName?.Trim().ToLowerInvariant() ?? string.Empty)
-                    );
+                    var moviePlotTagNorms = (m.Tags?.PlotTags ?? Enumerable.Empty<TagsView.PlotTag>())
+                        .Select(t => (t.TagName ?? string.Empty).Trim().ToLowerInvariant())
+                        .Where(s => !string.IsNullOrWhiteSpace(s))
+                        .ToHashSet();
 
-                    var queryTags = tagNameListInclude.Select(t => t.ToLowerInvariant()).ToList();
                     var tagMatch = matchAllTagsIn
-                        ? queryTags.All(q => movieTagNames.Contains(q))
-                        : queryTags.Any(q => movieTagNames.Contains(q));
+                        ? tagNameListIncludeNorm.All(q => moviePlotTagNorms.Contains(q))
+                        : tagNameListIncludeNorm.Any(q => moviePlotTagNorms.Contains(q));
 
                     if (!tagMatch) continue;
                 }
 
-                // Tags exclude
-                if (tagNameListExclude?.Any() == true)
+                // Tag exclude (legacy: checks across all tag lists)
+                if (tagNameListExclude.Any())
                 {
                     var movieTagNames = new HashSet<string>(
-                        (m.Tags?.TriggerTags ?? Enumerable.Empty<TagsView.TriggerTag>())
-                        .Select(t => t.TagName?.Trim().ToLowerInvariant() ?? string.Empty)
+                        (m.Tags?.PlotTags ?? Enumerable.Empty<TagsView.PlotTag>())
+                            .Select(t => (t.TagName ?? string.Empty).Trim().ToLowerInvariant())
+                        .Concat((m.Tags?.TriggerTags ?? Enumerable.Empty<TagsView.TriggerTag>())
+                            .Select(t => (t.TagName ?? string.Empty).Trim().ToLowerInvariant()))
+                        .Concat((m.Tags?.PersonTags ?? Enumerable.Empty<TagsView.PersonTag>())
+                            .Select(t => (t.TagName ?? string.Empty).Trim().ToLowerInvariant()))
                     );
 
-                    var queryTags = tagNameListExclude.Select(t => t.ToLowerInvariant()).ToList();
                     var tagMatch = matchAllTagsEx
-                        ? queryTags.All(q => !movieTagNames.Contains(q))
-                        : queryTags.Any(q => !movieTagNames.Contains(q));
+                        ? tagNameListExclude.All(q => !movieTagNames.Contains(q))
+                        : tagNameListExclude.Any(q => !movieTagNames.Contains(q));
 
                     if (!tagMatch) continue;
                 }
@@ -131,8 +185,8 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // ============================================================
         // DATABASE LOADER
+        // - populate PlotTags using plot_tags.tag_text_norm for searching
         // ============================================================
-
         private async Task<(List<MoviesView> Dtos, List<Movie> Entities)> LoadMovieDtosAsync()
         {
             var loaded = await _context.Movies
@@ -176,55 +230,77 @@ namespace FindMyFlickWebsite.Server.Controllers
                             TagID = w.DtddTopicId,
                             TagName = w.DtddTopic?.TopicName ?? string.Empty
                         })
-                      .GroupBy(t => t.TagName?.ToLowerInvariant() ?? string.Empty)
-
+                        .GroupBy(t => t.TagName?.ToLowerInvariant() ?? string.Empty)
                         .Select(g => g.First())
                         .ToList(),
-                    PlotTags = new List<TagsView.PlotTag>(),
+                    PlotTags = new List<TagsView.PlotTag>(),    // populated below
                     PersonTags = new List<TagsView.PersonTag>()
                 },
                 TagVotes = new List<MoviesView.TagVote>()
             }).ToList();
+
+            // Populate PlotTags for DTOs using plot_tags.tag_text_norm (normalized form)
+            if (dtoList.Count > 0)
+            {
+                var imdbIds = loaded.Select(m => m.ImdbId).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().ToList();
+
+                var plotRows = await _context.MoviePlotTags
+                    .AsNoTracking()
+                    .Include(mpt => mpt.PlotTag)
+                    .Where(mpt => imdbIds.Contains(mpt.ImdbId) && mpt.Status == "approved" && EF.Functions.ILike(mpt.Status, "approved"))
+                    .ToListAsync();
+
+                var byImdb = plotRows.GroupBy(r => r.ImdbId).ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var dto in dtoList)
+                {
+                    if (dto == null) continue;
+                    // Find original imdb string from loaded entities
+                    var movieEntity = loaded.FirstOrDefault(x => ParseImdbToInt(x.ImdbId) == dto.ID);
+                    if (movieEntity == null) continue;
+                    var mid = movieEntity.ImdbId;
+
+                    if (byImdb.TryGetValue(mid, out var rows))
+                    {
+                        dto.Tags.PlotTags = rows
+                            .Where(r => r.PlotTag != null)
+                            .Select(r => new TagsView.PlotTag
+                            {
+                                TagID = r.PlotTagId,
+                                // Use tag_text_norm for searching — store the normalized text here
+                                TagName = r.PlotTag?.TagTextNorm ?? (r.PlotTag?.TagText ?? string.Empty),
+                                TagType = "plot"
+                            })
+                            .GroupBy(t => (t.TagName ?? string.Empty).ToLowerInvariant())
+                            .Select(g => g.First())
+                            .ToList();
+                    }
+                }
+            }
 
             return (dtoList, loaded);
         }
 
         // ============================================================
         // SEARCH (GET /api/Movies/search)
-        // Refactored: accept the new MovieSearchRequest query fields,
-        // build a MovieSearchRequest and delegate entirely to MovieSearchController.Search.
+        // Uses helper ResolveImdbIdsByPlotTagNormsAsync for plot-tag-only DB searches
         // ============================================================
-
-        //My search endpoint in MoviesController uses the MovieSearchController's logic to return search results. The logic in MovieSearchController
-        //recently changed to use the queries Like this:
-        //{ "genreNames": ["thriller", "comedy"], "personNames": ["Tom Hanks"], "mpaaRatings": ["PG-13"], "streamingProviderNames": ["netflix", "hulu"], "excludeWarningNames": ["graphic violence"], "take": 10, "recommendationTake": 10, "enableApiFallback": true }
-        //    and
-        //{ "genreNames": ["comedy"], "mpaaRatings": ["PG", "PG-13"], "streamingProviderNames": ["disney", "amazon"], "includeWarningNames": ["animal death"], "take": 10, "recommendationTake": 10, "enableApiFallback": true }
-        //refactor my search endpoint in Movies Controller to utalize the new logic
-
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<MoviesView>), 200)]
         public async Task<ActionResult<IEnumerable<MoviesView>>> Search(
-            // Primary free-text / legacy name
             [FromQuery(Name = "titleContains")] string? titleContains = null,
             [FromQuery(Name = "name")] string? name = null,
-
-            // New structured search fields
             [FromQuery(Name = "genreNames")] List<string>? genreNames = null,
             [FromQuery(Name = "personNames")] List<string>? personNames = null,
             [FromQuery(Name = "mpaaRatings")] List<string>? mpaaRatings = null,
             [FromQuery(Name = "streamingProviderNames")] List<string>? streamingProviderNames = null,
             [FromQuery(Name = "includeWarningNames")] List<string>? includeWarningNames = null,
             [FromQuery(Name = "excludeWarningNames")] List<string>? excludeWarningNames = null,
-
-            // Control flags
             [FromQuery(Name = "take")] int take = 25,
             [FromQuery(Name = "recommendationTake")] int recommendationTake = 0,
             [FromQuery(Name = "enableApiFallback")] bool enableApiFallback = false,
             [FromQuery(Name = "maxApiAdds")] int maxApiAdds = 25,
             [FromQuery(Name = "watchRegion")] string? watchRegion = "US",
-
-            // Backwards-compatible advanced in-memory filters (optional)
             [FromQuery] bool matchAllStreaming = false,
             [FromQuery] bool matchAllGenres = false,
             [FromQuery] int? year = null,
@@ -235,10 +311,8 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             try
             {
-                // Prefer explicit titleContains param, fall back to legacy 'name'
                 var titleFilter = string.IsNullOrWhiteSpace(titleContains) ? name : titleContains;
 
-                // Normalize inputs (trim, remove empties)
                 genreNames = genreNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
                 personNames = personNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
                 mpaaRatings = mpaaRatings?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
@@ -246,8 +320,6 @@ namespace FindMyFlickWebsite.Server.Controllers
                 includeWarningNames = includeWarningNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
                 excludeWarningNames = excludeWarningNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
 
-                // Backwards compatibility: if callers used the old params (genres/streamingServices/tagNamesInclude/tagNamesExclude),
-                // prefer those when provided. This keeps existing clients working.
                 if ((genreNames == null || genreNames.Count == 0) && Request.Query.ContainsKey("genres"))
                 {
                     var legacyGenres = Request.Query["genres"].ToList().Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
@@ -260,13 +332,16 @@ namespace FindMyFlickWebsite.Server.Controllers
                     if (legacyS.Any()) streamingProviderNames = legacyS.ToList();
                 }
 
-                if ((includeWarningNames == null || includeWarningNames.Count == 0) && tagNamesInclude != null && tagNamesInclude.Count > 0)
-                    includeWarningNames = tagNamesInclude;
+                // NOTE: do not copy plot-tag params into the warning lists.
+                // Previously we did:
+                //   if ((includeWarningNames == null || includeWarningNames.Count == 0) && tagNamesInclude != null && tagNamesInclude.Count > 0)
+                //       includeWarningNames = tagNamesInclude;
+                //   if ((excludeWarningNames == null || excludeWarningNames.Count == 0) && tagNamesExclude != null && tagNamesExclude.Count > 0)
+                //       excludeWarningNames = tagNamesExclude;
+                //
+                // Removing those assignments ensures that when only `tagNamesInclude`/`tagNamesExclude`
+                // are provided the controller treats the MovieSearchRequest as empty and runs the DB plot-tag search.
 
-                if ((excludeWarningNames == null || excludeWarningNames.Count == 0) && tagNamesExclude != null && tagNamesExclude.Count > 0)
-                    excludeWarningNames = tagNamesExclude;
-
-                // Build the MovieSearchRequest using the MovieSearchController contract.
                 var movieSearchReq = new MovieSearchController.MovieSearchRequest
                 {
                     TitleContains = titleFilter,
@@ -283,13 +358,132 @@ namespace FindMyFlickWebsite.Server.Controllers
                     WatchRegion = string.IsNullOrWhiteSpace(watchRegion) ? "US" : watchRegion!
                 };
 
-                // Use a NEW DbContext instance for the delegated controller call to avoid optimistic concurrency
-                // between this controller's _context and the mutating work that MovieSearchController may perform.
+                bool MovieSearchRequestIsEmpty =
+                    string.IsNullOrWhiteSpace(movieSearchReq.TitleContains) &&
+                    (movieSearchReq.GenreNames == null || movieSearchReq.GenreNames.Count == 0) &&
+                    (movieSearchReq.PersonNames == null || movieSearchReq.PersonNames.Count == 0) &&
+                    (movieSearchReq.MpaaRatings == null || movieSearchReq.MpaaRatings.Count == 0) &&
+                    (movieSearchReq.StreamingProviderNames == null || movieSearchReq.StreamingProviderNames.Count == 0) &&
+                    (movieSearchReq.IncludeWarningNames == null || movieSearchReq.IncludeWarningNames.Count == 0) &&
+                    (movieSearchReq.ExcludeWarningNames == null || movieSearchReq.ExcludeWarningNames.Count == 0);
+
+                var includeNorms = (tagNamesInclude ?? Enumerable.Empty<string>())
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => NormalizeToTagTextNorm(t))
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Distinct()
+                    .ToList();
+
+                var excludeNorms = (tagNamesExclude ?? Enumerable.Empty<string>())
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .Select(t => NormalizeToTagTextNorm(t))
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Distinct()
+                    .ToList();
+
+                List<MoviesView> dtoList;
+
+                // If MovieSearchRequest is empty but caller supplied plot-tag filters, do DB search by plot tags directly.
+                if (MovieSearchRequestIsEmpty && (includeNorms.Any() || excludeNorms.Any()))
+                {
+                    // Use helper that resolves TagTextNorm -> PlotTagId -> MoviePlotTags reliably
+                    var imdbIds = await ResolveImdbIdsByPlotTagNormsAsync(includeNorms, excludeNorms, matchAllTagsIn);
+                    if (!imdbIds.Any())
+                        return Ok(Array.Empty<MoviesView>());
+
+                    var loaded = await _context.Movies
+                        .Include(m => m.MovieGenres).ThenInclude(g => g.TmdbGenre)
+                        .Include(m => m.MovieStreamings).ThenInclude(s => s.TmdbProvider)
+                        .Include(m => m.MovieWarnings).ThenInclude(w => w.DtddTopic)
+                        .AsNoTracking()
+                        .Where(m => imdbIds.Contains(m.ImdbId))
+                        .ToListAsync();
+
+                    dtoList = loaded.Select(m => new MoviesView
+                    {
+                        ID = ParseImdbToInt(m.ImdbId),
+                        Name = m.Title ?? "(Untitled)",
+                        Year = m.ReleaseYear,
+                        AgeRating = m.MpaaRating,
+                        Summary = m.PlotSummary ?? "",
+                        Poster = m.PosterUrl,
+                        GenreEntries = m.MovieGenres?.Select(g => new MoviesView.GenreEntry
+                        {
+                            TmdbGenreId = g.TmdbGenreId,
+                            GenreName = g.TmdbGenre?.GenreName ?? string.Empty
+                        }).ToList() ?? [],
+                        Genre = m.MovieGenres?
+                            .Select(g => g.TmdbGenre?.GenreName ?? string.Empty)
+                            .Where(s => !string.IsNullOrWhiteSpace(s))
+                            .ToList() ?? [],
+                        StreamingProviders = m.MovieStreamings?
+                            .GroupBy(ms => ms.TmdbProviderId)
+                            .Select(g => new MoviesView.StreamingProviderView
+                            {
+                                Id = g.Key,
+                                ProviderName = g.First().TmdbProvider?.ProviderName ?? string.Empty
+                            })
+                            .ToList() ?? [],
+                        Tags = new TagsView
+                        {
+                            TriggerTags = (m.MovieWarnings ?? [])
+                                .Where(w => string.Equals(w.Answer?.Trim(), "yes", StringComparison.OrdinalIgnoreCase))
+                                .Select(w => new TagsView.TriggerTag
+                                {
+                                    TagID = w.DtddTopicId,
+                                    TagName = w.DtddTopic?.TopicName ?? string.Empty
+                                })
+                                .GroupBy(t => t.TagName?.ToLowerInvariant() ?? string.Empty)
+                                .Select(g => g.First())
+                                .ToList(),
+                            PlotTags = new List<TagsView.PlotTag>(),
+                            PersonTags = new List<TagsView.PersonTag>()
+                        },
+                        TagVotes = new List<MoviesView.TagVote>()
+                    }).ToList();
+
+                    var plotRows = await _context.MoviePlotTags
+                        .AsNoTracking()
+                        .Include(mpt => mpt.PlotTag)
+                        .Where(mpt => imdbIds.Contains(mpt.ImdbId) && mpt.Status == "approved")
+                        .ToListAsync();
+
+                    var byImdb = plotRows.GroupBy(r => r.ImdbId).ToDictionary(g => g.Key, g => g.ToList());
+
+                    foreach (var dto in dtoList)
+                    {
+                        var movieEntity = loaded.FirstOrDefault(x => ParseImdbToInt(x.ImdbId) == dto.ID);
+                        if (movieEntity == null) continue;
+
+                        if (byImdb.TryGetValue(movieEntity.ImdbId, out var rows))
+                        {
+                            dto.Tags.PlotTags = rows
+                                .Where(r => r.PlotTag != null)
+                                .Select(r => new TagsView.PlotTag
+                                {
+                                    TagID = r.PlotTagId,
+                                    TagName = r.PlotTag?.TagTextNorm ?? (r.PlotTag?.TagText ?? string.Empty),
+                                    TagType = "plot"
+                                })
+                                .GroupBy(t => (t.TagName ?? string.Empty).ToLowerInvariant())
+                                .Select(g => g.First())
+                                .ToList();
+                        }
+                    }
+
+                    var finalFromDb = AdvancedSearch(dtoList, titleFilter ?? name, streamingProviderNames, matchAllStreaming,
+                        null, genreNames, matchAllGenres, year,
+                        null, tagNamesExclude, matchAllTagsIn, matchAllTagsEx).ToList();
+
+                    finalFromDb = finalFromDb.OrderByDescending(m => m.Year).ThenBy(m => m.Name).ToList();
+                    return Ok(finalFromDb);
+                }
+
+                // Otherwise fall back to the existing MovieSearchController path
                 await using var ctxForSearch = _dbContextFactory.CreateDbContext();
                 var searchController = new MovieSearchController(ctxForSearch);
                 var searchActionResult = await searchController.Search(movieSearchReq);
 
-                // Extract the MovieSearchResponse from ActionResult.
                 MovieSearchController.MovieSearchResponse? searchResp = null;
                 if (searchActionResult.Value != null)
                 {
@@ -305,32 +499,127 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
                 else
                 {
-                    // Unexpected shape
                     return StatusCode(500, new { message = "MovieSearchController.Search returned unexpected result shape." });
                 }
 
+                // If MovieSearchController returned no results but caller supplied plot tags, try the DB-plot-tag search as fallback
                 if (searchResp == null || searchResp.Results == null || searchResp.Results.Count == 0)
-                    return Ok(Array.Empty<MoviesView>());
+                {
+                    if (includeNorms.Any() || excludeNorms.Any())
+                    {
+                        var imdbIds = await ResolveImdbIdsByPlotTagNormsAsync(includeNorms, excludeNorms, matchAllTagsIn);
+                        if (!imdbIds.Any()) return Ok(Array.Empty<MoviesView>());
 
-                var imdbIds = searchResp.Results
+                        var loaded2 = await _context.Movies
+                            .Include(m => m.MovieGenres).ThenInclude(g => g.TmdbGenre)
+                            .Include(m => m.MovieStreamings).ThenInclude(s => s.TmdbProvider)
+                            .Include(m => m.MovieWarnings).ThenInclude(w => w.DtddTopic)
+                            .AsNoTracking()
+                            .Where(m => imdbIds.Contains(m.ImdbId))
+                            .ToListAsync();
+
+                        dtoList = loaded2.Select(m => new MoviesView
+                        {
+                            ID = ParseImdbToInt(m.ImdbId),
+                            Name = m.Title ?? "(Untitled)",
+                            Year = m.ReleaseYear,
+                            AgeRating = m.MpaaRating,
+                            Summary = m.PlotSummary ?? "",
+                            Poster = m.PosterUrl,
+                            GenreEntries = m.MovieGenres?.Select(g => new MoviesView.GenreEntry
+                            {
+                                TmdbGenreId = g.TmdbGenreId,
+                                GenreName = g.TmdbGenre?.GenreName ?? string.Empty
+                            }).ToList() ?? [],
+                            Genre = m.MovieGenres?
+                                .Select(g => g.TmdbGenre?.GenreName ?? string.Empty)
+                                .Where(s => !string.IsNullOrWhiteSpace(s))
+                                .ToList() ?? [],
+                            StreamingProviders = m.MovieStreamings?
+                                .GroupBy(ms => ms.TmdbProviderId)
+                                .Select(g => new MoviesView.StreamingProviderView
+                                {
+                                    Id = g.Key,
+                                    ProviderName = g.First().TmdbProvider?.ProviderName ?? string.Empty
+                                })
+                                .ToList() ?? [],
+                            Tags = new TagsView
+                            {
+                                TriggerTags = (m.MovieWarnings ?? [])
+                                    .Where(w => string.Equals(w.Answer?.Trim(), "yes", StringComparison.OrdinalIgnoreCase))
+                                    .Select(w => new TagsView.TriggerTag
+                                    {
+                                        TagID = w.DtddTopicId,
+                                        TagName = w.DtddTopic?.TopicName ?? string.Empty
+                                    })
+                                  .GroupBy(t => t.TagName?.ToLowerInvariant() ?? string.Empty)
+                                    .Select(g => g.First())
+                                    .ToList(),
+                                PlotTags = new List<TagsView.PlotTag>(),
+                                PersonTags = new List<TagsView.PersonTag>()
+                            },
+                            TagVotes = new List<MoviesView.TagVote>()
+                        }).ToList();
+
+                        var plotRows2 = await _context.MoviePlotTags
+                            .AsNoTracking()
+                            .Include(mpt => mpt.PlotTag)
+                            .Where(mpt => imdbIds.Contains(mpt.ImdbId) && mpt.Status == "approved")
+                            .ToListAsync();
+
+                        var byImdb2 = plotRows2.GroupBy(r => r.ImdbId).ToDictionary(g => g.Key, g => g.ToList());
+
+                        foreach (var dto in dtoList)
+                        {
+                            var movieEntity = loaded2.FirstOrDefault(x => ParseImdbToInt(x.ImdbId) == dto.ID);
+                            if (movieEntity == null) continue;
+
+                            if (byImdb2.TryGetValue(movieEntity.ImdbId, out var rows))
+                            {
+                                dto.Tags.PlotTags = rows
+                                    .Where(r => r.PlotTag != null)
+                                    .Select(r => new TagsView.PlotTag
+                                    {
+                                        TagID = r.PlotTagId,
+                                        TagName = r.PlotTag?.TagTextNorm ?? (r.PlotTag?.TagText ?? string.Empty),
+                                        TagType = "plot"
+                                    })
+                                    .GroupBy(t => (t.TagName ?? string.Empty).ToLowerInvariant())
+                                    .Select(g => g.First())
+                                    .ToList();
+                            }
+                        }
+
+                        var finalFromDb2 = AdvancedSearch(dtoList, titleFilter ?? name, streamingProviderNames, matchAllStreaming,
+                            null, genreNames, matchAllGenres, year,
+                            null, tagNamesExclude, matchAllTagsIn, matchAllTagsEx).ToList();
+
+                        finalFromDb2 = finalFromDb2.OrderByDescending(m => m.Year).ThenBy(m => m.Name).ToList();
+                        return Ok(finalFromDb2);
+                    }
+
+                    return Ok(Array.Empty<MoviesView>());
+                }
+
+                // Existing flow when MovieSearchController returned results
+                var imdbIdsResp = searchResp.Results
                     .Select(r => r.ImdbId)
-                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Where(i => !string.IsNullOrWhiteSpace(i))
                     .Distinct()
                     .ToList();
 
-                if (!imdbIds.Any())
+                if (!imdbIdsResp.Any())
                     return Ok(Array.Empty<MoviesView>());
 
-                // Load full movie rows for the matched imdb ids and map to MoviesView
-                var loaded = await _context.Movies
+                var loadedResp = await _context.Movies
                     .Include(m => m.MovieGenres).ThenInclude(g => g.TmdbGenre)
                     .Include(m => m.MovieStreamings).ThenInclude(s => s.TmdbProvider)
                     .Include(m => m.MovieWarnings).ThenInclude(w => w.DtddTopic)
                     .AsNoTracking()
-                    .Where(m => imdbIds.Contains(m.ImdbId))
+                    .Where(m => imdbIdsResp.Contains(m.ImdbId))
                     .ToListAsync();
 
-                var dtoList = loaded.Select(m => new MoviesView
+                dtoList = loadedResp.Select(m => new MoviesView
                 {
                     ID = ParseImdbToInt(m.ImdbId),
                     Name = m.Title ?? "(Untitled)",
@@ -373,15 +662,66 @@ namespace FindMyFlickWebsite.Server.Controllers
                     TagVotes = new List<MoviesView.TagVote>()
                 }).ToList();
 
-                // Apply any remaining advanced in-memory filtering if the caller supplied legacy advanced params.
-                var final = AdvancedSearch(dtoList, titleFilter ?? name, streamingProviderNames, matchAllStreaming,
-                    // ageRating is not in this signature any more, but mpaaRatings was passed to MovieSearchRequest.
-                    // We leave ageRating null here so AdvancedSearch doesn't double-filter incorrectly.
-                    null, genreNames, matchAllGenres, year,
-                    tagNamesInclude, tagNamesExclude, matchAllTagsIn, matchAllTagsEx).ToList();
+                // Populate plot tags for results (use tag_text_norm)
+                if (dtoList.Count > 0)
+                {
+                    var plotRows = await _context.MoviePlotTags
+                        .AsNoTracking()
+                        .Include(mpt => mpt.PlotTag)
+                        .Where(mpt => imdbIdsResp.Contains(mpt.ImdbId) && mpt.Status != null && EF.Functions.ILike(mpt.Status, "approved"))
+                        .ToListAsync();
 
-                // Preserve order from searchResp.Results where possible by ordering final list by the position in imdbIds
-                var position = imdbIds.Select((id, idx) => (id, idx)).ToDictionary(x => x.id, x => x.idx);
+                    var byImdb = plotRows.GroupBy(r => r.ImdbId).ToDictionary(g => g.Key, g => g.ToList());
+
+                    foreach (var dto in dtoList)
+                    {
+                        var movieEntity = loadedResp.FirstOrDefault(x => ParseImdbToInt(x.ImdbId) == dto.ID);
+                        if (movieEntity == null) continue;
+
+                        if (byImdb.TryGetValue(movieEntity.ImdbId, out var rows))
+                        {
+                            dto.Tags.PlotTags = rows
+                                .Where(r => r.PlotTag != null)
+                                .Select(r => new TagsView.PlotTag
+                                {
+                                    TagID = r.PlotTagId,
+                                    // store normalized token for matching
+                                    TagName = r.PlotTag?.TagTextNorm ?? (r.PlotTag?.TagText ?? string.Empty),
+                                    TagType = "plot"
+                                })
+                                .GroupBy(t => (t.TagName ?? string.Empty).ToLowerInvariant())
+                                .Select(g => g.First())
+                                .ToList();
+                        }
+                    }
+                }
+
+                var filteredByPlot = dtoList;
+                if (includeNorms.Any())
+                {
+                    if (matchAllTagsIn)
+                    {
+                        filteredByPlot = filteredByPlot
+                            .Where(d => includeNorms.All(q => (d.Tags?.PlotTags)
+                                .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
+                                .Contains(q)))
+                            .ToList();
+                    }
+                    else
+                    {
+                        filteredByPlot = filteredByPlot
+                            .Where(d => includeNorms.Any(q => (d.Tags?.PlotTags)
+                                .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
+                                .Contains(q)))
+                            .ToList();
+                    }
+                }
+
+                var final = AdvancedSearch(filteredByPlot, titleFilter ?? name, streamingProviderNames, matchAllStreaming,
+                    null, genreNames, matchAllGenres, year,
+                    null, tagNamesExclude, matchAllTagsIn, matchAllTagsEx).ToList();
+
+                var position = imdbIdsResp.Select((id, idx) => (id, idx)).ToDictionary(x => x.id, x => x.idx);
                 final = final.OrderBy(m => position.TryGetValue("tt" + m.ID.ToString().TrimStart('0'), out var p) ? p : (position.TryGetValue(m.ID.ToString(), out var p2) ? p2 : int.MaxValue))
                              .ThenByDescending(m => m.Year)
                              .ToList();
@@ -420,7 +760,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 // Normalise order param
                 var ord = (order ?? "release_year").Trim().ToLowerInvariant();
 
-                // Apply ordering based on query parameter:
+                // Apply ordering based on query param:
                 // - "release_year" (default): release year desc, then title asc
                 // - "none": no ordering (database default)
                 // - "title_asc": order by title ascending
@@ -550,6 +890,75 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (string.IsNullOrWhiteSpace(imdbId)) return 0;
             var digits = new string(imdbId.Where(char.IsDigit).ToArray());
             return int.TryParse(digits, out var result) ? result : 0;
+        }
+
+        // NEW helper: resolve include/exclude normalized tag tokens to imdb ids using plot_tag ids.
+        private async Task<List<string>> ResolveImdbIdsByPlotTagNormsAsync(
+            IReadOnlyCollection<string> includeNorms,
+            IReadOnlyCollection<string> excludeNorms,
+            bool matchAllTagsIn)
+        {
+            // If no include nor exclude norms, return all imdb ids
+            if ((includeNorms == null || includeNorms.Count == 0) && (excludeNorms == null || excludeNorms.Count == 0))
+                return await _context.Movies.AsNoTracking().Select(m => m.ImdbId).ToListAsync();
+
+            // Base join of approved MoviePlotTags -> PlotTags
+            var baseJoin = _context.MoviePlotTags
+                .AsNoTracking()
+                .Where(mpt => mpt.Status != null && EF.Functions.ILike(mpt.Status, "approved"))
+                .Join(_context.PlotTags.AsNoTracking(),
+                      mpt => mpt.PlotTagId,
+                      pt => pt.PlotTagId,
+                      (mpt, pt) => new { mpt.ImdbId, pt.TagTextNorm, mpt.PlotTagId });
+
+            List<string> imdbIds;
+
+            // INCLUDE processing
+            if (includeNorms != null && includeNorms.Count > 0)
+            {
+                // Any-match
+                if (!matchAllTagsIn)
+                {
+                    imdbIds = await baseJoin
+                        .Where(x => includeNorms.Contains(x.TagTextNorm))
+                        .Select(x => x.ImdbId)
+                        .Distinct()
+                        .ToListAsync();
+                }
+                else
+                {
+                    // All-match: group by imdb and ensure distinct tag_text_norm count >= includeNorms.Count
+                    imdbIds = await baseJoin
+                        .Where(x => includeNorms.Contains(x.TagTextNorm))
+                        .GroupBy(x => x.ImdbId)
+                        .Where(g => g.Select(x => x.TagTextNorm).Distinct().Count() >= includeNorms.Count)
+                        .Select(g => g.Key)
+                        .ToListAsync();
+                }
+
+                if (imdbIds.Count == 0)
+                    return new List<string>();
+            }
+            else
+            {
+                // No include constraint -> start with all movie ids referenced by approved MoviePlotTags
+                imdbIds = await baseJoin.Select(x => x.ImdbId).Distinct().ToListAsync();
+            }
+
+            // EXCLUDE processing: remove movies that reference any excluded normalized tag
+            if (excludeNorms != null && excludeNorms.Count > 0 && imdbIds.Count > 0)
+            {
+                var excludedImdbs = await baseJoin
+                    .Where(x => excludeNorms.Contains(x.TagTextNorm))
+                    .Select(x => x.ImdbId)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (excludedImdbs.Count > 0)
+                    imdbIds = imdbIds.Except(excludedImdbs).ToList();
+            }
+
+            return imdbIds;
         }
     }
 }
