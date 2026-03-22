@@ -104,6 +104,14 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 ---
+## Endpoint info
+/movies (returns all movies) returns pages of 50 which can be ordered by:
+ - "release_year" (default): release year desc, then title asc
+ - "none": no ordering (database default)
+ - "title_asc": order by title ascending
+ - "title_desc": order by title descending
+
+MovieRelated controller is used to return data from different tables that relate to the specified movie's ID
 
 ## References
 

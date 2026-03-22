@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using FindMyFlickWebsite.Server.DataModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace FindMyFlickWebsite.Server
 {
-//pretty much all copilot generated with many queries to fix different errors. 
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -33,7 +34,7 @@ namespace FindMyFlickWebsite.Server
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); // Identity mappings are configured here
 
             // Movie (movies)
             modelBuilder.Entity<Movie>(eb =>
