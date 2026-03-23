@@ -47,7 +47,7 @@ export default function App() {
           </NavLink>
 
           <NavLink to="/filters" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Filters
+            Advanced Search
           </NavLink>
 
           <NavLink to="/genres" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
@@ -113,7 +113,7 @@ export default function App() {
         <Route path="/search" element={<Search movies={movies} setMovies={setMovies} />} />
 
         {/* MOVIE DETAILS */}
-        <Route path="/movie/:id" element={<MovieDetails movies={movies} />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
 
         <Route path="/auth" element={<LoginSignup />} />
 

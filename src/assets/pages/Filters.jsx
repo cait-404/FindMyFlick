@@ -1,25 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-export default function Filters({ movies }) {
+export default function Filters() {
 
   const [genre, setGenre] = useState("");
   const [includeTag, setIncludeTag] = useState("");
   const [excludeTag, setExcludeTag] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const filteredMovies = movies.filter(movie => {
+  useEffect(() => {
 
-    if (genre && movie.genre !== genre) return false;
-    if (includeTag && !movie.tags?.includes(includeTag)) return false;
-    if (excludeTag && movie.tags?.includes(excludeTag)) return false;
+    const fetchMovies = async () => {
+      setLoading(true);
 
-    return true;
-  });
+      try {
+        const body = {
+          genreNames: genre ? [genre] : [],
+          includeWarningNames: includeTag ? [includeTag] : [],
+          excludeWarningNames: excludeTag ? [excludeTag] : [],
+          take: 20
+        };
+
+        const res = await fetch("https://localhost:5002/api/MovieSearch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        setMovies(data.results || []);
+
+      } catch (err) {
+        console.error("Error fetching movies:", err);
+      }
+
+      setLoading(false);
+    };
+
+    fetchMovies();
+
+  }, [genre, includeTag, excludeTag]);
 
   return (
     <div className="min-h-screen text-white p-10">
 
-      {/* PAGE TITLE */}
+      {/* TITLE */}
       <h1 className="text-4xl font-bold text-center mb-10 text-pink-400">
         Advanced Movie Filters
       </h1>
@@ -87,7 +116,9 @@ export default function Filters({ movies }) {
         Filter Results
       </h2>
 
-      {filteredMovies.length === 0 ? (
+      {loading ? (
+        <p className="text-center text-gray-300">Loading...</p>
+      ) : movies.length === 0 ? (
         <p className="text-center text-gray-300">
           No movies match your filters.
         </p>
@@ -95,29 +126,78 @@ export default function Filters({ movies }) {
 
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
 
-          {filteredMovies.map(movie => (
+          {movies.map((movie, index) => {
 
-            <Link key={movie.id} to={`/movie/${movie.id}`}>
+            const hasImdb = !!movie.imdbId;
 
-              <div className="bg-black/60 p-6 rounded-xl hover:bg-pink-500/20 transition hover:scale-105 shadow-lg">
+            return hasImdb ? (
+
+              /* ✅ CLICKABLE CARD */
+              <Link key={index} to={`/movie/${movie.imdbId}`}>
+
+                <div className="bg-black/60 p-6 rounded-xl hover:bg-pink-500/20 transition hover:scale-105 shadow-lg cursor-pointer">
+
+                  {movie.posterUrl ? (
+                    <img
+                      src={movie.posterUrl}
+                      alt={movie.title}
+                      className="w-full h-64 object-cover rounded-md mb-4"
+                    />
+                  ) : (
+                    <div className="w-full h-64 bg-gray-800 flex items-center justify-center rounded-md mb-4">
+                      No Image
+                    </div>
+                  )}
+
+                  <h3 className="text-xl font-semibold mb-2">
+                    {movie.title}
+                  </h3>
+
+                  <p className="text-sm text-gray-300">
+                    {movie.releaseYear || "N/A"}
+                  </p>
+
+                </div>
+
+              </Link>
+
+            ) : (
+
+              /* 🚫 NON-CLICKABLE (no imdbId) */
+              <div
+                key={index}
+                className="bg-gray-700 p-6 rounded-xl opacity-60 cursor-not-allowed"
+              >
+
+                {movie.posterUrl ? (
+                  <img
+                    src={movie.posterUrl}
+                    alt={movie.title}
+                    className="w-full h-64 object-cover rounded-md mb-4"
+                  />
+                ) : (
+                  <div className="w-full h-64 bg-gray-800 flex items-center justify-center rounded-md mb-4">
+                    No Image
+                  </div>
+                )}
 
                 <h3 className="text-xl font-semibold mb-2">
                   {movie.title}
                 </h3>
 
-                <p className="text-sm text-gray-300 mb-2">
-                  {movie.genre}
+                <p className="text-sm text-gray-300">
+                  {movie.releaseYear || "N/A"}
                 </p>
 
-                <p className="text-xs text-gray-400">
-                  {movie.tags?.join(", ")}
+                <p className="text-xs text-red-400 mt-2">
+                  No details available
                 </p>
 
               </div>
 
-            </Link>
+            );
 
-          ))}
+          })}
 
         </div>
 
