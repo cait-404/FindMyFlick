@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import API_URL from "../config.js";
 
 const MovieContext = createContext();
 
@@ -8,7 +9,7 @@ export function MovieProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('${import.meta.env.VITE_API_URL}/api/Movies')
+    fetch('${API_URL}/api/Movies')
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch movies");
         return res.json();
