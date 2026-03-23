@@ -23,12 +23,8 @@ jobs:
         with:
           dotnet-version: '9.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
-        working-directory: Code/FindMyFlickWebsite
-
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish FindMyFlickWebsite.Server/FindMyFlickWebsite.Server.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
         working-directory: Code/FindMyFlickWebsite
 
       - name: Upload artifact for deployment job
