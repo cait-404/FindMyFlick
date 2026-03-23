@@ -3,7 +3,7 @@ import API_URL from "../../config.js"
 import EmmanImg from "../images/emman.JPG";
 //import MichelleImg from "../images/michelle.jpg";
 //import IsabelleImg from "../images/isabelle.jpg";
-//import CaitlinImg from "../images/caitlin.jpg";
+import CaitlinImg from "../images/caitlin.jpg";
 
 export default function About() {
   const [movieCount, setMovieCount] = useState(null);
@@ -13,7 +13,7 @@ export default function About() {
   const team = [
     {
       name: "Emmanuella Asamoah",
-      role: "Frontend Lead",
+      role: "Frontend Developer",
       img: EmmanImg,
       bio: "Designing smooth, interactive, and responsive UI for the movie discovery platform."
     }
