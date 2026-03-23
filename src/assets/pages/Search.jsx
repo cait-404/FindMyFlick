@@ -15,7 +15,7 @@ function Search() {
     setLoading(true);
     setError(null);
 
-    fetch(`https://localhost:5002/api/Movies/search?name=${query}`)
+    fetch(`${import.meta.env.REACT_API_URL}/api/Movies/search?name=${query}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();
