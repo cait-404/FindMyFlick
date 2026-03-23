@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import API_URL from "../../config.js"
 
 /* ===============================
    Profile Page
@@ -21,7 +22,7 @@ export default function Profile() {
   ================================ */
   useEffect(() => {
     // Replace with your real endpoint later
-    fetch("http://localhost:5002/api/profile")
+    fetch('${API_URL}/api/profile')
       .then((res) => {
         if (!res.ok) throw new Error("No profile found");
         return res.json();

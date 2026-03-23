@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt; 
 using System.Security.Claims;
+using System.Linq;
 
 //all of the code here is based on this tutorial https://www.youtube.com/watch?v=brxStRVyJiM . this also includes the code for the admin and user controllers, plus their datamodels and the code for the jwt authentication in the program.cs file.
 namespace FindMyFlickWebsite.Server.Controllers
@@ -50,14 +51,26 @@ namespace FindMyFlickWebsite.Server.Controllers
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
+                // Get roles from Identity
                 var userRoles = await _userManager.GetRolesAsync(user);
+
+                // Build base claims (include NameIdentifier so server can read user id)
                 var authClaims = new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName ?? string.Empty),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id), // ensure user id present
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
                 };
 
-                authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+                // Add role claims in two forms to maximize compatibility:
+                //  - ClaimTypes.Role (used by many ASP.NET APIs)
+                //  - "role" (commonly used in JWT payloads and by some clients)
+                foreach (var role in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, role));
+                    authClaims.Add(new Claim("role", role));
+                }
 
                 var token = new JwtSecurityToken(
                     issuer: _configuration["Jwt:Issuer"],

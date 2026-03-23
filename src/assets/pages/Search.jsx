@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import API_URL from "../../config.js"
 
 function Search() {
   const location = useLocation();
@@ -15,7 +16,7 @@ function Search() {
     setLoading(true);
     setError(null);
 
-    fetch(`https://localhost:5002/api/Movies/search?name=${query}`)
+    fetch(`${API_URL}/api/Movies/search?name=${query}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

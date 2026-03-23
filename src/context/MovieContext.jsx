@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import API_URL from "../config.js";
 
 const MovieContext = createContext();
 

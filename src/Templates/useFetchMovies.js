@@ -1,5 +1,6 @@
 // src/hooks/useFetchMovies.js
 import { useState, useEffect } from "react";
+import API_URL from "../config.js";
 
 export default function useFetchMovies(endpoint) {
   const [movies, setMovies] = useState([]);
@@ -10,7 +11,7 @@ export default function useFetchMovies(endpoint) {
     if (!endpoint) return;
 
     setLoading(true);
-    fetch(`http://localhost:5135/api/${endpoint}`)
+    fetch(`${API_URL}/api/${endpoint}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch data");
         return res.json();

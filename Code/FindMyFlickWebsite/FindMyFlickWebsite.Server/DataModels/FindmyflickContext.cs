@@ -71,6 +71,12 @@ public partial class FindmyflickContext : DbContext
 
     public virtual DbSet<Warning> Warnings { get; set; }
 
+    public virtual DbSet<PlotTag> PlotTags { get; set; }
+
+    public virtual DbSet<MoviePlotTag> MoviePlotTags { get; set; }
+
+    public virtual DbSet<MoviePlotTagVote> MoviePlotTagVotes { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=findmyflick;Username=postgres;Password=p@ssw0rd;SSL Mode=Prefer");
@@ -772,6 +778,77 @@ public partial class FindmyflickContext : DbContext
                 .HasConstraintName("warnings_parent_fk");
         });
 
+        modelBuilder.Entity<PlotTag>(entity =>
+        {
+            entity.ToTable("plot_tags", schema: "public");
+
+            entity.HasKey(e => e.PlotTagId).HasName("pk_plot_tags");
+
+            entity.Property(e => e.PlotTagId).HasColumnName("plot_tag_id");
+            entity.Property(e => e.TagText).HasColumnName("tag_text").IsRequired();
+            entity.Property(e => e.TagTextNorm).HasColumnName("tag_text_norm").IsRequired();
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+            
+            // unique index on normalized text
+            entity.HasIndex(e => e.TagTextNorm).HasDatabaseName("idx_plot_tags_norm").IsUnique(false);
+        });
+
+        // Configure MoviePlotTag
+        modelBuilder.Entity<MoviePlotTag>(entity =>
+        {
+            entity.ToTable("movie_plot_tags", schema: "public");
+
+            entity.HasKey(e => new { e.ImdbId, e.PlotTagId }).HasName("pk_movie_plot_tags");
+
+            entity.Property(e => e.ImdbId).HasColumnName("imdb_id").HasMaxLength(16);
+            entity.Property(e => e.PlotTagId).HasColumnName("plot_tag_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+            
+            // created_by_user_id stored as text in your DB (adjust the column type if your DB differs)
+            entity.Property(e => e.CreatedByUserId).HasColumnName("created_by_user_id");
+            entity.Property(e => e.Status).HasColumnName("status").HasDefaultValue("approved");
+
+            entity.HasIndex(e => e.PlotTagId).HasDatabaseName("idx_movie_plot_tags_tag");
+            entity.HasIndex(e => e.Status).HasDatabaseName("idx_movie_plot_tags_status");
+
+            // FKs
+            entity.HasOne(d => d.PlotTag)
+                  .WithMany(p => p.MoviePlotTags)
+                  .HasForeignKey(d => d.PlotTagId)
+                  .HasConstraintName("fk_movie_plot_tags_plot_tag")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Movie FK (imdb_id) -> Movies table (if present in model)
+            entity.HasOne(d => d.Movie)
+                  .WithMany() // Movie entity already defines collections; avoid double mapping disagreements
+                  .HasForeignKey(d => d.ImdbId)
+                  .HasConstraintName("fk_movie_plot_tags_movie")
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure MoviePlotTagVote
+        modelBuilder.Entity<MoviePlotTagVote>(entity =>
+        {
+            entity.ToTable("movie_plot_tag_votes", schema: "public");
+
+            entity.HasKey(e => new { e.ImdbId, e.PlotTagId, e.UserId })
+                  .HasName("pk_movie_plot_tag_votes");
+
+            entity.Property(e => e.ImdbId).HasColumnName("imdb_id").HasMaxLength(16);
+            entity.Property(e => e.PlotTagId).HasColumnName("plot_tag_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Vote).HasColumnName("vote");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("now()");
+
+            // FK -> movie_plot_tags (imdb_id, plot_tag_id)
+            entity.HasOne(d => d.MoviePlotTag)
+                  .WithMany(p => p.MoviePlotTagVotes)
+                  .HasForeignKey(d => new { d.ImdbId, d.PlotTagId })
+                  .HasConstraintName("fk_movie_plot_tag_votes_movie_plot_tags")
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Allow the rest of the existing partials to run
         OnModelCreatingPartial(modelBuilder);
     }
 
