@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj": {}
+    "C:\\Users\\emman\\source\\repos\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj": {}
   },
   "projects": {
-    "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj": {
+    "C:\\Users\\emman\\source\\repos\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj",
+        "projectUniqueName": "C:\\Users\\emman\\source\\repos\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj",
         "projectName": "FindMyFlickWebsite.Server",
-        "projectPath": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj",
-        "packagesPath": "C:\\Users\\glowi\\.nuget\\packages\\",
-        "outputPath": "C:\\GIT\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\obj\\",
+        "projectPath": "C:\\Users\\emman\\source\\repos\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\FindMyFlickWebsite.Server.csproj",
+        "packagesPath": "C:\\Users\\emman\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\emman\\source\\repos\\FindMyFlick\\Code\\FindMyFlickWebsite\\FindMyFlickWebsite.Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\glowi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\emman\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,8 +44,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -119,7 +118,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.419/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
