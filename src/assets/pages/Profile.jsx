@@ -21,7 +21,7 @@ export default function Profile() {
   ================================ */
   useEffect(() => {
     // Replace with your real endpoint later
-    fetch('${import.meta.env.REACT_API_URL}/api/profile')
+    fetch('${import.meta.env.VITE_API_URL}/api/profile')
       .then((res) => {
         if (!res.ok) throw new Error("No profile found");
         return res.json();
