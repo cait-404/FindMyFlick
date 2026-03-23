@@ -117,7 +117,27 @@ builder.Services.AddAuthentication(options =>
             // Log the raw Authorization header and the token string
             var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
             var authHeader = ctx.Request.Headers["Authorization"].FirstOrDefault();
-            logger.LogInformation("OnMessageReceived - Authorization header: {Header}", authHeader ?? "(missing)");
+            // Sanitize header value to prevent log forging (strip control characters and line breaks)
+            string SanitizeForLogging(string value)
+            {
+                if (string.IsNullOrEmpty(value))
+                    return value;
+
+                var chars = value.ToCharArray();
+                for (int i = 0; i < chars.Length; i++)
+                {
+                    char c = chars[i];
+                    if (char.IsControl(c))
+                    {
+                        chars[i] = ' ';
+                    }
+                }
+
+                return new string(chars);
+            }
+
+            var safeAuthHeader = authHeader is null ? "(missing)" : SanitizeForLogging(authHeader);
+            logger.LogInformation("OnMessageReceived - Authorization header: {Header}", safeAuthHeader);
             var token = ctx.Request.Headers.ContainsKey("Authorization")
                         ? ctx.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault()
                         : null;
