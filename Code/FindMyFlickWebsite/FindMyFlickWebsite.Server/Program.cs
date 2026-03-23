@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +25,33 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers(options =>
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute()));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Configure Swagger with JWT / API token support
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FindMyFlick API", Version = "v1" });
+
+    // Define the BearerAuth scheme that's in use
+    var bearerScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer {your JWT token}' (without quotes)."
+    };
+
+    c.AddSecurityDefinition("Bearer", bearerScheme);
+
+    // Require the bearer token for all operations (UI will present Authorize button)
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { bearerScheme, Array.Empty<string>() }
+    });
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // keep ApplicationDbContext for Identity migrations / tooling
@@ -46,36 +72,80 @@ builder.Services.AddDbContext<FindmyflickContext>(options =>
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    //intellisense generated password requirements based on best practices and common security standards
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 15; //Changed this from 6 to 15 to enhance security
+    options.Password.RequiredLength = 15;
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddAuthentication(
-    options =>
-       {
-           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-           options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-           options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-       }
-    )
-    .AddJwtBearer(options =>
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        // Must match values used when creating the token
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+
+        // Make role and name claim resolution consistent with the claims you emit
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+        NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier
+    };
+
+    // Optional: helpful diagnostics during development
+    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
+        OnMessageReceived = ctx =>
         {
-            options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-            };
-        });
+            // Log the raw Authorization header and the token string
+            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            var authHeader = ctx.Request.Headers["Authorization"].FirstOrDefault();
+            logger.LogInformation("OnMessageReceived - Authorization header: {Header}", authHeader ?? "(missing)");
+            var token = ctx.Request.Headers.ContainsKey("Authorization")
+                        ? ctx.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault()
+                        : null;
+            logger.LogInformation("OnMessageReceived - extracted token length: {Len}", token?.Length ?? 0);
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = ctx =>
+        {
+            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ctx.Exception, "JWT authentication failed: {Message}", ctx.Exception.Message);
+            // include inner exception if present
+            if (ctx.Exception.InnerException != null)
+                logger.LogError(ctx.Exception.InnerException, "Inner exception: {Message}", ctx.Exception.InnerException.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = ctx =>
+        {
+            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            var roles = string.Join(",", ctx.Principal?.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value) ?? Enumerable.Empty<string>());
+            logger.LogInformation("OnTokenValidated - sub={Sub} nameid={NameId} roles={Roles}",
+                ctx.Principal?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value,
+                ctx.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
+                roles);
+            return Task.CompletedTask;
+        }
+    };
+});
+
 builder.Services.AddAuthorization(
     options =>
     {
@@ -85,21 +155,17 @@ builder.Services.AddAuthorization(
     );
 
 var app = builder.Build();
-////copilot generated code to apply pending migrations at startup generted by inputting the error "ERROR SqlState: 42P01 MessageText: relation "Movies" does not exist "
-//// Apply pending migrations (safe in many scenarios; prefer explicit migrations in production)
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//    db.Database.Migrate();
-//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "FindMyFlick API v1");
+        // The Authorize button will appear automatically because of the security definition.
+    });
 }
-
 
 //app.UseHttpsRedirection(); for prod
 app.UseRouting(); 
