@@ -8,7 +8,7 @@ export function MovieProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('${import.meta.env.REACT_API_URL}/api/Movies')
+    fetch('${import.meta.env.VITE_API_URL}/api/Movies')
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch movies");
         return res.json();
