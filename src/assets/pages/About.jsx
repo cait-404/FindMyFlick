@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API_URL from "../../config.js"
 import EmmanImg from "../images/emman.JPG";
 //import MichelleImg from "../images/michelle.jpg";
 //import IsabelleImg from "../images/isabelle.jpg";
@@ -33,14 +34,14 @@ export default function About() {
       name: "Caitlin Hemmert",
       role: "Cybersecurity",
       img: "/images/placeholder.jpg",
-      bio: "Bridging frontend and backend to create a seamless and interactive movie discovery experience."
+      bio: "Managing the team and enhancing security to provide a safe experience for all users."
     },
   ];
 
   useEffect(() => {
     Promise.all([
-      fetch('${import.meta.env.VITE_API_URL}/Movies').then(res => res.json()),
-      fetch('${import.meta.env.VITE_API_URL}/Tags').then(res => res.json())
+      fetch('${API_URL}/Movies').then(res => res.json()),
+      fetch('${API_URL}/Tags').then(res => res.json())
     ])
       .then(([movies, tags]) => {
         setMovieCount(movies.length);
