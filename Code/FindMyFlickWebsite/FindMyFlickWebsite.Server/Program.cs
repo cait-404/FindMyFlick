@@ -117,23 +117,17 @@ builder.Services.AddAuthentication(options =>
             // Log the raw Authorization header and the token string
             var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
             var authHeader = ctx.Request.Headers["Authorization"].FirstOrDefault();
-            // Sanitize header value to prevent log forging (strip control characters and line breaks)
+            // Sanitize header value to prevent log forging (strip line breaks)
             string SanitizeForLogging(string value)
             {
                 if (string.IsNullOrEmpty(value))
                     return value;
 
-                var chars = value.ToCharArray();
-                for (int i = 0; i < chars.Length; i++)
-                {
-                    char c = chars[i];
-                    if (char.IsControl(c))
-                    {
-                        chars[i] = ' ';
-                    }
-                }
-
-                return new string(chars);
+                // Remove CRLF and standalone CR/LF to avoid log forging via new lines
+                return value
+                    .Replace(Environment.NewLine, string.Empty)
+                    .Replace("\r", string.Empty)
+                    .Replace("\n", string.Empty);
             }
 
             var safeAuthHeader = authHeader is null ? "(missing)" : SanitizeForLogging(authHeader);
