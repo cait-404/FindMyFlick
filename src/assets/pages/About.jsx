@@ -39,8 +39,8 @@ export default function About() {
 
   useEffect(() => {
     Promise.all([
-      fetch('${import.meta.env.REACT_API_URL}/Movies').then(res => res.json()),
-      fetch('${import.meta.env.REACT_API_URL}/Tags').then(res => res.json())
+      fetch('${import.meta.env.VITE_API_URL}/Movies').then(res => res.json()),
+      fetch('${import.meta.env.VITE_API_URL}/Tags').then(res => res.json())
     ])
       .then(([movies, tags]) => {
         setMovieCount(movies.length);
