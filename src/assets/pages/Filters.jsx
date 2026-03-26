@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import API_URL from "../../config.js";
 
 export default function Filters() {
 
@@ -22,7 +23,7 @@ export default function Filters() {
           take: 20
         };
 
-        const res = await fetch("https://localhost:5002/api/MovieSearch", {
+        const res = await fetch('${API_URL}/api/MovieSearch', {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

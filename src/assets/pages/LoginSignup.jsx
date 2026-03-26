@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import API_URL from "../../config.js";
 
 export default function LoginSignup() {
 
@@ -55,7 +56,7 @@ export default function LoginSignup() {
     let response;
 
     if (isLogin) {
-      response = await fetch("https://localhost:5002/api/Account/login", {
+      response = await fetch('${API_URL}/api/Account/login', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,7 +65,7 @@ export default function LoginSignup() {
         })
       });
     } else {
-      response = await fetch("https://localhost:5002/api/Account/register", {
+      response = await fetch('${API_URL}/api/Account/register', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

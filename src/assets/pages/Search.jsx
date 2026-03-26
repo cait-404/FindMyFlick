@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import API_URL from "../../config.js"
+import API_URL from "../../config.js";
 
 function Search() {
   const location = useLocation();
