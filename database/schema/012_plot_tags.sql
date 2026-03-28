@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.movie_plot_tags (
                     REFERENCES public.plot_tags(plot_tag_id)
                     ON UPDATE CASCADE ON DELETE CASCADE,
   created_at         timestamptz NOT NULL DEFAULT now(),
-  created_by_user_id integer NULL,   -- backend will wire to users table later
+  created_by_user_id text NULL,
   status             text NOT NULL DEFAULT 'approved',
   PRIMARY KEY (imdb_id, plot_tag_id),
   CONSTRAINT movie_plot_tags_status_check
@@ -41,7 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_movie_plot_tags_status
 CREATE TABLE IF NOT EXISTS public.movie_plot_tag_votes (
   imdb_id      varchar(16) NOT NULL,
   plot_tag_id  integer NOT NULL,
-  user_id      integer NOT NULL,     -- backend will wire to users table later
+  user_id      text NOT NULL,
   vote         smallint NOT NULL,
   created_at   timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (imdb_id, plot_tag_id, user_id),
