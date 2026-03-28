@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import API_URL from "../../config.js"
+import API_URL from "../../config.js";
 import EmmanImg from "../images/emman.JPG";
 //import MichelleImg from "../images/michelle.jpg";
 //import IsabelleImg from "../images/isabelle.jpg";
@@ -33,7 +33,7 @@ export default function About() {
     {
       name: "Caitlin Hemmert",
       role: "Cybersecurity",
-      img: "/images/placeholder.jpg",
+      img: CaitlinImg,
       bio: "Managing the team and enhancing security to provide a safe experience for all users."
     },
   ];

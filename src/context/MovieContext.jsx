@@ -9,7 +9,7 @@ export function MovieProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("https://localhost:5002/api/Movies/search")
+    fetch('${API_URL}/api/Movies/search')
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch movies");
         return res.json();

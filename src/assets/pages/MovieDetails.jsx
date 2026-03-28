@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import API_URL from "../../config.js";
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export default function MovieDetails() {
     const fetchMovieDetails = async () => {
       try {
         // Main movie
-        const res = await fetch(`https://localhost:5002/api/Movies/${id}`);
+        const res = await fetch(`${API_URL}/api/Movies/${id}`);
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
         const data = await res.json();
         setMovie(data);
@@ -34,13 +35,13 @@ export default function MovieDetails() {
           warningsRes,
           collectionsRes
         ] = await Promise.all([
-          fetch(`https://localhost:5002/api/movies/${id}/plot-tags`),
-          fetch(`https://localhost:5002/api/movies/${id}/genres`),
-          fetch(`https://localhost:5002/api/movies/${id}/streaming-providers`),
-          fetch(`https://localhost:5002/api/movies/${id}/cast`),
-          fetch(`https://localhost:5002/api/movies/${id}/crew`),
-          fetch(`https://localhost:5002/api/movies/${id}/warnings`),
-          fetch(`https://localhost:5002/api/movies/${id}/collections`)
+          fetch(`${API_URL}/api/movies/${id}/plot-tags`),
+          fetch(`${API_URL}/api/movies/${id}/genres`),
+          fetch(`${API_URL}/api/movies/${id}/streaming-providers`),
+          fetch(`${API_URL}/api/movies/${id}/cast`),
+          fetch(`${API_URL}/api/movies/${id}/crew`),
+          fetch(`${API_URL}/api/movies/${id}/warnings`),
+          fetch(`${API_URL}/api/movies/${id}/collections`)
         ]);
 
         // Convert responses to JSON
