@@ -4,4 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [ tailwindcss(), react()],
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://findmyflick-api-ecargjhzf4acffec.canadacentral-01.azurewebsites.net')
+  }
 })
