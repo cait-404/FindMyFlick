@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import API_URL from "../../config.js";
 
 export default function LoginSignup() {
   const navigate = useNavigate();
@@ -76,6 +77,7 @@ export default function LoginSignup() {
     try {
       let response;
 
+<<<<<<< HEAD
       if (isLogin) {
         response = await fetch(`${API}/api/Account/login`, {
           method: "POST",
@@ -171,6 +173,27 @@ export default function LoginSignup() {
         favoriteGenres: [],
         bio: "",
         theme: "Disco"
+=======
+    if (isLogin) {
+      response = await fetch('${API_URL}/api/Account/login', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        })
+      });
+    } else {
+      response = await fetch('${API_URL}/api/Account/register', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword
+        })
+>>>>>>> a9957c9bc61f89ee8f0651b70fc8121e7f015324
       });
 
     } catch (err) {

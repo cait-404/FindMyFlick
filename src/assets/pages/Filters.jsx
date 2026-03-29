@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import API_URL from "../../config.js";
 
 export default function Filters() {
 
@@ -33,6 +34,7 @@ export default function Filters() {
           return [tag];
         };
 
+<<<<<<< HEAD
         const formatGenre = (g) => {
   if (!g) return [];
   return [g.charAt(0).toUpperCase() + g.slice(1).toLowerCase()];
@@ -46,6 +48,9 @@ const body = {
 };
 
         const res = await fetch("https://localhost:5002/api/MovieSearch", {
+=======
+        const res = await fetch('${API_URL}/api/MovieSearch', {
+>>>>>>> a9957c9bc61f89ee8f0651b70fc8121e7f015324
           method: "POST",
           headers: {
             "Content-Type": "application/json"
