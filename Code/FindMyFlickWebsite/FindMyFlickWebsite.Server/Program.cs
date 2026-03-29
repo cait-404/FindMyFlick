@@ -14,9 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-            policy.WithOrigins("https://thankful-mud-03220200f.4.azurestaticapps.net","http://localhost:5173")
+            policy.WithOrigins("https://thankful-mud-03220200f.4.azurestaticapps.net","http://localhost:5173", "https://localhost:5174")
                 .AllowAnyHeader()
-                .AllowAnyMethod());
+                .AllowAnyMethod()
+                .AllowCredentials());
 });
 
 builder.Services.AddControllers(options =>
