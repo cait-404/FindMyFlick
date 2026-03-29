@@ -54,7 +54,14 @@ const body = {
           body: JSON.stringify(body)
         });
 
-        const data = await res.json();
+        const text = await res.text();
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch {
+  throw new Error("Server not returning JSON (is backend running?)");
+}
 
         setMovies(data.results || []);
 

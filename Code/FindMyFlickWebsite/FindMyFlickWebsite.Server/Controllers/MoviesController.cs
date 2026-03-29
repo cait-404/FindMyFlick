@@ -145,7 +145,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (year.HasValue && m.Year != year.Value)
                     continue;
 
-                // Plot tag include (NEW behavior) — operates on normalized values stored in DTO PlotTags.TagName
+                // Plot tag include (NEW behavior) ï¿½ operates on normalized values stored in DTO PlotTags.TagName
                 if (tagNameListIncludeNorm.Any())
                 {
                     var moviePlotTagNorms = (m.Tags?.PlotTags ?? Enumerable.Empty<TagsView.PlotTag>())
@@ -267,7 +267,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                             .Select(r => new TagsView.PlotTag
                             {
                                 TagID = r.PlotTagId,
-                                // Use tag_text_norm for searching — store the normalized text here
+                                // Use tag_text_norm for searching ï¿½ store the normalized text here
                                 TagName = r.PlotTag?.TagTextNorm ?? (r.PlotTag?.TagText ?? string.Empty),
                                 TagType = "plot"
                             })
@@ -702,17 +702,17 @@ namespace FindMyFlickWebsite.Server.Controllers
                     if (matchAllTagsIn)
                     {
                         filteredByPlot = filteredByPlot
-                            .Where(d => includeNorms.All(q => (d.Tags?.PlotTags)
-                                .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
-                                .Contains(q)))
+                            .Where(d => includeNorms.All(q => (d.Tags?.PlotTags ?? Enumerable.Empty<TagsView.PlotTag>())
+    .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
+    .Contains(q)))
                             .ToList();
                     }
                     else
                     {
                         filteredByPlot = filteredByPlot
-                            .Where(d => includeNorms.Any(q => (d.Tags?.PlotTags)
-                                .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
-                                .Contains(q)))
+                           .Where(d => includeNorms.Any(q => (d.Tags?.PlotTags ?? Enumerable.Empty<TagsView.PlotTag>())
+    .Select(pt => (pt.TagName ?? string.Empty).Trim().ToLowerInvariant())
+    .Contains(q)))
                             .ToList();
                     }
                 }

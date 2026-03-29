@@ -1,5 +1,4 @@
 import fmy from "../images/fmy.png";
-import { useMovies } from "../../context/MovieContext";
 
 function MovieGrid({ movies, title }) {
   if (!movies) return null;
@@ -39,9 +38,7 @@ function MovieGrid({ movies, title }) {
   );
 }
 
-export default function Home() {
-  const { movies, loading, error } = useMovies();
-
+export default function Home({ movies, loading, error }) {
   return (
     <div className="text-white">
       <header className="relative h-[300px] md:h-[450px] w-full mt-6 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
