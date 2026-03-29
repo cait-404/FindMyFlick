@@ -1,8 +1,9 @@
-import './App.css';
+import './App.css'; 
 import { Routes, Route, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import Footer from "./components/Footer";
+import ProfileMenu from "./components/ProfileMenu"; 
 
 import Home from './assets/pages/Home';
 import Discover from './assets/pages/Discover';
@@ -12,13 +13,15 @@ import Profile from './assets/pages/Profile';
 import Search from './assets/pages/Search';
 import LoginSignup from './assets/pages/LoginSignup';
 import MovieDetails from './assets/pages/MovieDetails';
-import Filters from './assets/pages/Filters'; // NEW PAGE
+import Filters from './assets/pages/Filters';
 
 export default function App() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState([]);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token"); 
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
@@ -58,9 +61,7 @@ export default function App() {
             About
           </NavLink>
 
-          <NavLink to="/profile" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Profile
-          </NavLink>
+          {/* REMOVED PROFILE NAVLINK */}
 
           {/* SEARCH BAR */}
           <div className="flex gap-2 items-center">
@@ -85,16 +86,21 @@ export default function App() {
 
           </div>
 
-          <Link
-            to="/auth"
-            className="px-5 py-2 rounded-full font-semibold transition
-                       bg-linear-to-r from-[#ff39e1] to-[#ff6ed0]
-                       shadow-[0_0_15px_#ff39e1]
-                       hover:shadow-[0_0_30px_#ff6ed0]
-                       hover:scale-105"
-          >
-            Login / Signup
-          </Link>
+          {/* ✅ REPLACED LOGIN BUTTON */}
+          {!token ? (
+            <Link
+              to="/auth"
+              className="px-5 py-2 rounded-full font-semibold transition
+                         bg-linear-to-r from-[#ff39e1] to-[#ff6ed0]
+                         shadow-[0_0_15px_#ff39e1]
+                         hover:shadow-[0_0_30px_#ff6ed0]
+                         hover:scale-105"
+            >
+              Login / Signup
+            </Link>
+          ) : (
+            <ProfileMenu />
+          )}
 
         </div>
       </nav>
@@ -112,12 +118,10 @@ export default function App() {
 
         <Route path="/search" element={<Search movies={movies} setMovies={setMovies} />} />
 
-        {/* MOVIE DETAILS */}
         <Route path="/movie/:id" element={<MovieDetails />} />
 
         <Route path="/auth" element={<LoginSignup />} />
 
-        {/* FOOTER PAGES */}
         <Route path="/terms" element={<About />} />
         <Route path="/privacy" element={<About />} />
         <Route path="/project-info" element={<About />} />

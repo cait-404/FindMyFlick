@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API_URL from "../../config.js"
 import EmmanImg from "../images/emman.JPG";
-//import MichelleImg from "../images/michelle.jpg";
+import MichelleImg from "../images/michelle.png";
 //import IsabelleImg from "../images/isabelle.jpg";
 //import CaitlinImg from "../images/caitlin.jpg";
 
@@ -13,15 +13,15 @@ export default function About() {
   const team = [
     {
       name: "Emmanuella Asamoah",
-      role: "Frontend Lead",
+      role: "Frontend Developer",
       img: EmmanImg,
       bio: "Designing smooth, interactive, and responsive UI for the movie discovery platform."
     }
     ,
     {
       name: "Michelle Yau",
-      role: "Data Tech",
-      img: "/images/placeholder.jpg",
+      role: "Data Technology",
+      img: MichelleImg,
       bio: "Focused on robust API design and ensuring smooth data delivery for the platform."
     },
     {
@@ -96,7 +96,7 @@ export default function About() {
 
   {/* Michelle */}
   <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src="/images/placeholder.jpg" alt="Michelle" className="w-32 h-32 rounded-full mx-auto mb-4" />
+    <img src={MichelleImg} alt="Michelle" className="w-48 h-48 object-cover mx-auto mb-4" />
     <h4 className="font-bold text-lg neon-text">Michelle Yau</h4>
     <p className="opacity-80 mb-2">Data Tech</p>
     <p className="text-sm opacity-90">
@@ -106,7 +106,7 @@ export default function About() {
 
   {/* Isabelle */}
   <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src="/images/placeholder.jpg" alt="Isabelle" className="w-32 h-32 rounded-full mx-auto mb-4" />
+    <img src="/images/placeholder.jpg" alt="Isabelle" className="w-48 h-48 object-cover mx-auto mb-4"/>
     <h4 className="font-bold text-lg neon-text">Isabelle Kramer</h4>
     <p className="opacity-80 mb-2">Backend Developer</p>
     <p className="text-sm opacity-90">
@@ -116,7 +116,7 @@ export default function About() {
 
   {/* Caitlin */}
   <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src="/images/placeholder.jpg" alt="Caitlin" className="w-32 h-32 rounded-full mx-auto mb-4" />
+    <img src="/images/placeholder.jpg" alt="Caitlin" className="w-48 h-48 object-cover mx-auto mb-4"/>
     <h4 className="font-bold text-lg neon-text">Caitlin Hemmert</h4>
     <p className="opacity-80 mb-2">Cybersecurity</p>
     <p className="text-sm opacity-90">

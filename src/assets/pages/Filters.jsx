@@ -15,12 +15,35 @@ export default function Filters() {
       setLoading(true);
 
       try {
-        const body = {
-          genreNames: genre ? [genre] : [],
-          includeWarningNames: includeTag ? [includeTag] : [],
-          excludeWarningNames: excludeTag ? [excludeTag] : [],
-          take: 20
+
+        // 🔥 NORMALIZE INPUT (fixes your issue)
+        const normalizeTag = (tag) => {
+          if (!tag) return [];
+
+          const lower = tag.toLowerCase();
+
+          if (lower === "violence") {
+            return ["gun violence", "violence"];
+          }
+
+          if (lower === "gore") {
+            return ["blood/gore", "gore"];
+          }
+
+          return [tag];
         };
+
+        const formatGenre = (g) => {
+  if (!g) return [];
+  return [g.charAt(0).toUpperCase() + g.slice(1).toLowerCase()];
+};
+
+const body = {
+  genreNames: formatGenre(genre),
+  includeWarningNames: normalizeTag(includeTag),
+  excludeWarningNames: normalizeTag(excludeTag),
+  take: 20
+};
 
         const res = await fetch("https://localhost:5002/api/MovieSearch", {
           method: "POST",
@@ -132,7 +155,6 @@ export default function Filters() {
 
             return hasImdb ? (
 
-              /* ✅ CLICKABLE CARD */
               <Link key={index} to={`/movie/${movie.imdbId}`}>
 
                 <div className="bg-black/60 p-6 rounded-xl hover:bg-pink-500/20 transition hover:scale-105 shadow-lg cursor-pointer">
@@ -163,7 +185,6 @@ export default function Filters() {
 
             ) : (
 
-              /* 🚫 NON-CLICKABLE (no imdbId) */
               <div
                 key={index}
                 className="bg-gray-700 p-6 rounded-xl opacity-60 cursor-not-allowed"
