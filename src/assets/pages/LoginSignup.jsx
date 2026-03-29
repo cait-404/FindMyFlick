@@ -22,7 +22,7 @@ export default function LoginSignup() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const API = "https://localhost:5002";
+  const API = "http://localhost:5002";
 
   const handleChange = (e) => {
     setFormData({

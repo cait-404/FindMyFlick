@@ -19,7 +19,7 @@ export function useInfiniteMovies(genreFilter = "") {
   const fetchBatch = useCallback(async (currentSkip, genre) => {
     setLoading(true);
     try {
-      const res = await fetch("https://localhost:5002/api/MovieSearch", {
+      const res = await fetch("http://localhost:5002/api/MovieSearch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

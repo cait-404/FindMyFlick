@@ -48,7 +48,7 @@ export default function Discover() {
         if (genre) params.append("genre", genre);
         params.append("limit", "100");
 
-        const url = `${API_URL}/api/movies?${params.toString()}`;
+        const url = "http://localhost:5002/api/movies?${params.toString()}";
 
         const res = await fetch(url);
         if (!res.ok) {

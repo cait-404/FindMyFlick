@@ -13,11 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
-            policy.WithOrigins("https://thankful-mud-03220200f.4.azurestaticapps.net","http://localhost:5173", "https://localhost:5174")
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials());
+                .AllowAnyMethod();
+        });
 });
 
 builder.Services.AddControllers(options =>
@@ -183,6 +186,7 @@ app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 //specify use for development

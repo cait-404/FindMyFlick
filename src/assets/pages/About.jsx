@@ -40,8 +40,8 @@ export default function About() {
 
   useEffect(() => {
     Promise.all([
-      fetch('${API_URL}/Movies').then(res => res.json()),
-      fetch('${API_URL}/Tags').then(res => res.json())
+      fetch("http://localhost:5002/Movies").then(res => res.json()),
+      fetch("http://localhost:5002/Tags").then(res => res.json())
     ])
       .then(([movies, tags]) => {
         setMovieCount(movies.length);

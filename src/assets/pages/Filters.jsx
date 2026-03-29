@@ -17,7 +17,6 @@ export default function Filters() {
 
       try {
 
-        // 🔥 NORMALIZE INPUT (fixes your issue)
         const normalizeTag = (tag) => {
           if (!tag) return [];
 
@@ -46,7 +45,7 @@ const body = {
   take: 20
 };
 
-        const res = await fetch("https://localhost:5002/api/MovieSearch", {
+        const res = await fetch("http://localhost:5002/api/MovieSearch", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
