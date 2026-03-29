@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-<<<<<<< HEAD
 import { useNavigate } from "react-router-dom";
-=======
->>>>>>> a9957c9bc61f89ee8f0651b70fc8121e7f015324
 import API_URL from "../../config.js";
 
 function Search() {

@@ -20,16 +20,10 @@ export default function MovieDetails() {
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-<<<<<<< HEAD
         // 🎬 MAIN MOVIE
         const res = await fetch(`https://localhost:5002/api/Movies/${id}`);
-=======
-        // Main movie
-        const res = await fetch(`${API_URL}/api/Movies/${id}`);
->>>>>>> a9957c9bc61f89ee8f0651b70fc8121e7f015324
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
-<<<<<<< HEAD
         const data = await res.json();
         console.log("Movie Data:", data);
 
@@ -46,25 +40,6 @@ export default function MovieDetails() {
           fetch(`https://localhost:5002/api/Movies/${id}/crew`),
           fetch(`https://localhost:5002/api/Movies/${id}/warnings`),
           fetch(`https://localhost:5002/api/Movies/${id}/collections`)
-=======
-        // Parallel fetches
-        const [
-          plotTagsRes,
-          genresRes,
-          streamingRes,
-          castRes,
-          crewRes,
-          warningsRes,
-          collectionsRes
-        ] = await Promise.all([
-          fetch(`${API_URL}/api/movies/${id}/plot-tags`),
-          fetch(`${API_URL}/api/movies/${id}/genres`),
-          fetch(`${API_URL}/api/movies/${id}/streaming-providers`),
-          fetch(`${API_URL}/api/movies/${id}/cast`),
-          fetch(`${API_URL}/api/movies/${id}/crew`),
-          fetch(`${API_URL}/api/movies/${id}/warnings`),
-          fetch(`${API_URL}/api/movies/${id}/collections`)
->>>>>>> a9957c9bc61f89ee8f0651b70fc8121e7f015324
         ]);
 
         const parse = async (res) =>
