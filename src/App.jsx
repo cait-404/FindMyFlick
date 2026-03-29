@@ -1,6 +1,6 @@
 import './App.css'; 
 import { Routes, Route, NavLink, useNavigate, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import Footer from "./components/Footer";
 import ProfileMenu from "./components/ProfileMenu"; 
@@ -15,17 +15,39 @@ import LoginSignup from './assets/pages/LoginSignup';
 import MovieDetails from './assets/pages/MovieDetails';
 import Filters from './assets/pages/Filters';
 
-export default function App() {
+import API_URL from './config'; // Make sure this points to your new backend
 
+export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token"); 
 
+  // Fetch movies from new endpoint
+  useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_URL}/movies?limit=100`); // Update endpoint if needed
+        if (!res.ok) throw new Error("Server error");
+        const data = await res.json();
+        setMovies(data);
+      } catch (err) {
+        setError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMovies();
+  }, []);
+
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
-
     navigate(`/search?query=${encodeURIComponent(searchTerm.trim())}`);
     setSearchTerm('');
   };
@@ -61,19 +83,14 @@ export default function App() {
             About
           </NavLink>
 
-          {/* REMOVED PROFILE NAVLINK */}
-
           {/* SEARCH BAR */}
           <div className="flex gap-2 items-center">
-
             <input
               type="text"
               placeholder="Search movies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="p-2 rounded-md text-black text-sm"
             />
 
@@ -83,10 +100,9 @@ export default function App() {
             >
               <FaSearch />
             </button>
-
           </div>
 
-          {/* ✅ REPLACED LOGIN BUTTON */}
+          {/* LOGIN / PROFILE */}
           {!token ? (
             <Link
               to="/auth"
@@ -107,29 +123,21 @@ export default function App() {
 
       {/* ROUTES */}
       <Routes>
-
-        <Route path="/" element={<Home movies={movies} setMovies={setMovies} />} />
-        <Route path="/discover" element={<Discover movies={movies} setMovies={setMovies} />} />
+        <Route path="/" element={<Home movies={movies} loading={loading} error={error} />} />
+        <Route path="/discover" element={<Discover movies={movies} loading={loading} error={error} />} />
         <Route path="/filters" element={<Filters movies={movies} />} />
-
-        <Route path="/genres" element={<Genres movies={movies} setMovies={setMovies} />} />
-        <Route path="/about" element={<About movies={movies} setMovies={setMovies} />} />
-        <Route path="/profile" element={<Profile movies={movies} setMovies={setMovies} />} />
-
-        <Route path="/search" element={<Search movies={movies} setMovies={setMovies} />} />
-
+        <Route path="/genres" element={<Genres movies={movies} loading={loading} error={error} />} />
+        <Route path="/about" element={<About movies={movies} loading={loading} error={error} />} />
+        <Route path="/profile" element={<Profile movies={movies} loading={loading} error={error} />} />
+        <Route path="/search" element={<Search movies={movies} loading={loading} error={error} />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
-
         <Route path="/auth" element={<LoginSignup />} />
-
         <Route path="/terms" element={<About />} />
         <Route path="/privacy" element={<About />} />
         <Route path="/project-info" element={<About />} />
-
       </Routes>
 
       <Footer />
-
     </>
   );
 }

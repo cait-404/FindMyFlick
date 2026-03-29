@@ -106,9 +106,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                     return StatusCode(500, removeResult.Errors);
             }
 
-            var genresValue = (model.FavoriteGenres ?? new List<string>()).Any()
-                ? string.Join(",", model.FavoriteGenres)
-                : string.Empty;
+        var genresValue = (model.FavoriteGenres ?? Enumerable.Empty<string>()).Any()
+    ? string.Join(",", model.FavoriteGenres ?? Enumerable.Empty<string>())
+    : string.Empty;
 
             var newClaims = new List<Claim>
             {
