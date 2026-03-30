@@ -19,7 +19,7 @@ function Search() {
   setError(null);
  
   // Step 1: Search by title first
-  fetch(`https://localhost:5002/api/MovieSearch`, {
+  fetch(`http://localhost:5002/api/MovieSearch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -50,7 +50,7 @@ function Search() {
       }
  
       // Fallback: search by keyword and genre
-      return fetch(`https://localhost:5002/api/MovieSearch`, {
+      return fetch(`http://localhost:5002/api/MovieSearch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

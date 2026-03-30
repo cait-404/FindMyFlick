@@ -21,7 +21,7 @@ export default function MovieDetails() {
     const fetchMovieDetails = async () => {
       try {
         // 🎬 MAIN MOVIE
-        const res = await fetch(`https://localhost:5002/api/Movies/${id}`);
+        const res = await fetch(`http://localhost:5002/api/Movies/${id}`);
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
         const data = await res.json();
@@ -33,13 +33,13 @@ export default function MovieDetails() {
 
         // ⚡ PARALLEL FETCHES (safe)
         const responses = await Promise.allSettled([
-          fetch(`https://localhost:5002/api/Movies/${id}/plot-tags`),
-          fetch(`https://localhost:5002/api/Movies/${id}/genres`),
-          fetch(`https://localhost:5002/api/Movies/${id}/streaming-providers`),
-          fetch(`https://localhost:5002/api/Movies/${id}/cast`),
-          fetch(`https://localhost:5002/api/Movies/${id}/crew`),
-          fetch(`https://localhost:5002/api/Movies/${id}/warnings`),
-          fetch(`https://localhost:5002/api/Movies/${id}/collections`)
+          fetch(`http://localhost:5002/api/Movies/${id}/plot-tags`),
+          fetch(`http://localhost:5002/api/Movies/${id}/genres`),
+          fetch(`http://localhost:5002/api/Movies/${id}/streaming-providers`),
+          fetch(`http://localhost:5002/api/Movies/${id}/cast`),
+          fetch(`http://localhost:5002/api/Movies/${id}/crew`),
+          fetch(`http://localhost:5002/api/Movies/${id}/warnings`),
+          fetch(`http://localhost:5002/api/Movies/${id}/collections`)
         ]);
 
         const parse = async (res) =>

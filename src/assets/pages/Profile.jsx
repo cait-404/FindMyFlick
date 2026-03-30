@@ -17,7 +17,7 @@ export default function Profile() {
       try {
         const token = localStorage.getItem("token");
 
-fetch("https://localhost:5002/api/Profile", {
+fetch("http://localhost:5002/api/Profile", {
   headers: {
     Authorization: `Bearer ${token}`
   }
@@ -28,7 +28,7 @@ fetch("https://localhost:5002/api/Profile", {
         }
 
         //const res = await fetch(`${API_URL}/api/Profile`, { 
-        const res = await fetch("https://localhost:5002/api/Profile", {
+        const res = await fetch("http://localhost:5002/api/Profile", {
           headers: {
             Authorization: `Bearer ${token}`, // THIS IS THE FIX
           },
@@ -75,7 +75,7 @@ fetch("https://localhost:5002/api/Profile", {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("https://localhost:5002/api/Profile", {
+    const res = await fetch("http://localhost:5002/api/Profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
