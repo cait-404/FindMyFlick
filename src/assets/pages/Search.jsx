@@ -19,14 +19,14 @@ function Search() {
   setError(null);
  
   // Step 1: Search by title first
-  fetch(`http://localhost:5002/api/MovieSearch`, {
+  fetch(`${API_URL}/api/MovieSearch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       take: 20,
       minMatches: 1,
-      enableApiFallback: true,
-      alwaysAddFromApis: true,
+      enableApiFallback: false,
+      alwaysAddFromApis: false,
       titleContains: query,   // ✅ title-first search
       genreNames: [],
       keywordNames: [],
@@ -50,7 +50,7 @@ function Search() {
       }
  
       // Fallback: search by keyword and genre
-      return fetch(`http://localhost:5002/api/MovieSearch`, {
+      return fetch(`${API_URL}/api/MovieSearch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

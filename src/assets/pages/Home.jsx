@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import fmy from "../images/fmy.png";
 
 function MovieGrid({ movies, title }) {
@@ -16,9 +17,10 @@ function MovieGrid({ movies, title }) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {movies.map((movie) => (
-            <div
+            <Link
               key={movie.id}
-              className="rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg"
+              to={`/movie/${movie.id}`}
+              className="rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg block"
             >
               <img
                 src={movie.poster_url}
@@ -30,7 +32,7 @@ function MovieGrid({ movies, title }) {
                 <h4 className="font-semibold text-lg truncate">{movie.title}</h4>
                 <p className="text-sm text-gray-400 mt-1">{movie.release_year}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
@@ -75,7 +77,12 @@ export default function Home({ movies, loading, error }) {
         {loading && <p className="text-gray-400">Loading movies...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && (
-          <MovieGrid movies={movies.slice(0, 12)} title="Trending Now" />
+          <MovieGrid
+            movies={movies
+              .filter(m => m.release_year && m.release_year <= new Date().getFullYear())
+              .slice(0, 12)}
+            title="Trending Now"
+          />
         )}
       </section>
 

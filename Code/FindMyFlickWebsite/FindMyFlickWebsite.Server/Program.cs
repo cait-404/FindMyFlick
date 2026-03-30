@@ -20,7 +20,8 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .WithExposedHeaders("X-Total-Count", "X-Page", "X-Page-Size");
         });
 });
 
@@ -182,58 +183,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-<<<<<<< HEAD
-var builder = WebApplication.CreateBuilder(args);
-=======
 //app.UseHttpsRedirection(); for prod
-app.UseRouting(); 
+app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
->>>>>>> 4db7736f7051ced3958f6de6f2843d007280641b
-
-// Add controllers
-builder.Services.AddControllers();
-
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173") // your React app
-              .AllowAnyHeader()
-              .AllowAnyMethod());
-});
-
-// If you have authentication later, configure it properly here
-// builder.Services.AddAuthentication("YourScheme").AddYourAuthMethod();
-// builder.Services.AddAuthorization();
-
-var app = builder.Build();
-
-// Development URLs
-if (app.Environment.IsDevelopment())
-{
-    app.Urls.Clear();
-    app.Urls.Add("https://localhost:5002");
-    app.Urls.Add("http://localhost:5003");
-}
-
-<<<<<<< HEAD
-// Middleware
-app.UseHttpsRedirection();
-app.UseRouting();
-
-// CORS must come after UseRouting and before MapControllers
-app.UseCors("AllowFrontend");
-
-// Uncomment these when you configure authentication
-// app.UseAuthentication();
-// app.UseAuthorization();
-
-app.MapControllers();
-
-=======
->>>>>>> 4db7736f7051ced3958f6de6f2843d007280641b
 app.Run();

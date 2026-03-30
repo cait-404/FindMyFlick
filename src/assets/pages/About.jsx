@@ -33,19 +33,20 @@ export default function About() {
     {
       name: "Caitlin Hemmert",
       role: "Cybersecurity",
-      img: CaitlinImg,
+      img: CaitlinImg || "/images/placeholder.jpg",
       bio: "Managing the team and enhancing security to provide a safe experience for all users."
     },
   ];
 
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:5002/Movies").then(res => res.json()),
-      fetch("http://localhost:5002/Tags").then(res => res.json())
+      fetch(`${API_URL}/api/Movies?page=1`),
+      fetch(`${API_URL}/api/Genres`).then(res => res.json())
     ])
-      .then(([movies, tags]) => {
-        setMovieCount(movies.length);
-        setGenreCount(tags.length);
+      .then(async ([moviesRes, genres]) => {
+        const total = parseInt(moviesRes.headers.get("X-Total-Count") || "0", 10);
+        setMovieCount(total || null);
+        setGenreCount(genres.length);
         setStatus("Connected");
       })
       .catch(() => {
@@ -77,54 +78,19 @@ export default function About() {
       {/* Divider */}
       <div className="h-px bg-linear-to-r from-transparent via-purple-500 to-transparent my-10"></div>
 
-     {/* Meet the Team */}
-<h3 className="text-2xl font-semibold neon-text mb-4">
-  Meet the Team
-</h3>
+      {/* Meet the Team */}
+      <h3 className="text-2xl font-semibold neon-text mb-4">Meet the Team</h3>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-
-  {/* Emman */}
-  <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src={EmmanImg} alt="Emman" className="w-48 h-48 object-cover mx-auto mb-4"  />
-    <h4 className="font-bold text-lg neon-text">Emman Asamoah</h4>
-    <p className="opacity-80 mb-2">Frontend Developer</p>
-    <p className="text-sm opacity-90">
-      Focused on creating a seamless and interactive movie discovery experience.
-    </p>
-  </div>
-
-  {/* Michelle */}
-  <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src={MichelleImg} alt="Michelle" className="w-48 h-48 object-cover mx-auto mb-4" />
-    <h4 className="font-bold text-lg neon-text">Michelle Yau</h4>
-    <p className="opacity-80 mb-2">Data Tech</p>
-    <p className="text-sm opacity-90">
-      Focused on robust API design and ensuring smooth data delivery for the platform.
-    </p>
-  </div>
-
-  {/* Isabelle */}
-  <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src="/images/placeholder.jpg" alt="Isabelle" className="w-48 h-48 object-cover mx-auto mb-4"/>
-    <h4 className="font-bold text-lg neon-text">Isabelle Kramer</h4>
-    <p className="opacity-80 mb-2">Backend Developer</p>
-    <p className="text-sm opacity-90">
-      Crafting intuitive and visually engaging experiences for all users.
-    </p>
-  </div>
-
-  {/* Caitlin */}
-  <div className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-    <img src="/images/placeholder.jpg" alt="Caitlin" className="w-48 h-48 object-cover mx-auto mb-4"/>
-    <h4 className="font-bold text-lg neon-text">Caitlin Hemmert</h4>
-    <p className="opacity-80 mb-2">Cybersecurity</p>
-    <p className="text-sm opacity-90">
-      Bridging frontend and backend to create a seamless and interactive movie discovery experience.
-    </p>
-  </div>
-
-</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        {team.map((member) => (
+          <div key={member.name} className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
+            <img src={member.img} alt={member.name} className="w-48 h-48 object-cover mx-auto mb-4" />
+            <h4 className="font-bold text-lg neon-text">{member.name}</h4>
+            <p className="opacity-80 mb-2">{member.role}</p>
+            <p className="text-sm opacity-90">{member.bio}</p>
+          </div>
+        ))}
+      </div>
       {/* Divider */}
       <div className="h-px bg-linear-to-r from-transparent via-purple-500 to-transparent my-10"></div>
 

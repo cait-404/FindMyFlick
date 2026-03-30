@@ -32,7 +32,7 @@ export default function App() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://localhost:5002/movies?limit=100"); // Update endpoint if needed
+        const res = await fetch(`${API_URL}/api/Movies?limit=100`);
         if (!res.ok) throw new Error("Server error");
         const data = await res.json();
         setMovies(data);

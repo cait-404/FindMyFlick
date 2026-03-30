@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa";
-import { useMovies } from "../../context/MovieContext";
+import API_URL from "../../config.js";
 
 const genreColors = {
   action: "from-red-600/90 to-red-900/90",
@@ -30,32 +30,17 @@ const genreTaglines = {
 };
 
 export default function Genres() {
-  const { movies, loading } = useMovies();
   const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!movies.length) return;
-
-    const genreMap = {};
-
-    movies.forEach((movie) => {
-      const movieGenres = movie.genre || [];
-
-      movieGenres.forEach((g) => {
-        if (g) {
-          const key = g.toLowerCase();
-          genreMap[key] = (genreMap[key] || 0) + 1;
-        }
-      });
-    });
-
-    setGenres(
-      Object.entries(genreMap)
-        .sort((a, b) => b[1] - a[1])
-        .map(([name, count]) => ({ name, count }))
-    );
-  }, [movies]);
+    fetch(`${API_URL}/api/Genres`)
+      .then(res => res.json())
+      .then(data => setGenres(data.map(g => ({ name: g.name?.toLowerCase(), count: null }))))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   if (loading) {
     return (
@@ -124,9 +109,11 @@ export default function Genres() {
 
               <div className="flex items-center justify-between mt-4">
 
-                <span className="text-sm text-gray-200/90 font-semibold">
-                  {genre.count} movies
-                </span>
+                {genre.count !== null && (
+                  <span className="text-sm text-gray-200/90 font-semibold">
+                    {genre.count} movies
+                  </span>
+                )}
 
                 <FaChevronRight className="opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-pink-400" />
 

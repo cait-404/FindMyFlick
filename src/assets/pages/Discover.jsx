@@ -13,24 +13,11 @@ export default function Discover() {
   const genre = searchParams.get("genre");
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  // Filtered movies after fetching
-  let filteredMovies = movies || [];
+  // When a genre is active, apply letter filter client-side on fetched results
+  const filteredMovies = genre && selectedLetter
+    ? movies.filter(m => m.title?.toUpperCase().startsWith(selectedLetter))
+    : movies;
 
-  // Client-side genre filter if API didn't filter
-  if (genre) {
-    filteredMovies = filteredMovies.filter((movie) =>
-      movie.genre?.some((g) => g.toLowerCase().includes(genre.toLowerCase()))
-    );
-  }
-
-  // Client-side letter filter if API didn't filter
-  if (selectedLetter) {
-    filteredMovies = filteredMovies.filter((movie) =>
-      movie.title?.toUpperCase().startsWith(selectedLetter)
-    );
-  }
-
-  // Sort alphabetically
   const sortedMovies = [...filteredMovies].sort((a, b) =>
     (a.title || "").localeCompare(b.title || "")
   );
@@ -42,13 +29,15 @@ export default function Discover() {
         setLoading(true);
         setError(null);
 
-        // Build query params
-        const params = new URLSearchParams();
-        if (selectedLetter) params.append("startsWith", selectedLetter.toUpperCase());
-        if (genre) params.append("genre", genre);
-        params.append("limit", "100");
-
-        const url = "http://localhost:5002/api/movies?${params.toString()}";
+        let url;
+        if (genre) {
+          // Fetch all movies for this genre; letter filtering is applied client-side
+          url = `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genre)}?limit=500`;
+        } else if (selectedLetter) {
+          url = `${API_URL}/api/movies/getby/starts-with/${encodeURIComponent(selectedLetter)}?limit=500`;
+        } else {
+          url = `${API_URL}/api/Movies?page=1&order=title_asc`;
+        }
 
         const res = await fetch(url);
         if (!res.ok) {
@@ -67,7 +56,8 @@ export default function Discover() {
     };
 
     fetchMovies();
-  }, [selectedLetter, genre]);
+  // Only re-fetch when genre changes or when letter changes without an active genre
+  }, [genre, genre ? null : selectedLetter]);
 
   return (
     <div className="p-4">
@@ -102,12 +92,12 @@ export default function Discover() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {sortedMovies.map((movie) => (
           <Link
-            key={movie.id}
-            to={`/movies/${movie.id}`}
+            key={movie.imdbId || movie.id}
+            to={`/movie/${movie.imdbId || movie.id}`}
             className="border rounded-lg p-2 hover:shadow-lg hover:scale-105 transition-transform duration-200"
           >
             <img
-              src={movie.posterUrl}
+              src={movie.poster_url || movie.posterUrl}
               alt={movie.title}
               className="w-full h-64 object-cover rounded"
             />

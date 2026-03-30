@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../config.js";
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null); // NEW
   const navigate = useNavigate();
 
-  const API = "https://localhost:5002"; // LOCAL HOST
+  const API = API_URL;
 
   // ETCH USER DATA
   useEffect(() => {
