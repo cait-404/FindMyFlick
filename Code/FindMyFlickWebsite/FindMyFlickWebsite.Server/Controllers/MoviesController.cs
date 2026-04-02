@@ -743,12 +743,14 @@ namespace FindMyFlickWebsite.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMoviesView_ParseImdb(
             [FromQuery] int page = 1,
-            [FromQuery] string? order = "release_year")
+            [FromQuery] string? order = "release_year",
+            [FromQuery] int limit = 50)
         {
             try
             {
                 if (page <= 0) page = 1;
-                const int PageSize = 50;
+                if (limit <= 0 || limit > 1000) limit = 50;
+                int PageSize = limit;
 
                 // Build base query (no ordering yet)
                 // Only movies with US subscription/free streaming AND Does the Dog Die warning data

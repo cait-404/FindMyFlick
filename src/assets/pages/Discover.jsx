@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import API_URL from "../../config.js";
 
+// Pagination, 0-9 filter, and article-stripping sort added with Claude (April 2026)
+
+const PAGE_SIZE = 24;
+
 export default function Discover() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [searchParams] = useSearchParams();
-  const [selectedLetter, setSelectedLetter] = useState("");
+  // Default to "A" instead of "All"
+  const [selectedLetter, setSelectedLetter] = useState("A");
 
   const genre = searchParams.get("genre");
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -18,9 +24,30 @@ export default function Discover() {
     ? movies.filter(m => m.title?.toUpperCase().startsWith(selectedLetter))
     : movies;
 
+  // Strip leading articles (A, An, The) for sorting — matches backend behavior
+  const stripArticle = (title) => {
+    if (!title) return "";
+    if (title.match(/^the /i)) return title.substring(4).trimStart();
+    if (title.match(/^an /i)) return title.substring(3).trimStart();
+    if (title.match(/^a /i)) return title.substring(2).trimStart();
+    return title;
+  };
+
   const sortedMovies = [...filteredMovies].sort((a, b) =>
-    (a.title || "").localeCompare(b.title || "")
+    stripArticle(a.title || "").localeCompare(stripArticle(b.title || ""))
   );
+
+  // Pagination
+  const totalPages = Math.ceil(sortedMovies.length / PAGE_SIZE);
+  const paginatedMovies = sortedMovies.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  // Reset to page 1 when letter or genre changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedLetter, genre]);
 
   // Fetch movies from API
   useEffect(() => {
@@ -33,10 +60,11 @@ export default function Discover() {
         if (genre) {
           // Fetch all movies for this genre; letter filtering is applied client-side
           url = `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genre)}?limit=500`;
-        } else if (selectedLetter) {
-          url = `${API_URL}/api/movies/getby/starts-with/${encodeURIComponent(selectedLetter)}?limit=500`;
+        } else if (selectedLetter === "0-9") {
+          // Fetch movies starting with numbers or symbols
+          url = `${API_URL}/api/movies/getby/non-alpha?limit=500`;
         } else {
-          url = `${API_URL}/api/Movies?page=1&order=title_asc`;
+          url = `${API_URL}/api/movies/getby/starts-with/${encodeURIComponent(selectedLetter)}?limit=500`;
         }
 
         const res = await fetch(url);
@@ -78,15 +106,16 @@ export default function Discover() {
             {letter}
           </button>
         ))}
+        {/* 0-9 button at the end for numbers and symbols */}
         <button
           className={`px-3 py-1 rounded ${
-            selectedLetter === ""
+            selectedLetter === "0-9"
               ? "bg-purple-700 text-white"
-              : "bg-gray-400 text-white"
+              : "bg-gray-200 text-gray-800"
           }`}
-          onClick={() => setSelectedLetter("")}
+          onClick={() => setSelectedLetter("0-9")}
         >
-          All
+          0-9
         </button>
       </div>
 
@@ -94,13 +123,20 @@ export default function Discover() {
       {loading && <p>Loading movies...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* ✅ FIX: 5-6 cards across, fixed poster height, full title shown */}
+      {/* Movie count and page info */}
+      {!loading && !error && (
+        <p className="text-gray-400 text-sm mb-3">
+          Showing {paginatedMovies.length} of {sortedMovies.length} movies
+          {totalPages > 1 && ` — Page ${currentPage} of ${totalPages}`}
+        </p>
+      )}
+
+      {/* Cards */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-3">
-        {sortedMovies.map((movie) => (
-          // ✅ FIX: Use movie.id (integer) so MovieDetails can fetch correctly
+        {paginatedMovies.map((movie) => (
           <Link
-            key={movie.id}
-            to={`/movie/${movie.id}`}
+            key={movie.imdbId || movie.id}
+            to={`/movie/${movie.imdbId || movie.id}`}
             className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
           >
             {movie.poster_url || movie.posterUrl ? (
@@ -126,6 +162,31 @@ export default function Discover() {
           </Link>
         ))}
       </div>
+
+      {/* Pagination controls */}
+      {!loading && !error && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-8">
+          <button
+            onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+          >
+            ← Previous
+          </button>
+
+          <span className="text-gray-300 text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo(0, 0); }}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
