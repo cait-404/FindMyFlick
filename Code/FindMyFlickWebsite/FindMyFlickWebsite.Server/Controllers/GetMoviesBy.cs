@@ -8,6 +8,9 @@ using FindMyFlickWebsite.Server.DataModels;
 
 //create me a controller that can get movies by the first letter in their title (so all movies that start with an
 //A) and another endpoint in the controller that can get all movies associated with a genre name
+
+// Streaming availability and Does the Dog Die warning filters added with Claude (April 2026)
+
 namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
@@ -33,6 +36,7 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // GET api/movies/starts-with/{letter}?limit=100
         // Returns movies whose Title starts with the specified letter (case-insensitive).
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
         [HttpGet("starts-with/{letter}")]
         public async Task<IActionResult> GetByFirstLetter(string letter, int limit = 100)
         {
@@ -43,12 +47,15 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             await using var ctx = _dbFactory.CreateDbContext();
 
-            // Use ILike for case-insensitive match on PostgreSQL; falls back to ToLower comparison otherwise.
             var query = ctx.Movies
                 .AsNoTracking()
-                .Where(m =>
-                    EF.Functions.ILike(m.Title, $"{first}%")
-                )
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                .Where(m => EF.Functions.ILike(m.Title, $"{first}%"))
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
@@ -66,7 +73,8 @@ namespace FindMyFlickWebsite.Server.Controllers
         }
 
         // GET api/movies/genre/{genreName}?limit=200
-        // Returns movies associated with the given genre name (case-insensitive)
+        // Returns movies associated with the given genre name (case-insensitive).
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
         [HttpGet("genre/{genreName}")]
         public async Task<IActionResult> GetByGenre(string genreName, int limit = 200)
         {
@@ -77,13 +85,17 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             await using var ctx = _dbFactory.CreateDbContext();
 
-            // Join via MovieGenres -> Genre -> Movie
-            // Select the Movie navigation, filter nulls, then group by ImdbId to remove duplicates.
             var query = ctx.MovieGenres
                 .AsNoTracking()
                 .Where(mg => EF.Functions.ILike(mg.TmdbGenre.GenreName, normalized))
                 .Select(mg => mg.Imdb)
                 .Where(m => m != null)
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
                 .OrderBy(m => m.Title)
                 .Select(m => new MovieSummary
                 {

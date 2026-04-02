@@ -56,8 +56,8 @@ export default function Discover() {
     };
 
     fetchMovies();
-  // Only re-fetch when genre changes or when letter changes without an active genre
-  }, [genre, genre ? null : selectedLetter]);
+  // ✅ FIX: Proper dependency array so letter filter actually triggers a re-fetch
+  }, [genre, selectedLetter]);
 
   return (
     <div className="p-4">
@@ -69,7 +69,9 @@ export default function Discover() {
           <button
             key={letter}
             className={`px-3 py-1 rounded ${
-              selectedLetter === letter ? "bg-purple-700 text-white" : "bg-gray-200 text-gray-800"
+              selectedLetter === letter
+                ? "bg-purple-700 text-white"
+                : "bg-gray-200 text-gray-800"
             }`}
             onClick={() => setSelectedLetter(letter)}
           >
@@ -77,7 +79,11 @@ export default function Discover() {
           </button>
         ))}
         <button
-          className="px-3 py-1 rounded bg-gray-400 text-white"
+          className={`px-3 py-1 rounded ${
+            selectedLetter === ""
+              ? "bg-purple-700 text-white"
+              : "bg-gray-400 text-white"
+          }`}
           onClick={() => setSelectedLetter("")}
         >
           All
@@ -88,21 +94,35 @@ export default function Discover() {
       {loading && <p>Loading movies...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Movies list */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* ✅ FIX: 5-6 cards across, fixed poster height, full title shown */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-3">
         {sortedMovies.map((movie) => (
+          // ✅ FIX: Use movie.id (integer) so MovieDetails can fetch correctly
           <Link
-            key={movie.imdbId || movie.id}
-            to={`/movie/${movie.imdbId || movie.id}`}
-            className="border rounded-lg p-2 hover:shadow-lg hover:scale-105 transition-transform duration-200"
+            key={movie.id}
+            to={`/movie/${movie.id}`}
+            className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
           >
-            <img
-              src={movie.poster_url || movie.posterUrl}
-              alt={movie.title}
-              className="w-full h-64 object-cover rounded"
-            />
-            <h2 className="mt-2 font-semibold text-lg">{movie.title}</h2>
-            <p className="text-gray-400 text-sm">{movie.genre?.join(", ")}</p>
+            {movie.poster_url || movie.posterUrl ? (
+              <img
+                src={movie.poster_url || movie.posterUrl}
+                alt={movie.title}
+                className="w-full object-contain"
+              />
+            ) : (
+              <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
+                No Image
+              </div>
+            )}
+            <div className="p-2 flex flex-col gap-1">
+              {/* ✅ FIX: No truncation, title wraps fully */}
+              <h2 className="font-semibold text-sm text-white leading-snug">
+                {movie.title}
+              </h2>
+              <p className="text-gray-400 text-xs">
+                {movie.releaseYear || movie.release_year}
+              </p>
+            </div>
           </Link>
         ))}
       </div>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import fmy from "../images/fmy.png";
 
+// Poster display and title truncation fixed with Claude (April 2026)
 function MovieGrid({ movies, title }) {
   if (!movies) return null;
 
@@ -15,21 +16,28 @@ function MovieGrid({ movies, title }) {
       {movies.length === 0 ? (
         <p className="text-gray-400">No movies found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {movies.map((movie) => (
             <Link
               key={movie.id}
               to={`/movie/${movie.id}`}
-              className="rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg block"
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg"
             >
-              <img
-                src={movie.poster_url}
-                alt={movie.title}
-                className="w-full h-56 object-cover"
-              />
-
-              <div className="p-3 text-center">
-                <h4 className="font-semibold text-lg truncate">{movie.title}</h4>
+              {movie.poster_url ? (
+                <img
+                  src={movie.poster_url}
+                  alt={movie.title}
+                  className="w-full object-contain"
+                />
+              ) : (
+                <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
+                  No Image
+                </div>
+              )}
+              <div className="p-2 flex flex-col gap-1">
+                <h4 className="font-semibold text-sm text-white leading-snug">
+                  {movie.title}
+                </h4>
                 <p className="text-sm text-gray-400 mt-1">{movie.release_year}</p>
               </div>
             </Link>
@@ -57,15 +65,15 @@ export default function Home({ movies, loading, error }) {
         </p>
 
         <div className="mt-8 flex justify-center gap-4 flex-wrap">
-          <a
-            href="/discover"
+          
+          <a  href="/discover"
             className="px-6 py-3 rounded-full bg-pink-600 hover:bg-pink-500 transition font-semibold shadow-lg"
           >
             Explore Movies →
           </a>
 
-          <a
-            href="/genres"
+          
+          <a href="/genres"
             className="px-6 py-3 rounded-full border border-pink-500 text-pink-400 hover:bg-pink-500/10 transition font-semibold"
           >
             Browse Genres
