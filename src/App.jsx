@@ -14,6 +14,7 @@ import Search from './assets/pages/Search';
 import LoginSignup from './assets/pages/LoginSignup';
 import MovieDetails from './assets/pages/MovieDetails';
 import Filters from './assets/pages/Filters';
+import GenreBrowse from './assets/pages/GenreBrowse';
 
 import API_URL from './config'; // Make sure this points to your new backend
 
@@ -131,6 +132,7 @@ export default function App() {
         <Route path="/profile" element={<Profile movies={movies} loading={loading} error={error} />} />
         <Route path="/search" element={<Search movies={movies} loading={loading} error={error} />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/genre/:genreName" element={<GenreBrowse />} />
         <Route path="/auth" element={<LoginSignup />} />
         <Route path="/terms" element={<About />} />
         <Route path="/privacy" element={<About />} />

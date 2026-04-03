@@ -1,28 +1,21 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import API_URL from "../../config.js";
 
-// Pagination, 0-9 filter, and article-stripping sort added with Claude (April 2026)
+// Genre Browse page — dedicated page for browsing movies within a single genre
+// Created with Claude (April 2026)
 
 const PAGE_SIZE = 24;
 
-export default function Discover() {
+export default function GenreBrowse() {
+  const { genreName } = useParams();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLetter, setSelectedLetter] = useState("");
 
-  const [searchParams] = useSearchParams();
-  // Default to "A" instead of "All"
-  const [selectedLetter, setSelectedLetter] = useState("A");
-
-  const genre = searchParams.get("genre");
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-  // When a genre is active, apply letter filter client-side on fetched results
-  const filteredMovies = genre && selectedLetter
-    ? movies.filter(m => m.title?.toUpperCase().startsWith(selectedLetter))
-    : movies;
 
   // Strip leading articles (A, An, The) for sorting — matches backend behavior
   const stripArticle = (title) => {
@@ -32,6 +25,40 @@ export default function Discover() {
     if (title.match(/^a /i)) return title.substring(2).trimStart();
     return title;
   };
+
+  // Fetch all movies for this genre from the backend
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(
+          `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genreName)}?limit=2000`
+        );
+        if (!res.ok) throw new Error("Failed to fetch movies");
+        const data = await res.json();
+        setMovies(data);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to load movies for this genre.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMovies();
+  }, [genreName]);
+
+  // Reset to page 1 when letter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedLetter]);
+
+  // Filter by selected letter (after stripping articles)
+  const filteredMovies = selectedLetter
+    ? movies.filter(m =>
+        stripArticle(m.title || "").toUpperCase().startsWith(selectedLetter)
+      )
+    : movies;
 
   const sortedMovies = [...filteredMovies].sort((a, b) =>
     stripArticle(a.title || "").localeCompare(stripArticle(b.title || ""))
@@ -44,55 +71,40 @@ export default function Discover() {
     currentPage * PAGE_SIZE
   );
 
-  // Reset to page 1 when letter or genre changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedLetter, genre]);
-
-  // Fetch movies from API
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        let url;
-        if (genre) {
-          // Fetch all movies for this genre; letter filtering is applied client-side
-          url = `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genre)}?limit=500`;
-        } else if (selectedLetter === "0-9") {
-          // Fetch movies starting with numbers or symbols
-          url = `${API_URL}/api/movies/getby/non-alpha?limit=500`;
-        } else {
-          url = `${API_URL}/api/movies/getby/starts-with/${encodeURIComponent(selectedLetter)}?limit=500`;
-        }
-
-        const res = await fetch(url);
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Failed to fetch movies");
-        }
-
-        const data = await res.json();
-        setMovies(data);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError("Failed to load movies");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMovies();
-  // ✅ FIX: Proper dependency array so letter filter actually triggers a re-fetch
-  }, [genre, selectedLetter]);
+  const displayName = genreName
+    ? genreName.charAt(0).toUpperCase() + genreName.slice(1).toLowerCase()
+    : "";
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">Discover Movies</h1>
+    <div className="p-4 text-white">
+      {/* Header */}
+      <div className="mb-6">
+        <Link
+          to="/genres"
+          className="text-pink-400 hover:text-pink-300 text-sm mb-2 inline-block"
+        >
+          ← Back to Genres
+        </Link>
+        <h1 className="text-3xl font-bold">{displayName} Movies</h1>
+        {!loading && !error && (
+          <p className="text-gray-400 text-sm mt-1">
+            {sortedMovies.length} movies available
+          </p>
+        )}
+      </div>
 
       {/* Alphabet filter buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
+        <button
+          className={`px-3 py-1 rounded ${
+            selectedLetter === ""
+              ? "bg-purple-700 text-white"
+              : "bg-gray-200 text-gray-800"
+          }`}
+          onClick={() => setSelectedLetter("")}
+        >
+          All
+        </button>
         {alphabet.map((letter) => (
           <button
             key={letter}
@@ -106,21 +118,10 @@ export default function Discover() {
             {letter}
           </button>
         ))}
-        {/* 0-9 button at the end for numbers and symbols */}
-        <button
-          className={`px-3 py-1 rounded ${
-            selectedLetter === "0-9"
-              ? "bg-purple-700 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-          onClick={() => setSelectedLetter("0-9")}
-        >
-          0-9
-        </button>
       </div>
 
       {/* Loading / Error */}
-      {loading && <p>Loading movies...</p>}
+      {loading && <p className="text-gray-400">Loading movies...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       {/* Movie count and page info */}
@@ -151,7 +152,6 @@ export default function Discover() {
               </div>
             )}
             <div className="p-2 flex flex-col gap-1">
-              {/* ✅ FIX: No truncation, title wraps fully */}
               <h2 className="font-semibold text-sm text-white leading-snug">
                 {movie.title}
               </h2>
@@ -173,11 +173,9 @@ export default function Discover() {
           >
             ← Previous
           </button>
-
           <span className="text-gray-300 text-sm">
             Page {currentPage} of {totalPages}
           </span>
-
           <button
             onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === totalPages}
