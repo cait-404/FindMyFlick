@@ -18,7 +18,10 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173")
+                .WithOrigins(
+                    "http://localhost:5173",
+                    "https://thankful-mud-03220200f.canadacentral.5.azurestaticapps.net"
+                )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .WithExposedHeaders("X-Total-Count", "X-Page", "X-Page-Size");
