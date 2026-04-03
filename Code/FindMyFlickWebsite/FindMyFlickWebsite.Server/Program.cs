@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
             policy
                 .WithOrigins(
                     "http://localhost:5173",
-                    "https://thankful-mud-03220200f.canadacentral.5.azurestaticapps.net"
+                    "https://thankful-mud-03220200f.4.azurestaticapps.net"
                 )
                 .AllowAnyHeader()
                 .AllowAnyMethod()
