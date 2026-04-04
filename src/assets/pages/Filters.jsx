@@ -460,16 +460,7 @@ export default function Filters() {
               title={category.categoryName}
               headerExtra={
                 <div className="flex gap-2 mr-2" onClick={e => e.stopPropagation()}>
-                  <button
-                    onClick={() => toggleIncludeCategory(category.categoryId)}
-                    className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
-                      includeCategoryIds.has(category.categoryId)
-                        ? "bg-green-600 text-white"
-                        : "border border-green-600 text-green-400 hover:bg-green-600/20"
-                    }`}
-                  >
-                    Include All
-                  </button>
+                  
                   <button
                     onClick={() => toggleExcludeCategory(category.categoryId)}
                     className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
