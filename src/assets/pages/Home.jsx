@@ -19,13 +19,13 @@ function MovieGrid({ movies, title }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {movies.map((movie) => (
             <Link
-              key={movie.id}
-              to={`/movie/${movie.id}`}
+              key={movie.imdbId || movie.id}
+              to={`/movie/${movie.imdbId || movie.id}`}
               className="flex flex-col rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg"
             >
-              {movie.poster_url ? (
+              {movie.poster_url || movie.posterUrl ? (
                 <img
-                  src={movie.poster_url}
+                  src={movie.poster_url || movie.posterUrl}
                   alt={movie.title}
                   className="w-full object-contain"
                 />
@@ -38,7 +38,7 @@ function MovieGrid({ movies, title }) {
                 <h4 className="font-semibold text-sm text-white leading-snug">
                   {movie.title}
                 </h4>
-                <p className="text-sm text-gray-400 mt-1">{movie.release_year}</p>
+                <p className="text-sm text-gray-400 mt-1">{movie.release_year || movie.releaseYear}</p>
               </div>
             </Link>
           ))}
@@ -85,9 +85,7 @@ export default function Home({ movies, loading, error }) {
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && (
           <MovieGrid
-            movies={movies
-              .filter(m => m.release_year && m.release_year <= new Date().getFullYear())
-              .slice(0, 12)}
+            movies={movies.slice(0, 12)}
             title="Trending Now"
           />
         )}

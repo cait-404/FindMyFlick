@@ -27,13 +27,14 @@ export default function App() {
 
   const token = localStorage.getItem("token"); 
 
-  // Fetch movies from new endpoint
+  // Fetch random movies for home page — different selection each visit
+  // Updated with Claude (April 2026)
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_URL}/api/Movies?limit=100`);
+        const res = await fetch(`${API_URL}/api/movies/getby/random?count=12`);
         if (!res.ok) throw new Error("Server error");
         const data = await res.json();
         setMovies(data);

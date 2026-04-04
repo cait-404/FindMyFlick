@@ -12,6 +12,7 @@ using FindMyFlickWebsite.Server.DataModels;
 // Streaming availability and Does the Dog Die warning filters added with Claude (April 2026)
 // Article-stripping logic (A, An, The) for letter filtering added with Claude (April 2026)
 // 0-9 (numbers/symbols) filter endpoint added with Claude (April 2026)
+// Random movie endpoint added with Claude (April 2026)
 
 namespace FindMyFlickWebsite.Server.Controllers
 {
@@ -46,6 +47,42 @@ namespace FindMyFlickWebsite.Server.Controllers
             if (t.StartsWith("an ", StringComparison.OrdinalIgnoreCase))  return t.Substring(3).TrimStart();
             if (t.StartsWith("a ", StringComparison.OrdinalIgnoreCase))   return t.Substring(2).TrimStart();
             return t;
+        }
+
+        // GET api/movies/getby/random?count=12
+        // Returns a random selection of eligible movies for the home page.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        // Uses PostgreSQL's random ordering to ensure a different set each time.
+        [HttpGet("random")]
+        public async Task<IActionResult> GetRandom(int count = 12)
+        {
+            count = Math.Max(1, Math.Min(count, 50)); // guard: between 1 and 50
+
+            await using var ctx = _dbFactory.CreateDbContext();
+
+            var results = await ctx.Movies
+                .AsNoTracking()
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                // Only movies with a poster
+                .Where(m => m.PosterUrl != null)
+                .OrderBy(m => EF.Functions.Random())
+                .Take(count)
+                .Select(m => new MovieSummary
+                {
+                    ImdbId = EF.Property<string>(m, "ImdbId"),
+                    TmdbId = m.TmdbId,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    PosterUrl = m.PosterUrl
+                })
+                .ToListAsync();
+
+            return Ok(results);
         }
 
         // GET api/movies/getby/starts-with/{letter}?limit=500
