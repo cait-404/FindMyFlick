@@ -52,7 +52,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         // GET api/movies/getby/random?count=12
         // Returns a random selection of eligible movies for the home page.
         // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
-        // Uses PostgreSQL's random ordering to ensure a different set each time.
+        // Randomizes in memory for compatibility — fetches 200 eligible movies then shuffles.
         [HttpGet("random")]
         public async Task<IActionResult> GetRandom(int count = 12)
         {
@@ -70,8 +70,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
                 // Only movies with a poster
                 .Where(m => m.PosterUrl != null)
-                .OrderBy(m => EF.Functions.Random())
-                .Take(count)
+                .Take(200)
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
@@ -82,7 +81,10 @@ namespace FindMyFlickWebsite.Server.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(results);
+            // Randomize in memory instead of in SQL for better compatibility
+            var random = new Random();
+            var shuffled = results.OrderBy(_ => random.Next()).Take(count).ToList();
+            return Ok(shuffled);
         }
 
         // GET api/movies/getby/starts-with/{letter}?limit=500
