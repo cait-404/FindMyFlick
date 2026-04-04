@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API_URL from "../../config.js";
 import EmmanImg from "../images/emman.JPG";
 import MichelleImg from "../images/michelle.png";
-//import IsabelleImg from "../images/isabelle.jpg";
+import IsabelleImg from "../images/isabelle.png";
 import CaitlinImg from "../images/caitlin.jpg";
 
 export default function About() {
@@ -27,7 +27,7 @@ export default function About() {
     {
       name: "Isabelle Kramer",
       role: "Backend Developer",
-      img: "/images/placeholder.jpg",
+      img: IsabelleImg,
       bio: "Crafting intuitive and visually engaging experiences for all users."
     },
     {

@@ -51,8 +51,8 @@ function MovieGrid({ movies, title }) {
 export default function Home({ movies, loading, error }) {
   return (
     <div className="text-white">
-      <header className="relative h-[300px] md:h-[450px] w-full mt-6 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
-        <img src={fmy} alt="Find My Flick banner" className="w-full h-full object-cover" />
+      <header className="relative w-full mt-6 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
+        <img src={fmy} alt="Find My Flick banner" className="w-full h-auto object-contain" />
       </header>
 
       <section className="mt-8 px-6 max-w-6xl mx-auto text-center">
@@ -66,18 +66,17 @@ export default function Home({ movies, loading, error }) {
 
         <div className="mt-8 flex justify-center gap-4 flex-wrap">
           
-          <a  href="/discover"
+          <Link to="/discover"
             className="px-6 py-3 rounded-full bg-pink-600 hover:bg-pink-500 transition font-semibold shadow-lg"
           >
             Explore Movies →
-          </a>
-
+          </Link>
           
-          <a href="/genres"
+          <Link to="/genres"
             className="px-6 py-3 rounded-full border border-pink-500 text-pink-400 hover:bg-pink-500/10 transition font-semibold"
           >
             Browse Genres
-          </a>
+          </Link>
         </div>
       </section>
 
