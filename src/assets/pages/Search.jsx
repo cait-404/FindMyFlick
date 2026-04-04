@@ -25,8 +25,9 @@ function Search() {
     body: JSON.stringify({
       take: 20,
       minMatches: 1,
-      enableApiFallback: false,
-      alwaysAddFromApis: false,
+      enableApiFallback: true,
+      alwaysAddFromApis: true,
+      minMatches: 5,
       titleContains: query,   // ✅ title-first search
       genreNames: [],
       keywordNames: [],
@@ -74,7 +75,9 @@ function Search() {
     })
     .catch((err) => {
       console.error("Error fetching movies:", err);
-      setError("Failed to fetch movies. Try again later.");
+      if (movies.length === 0) {
+        setError("Failed to fetch movies. Try again later.");
+      }
     })
     .finally(() => setLoading(false));
 }, [query]);
