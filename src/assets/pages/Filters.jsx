@@ -290,7 +290,9 @@ export default function Filters() {
         tagNamesInclude: includePlotTags,
         tagNamesExclude: excludePlotTags,
         take: 50,
-        enableApiFallback: false
+        enableApiFallback: true,
+        minMatches: 10,
+        maxApiAdds: 5
       };
 
       const res = await fetch(`${API_URL}/api/MovieSearch`, {
@@ -414,7 +416,7 @@ export default function Filters() {
               />
             </div>
             <div>
-              <label className="block mb-1 text-sm text-green-400 font-semibold">Include Crew Member</label>
+              <label className="block mb-1 text-sm text-green-400 font-semibold">Include Crew Member (Director, Writer, etc.)</label>
               <input
                 type="text"
                 placeholder="e.g. Christopher Nolan"

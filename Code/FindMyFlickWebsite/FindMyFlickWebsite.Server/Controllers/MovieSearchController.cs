@@ -433,7 +433,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
             // Global rules — always applied
-            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null));
+            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")));
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")));
@@ -777,7 +777,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         {
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
-            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null));
+            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")));
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")));
