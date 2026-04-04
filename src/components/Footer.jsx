@@ -57,7 +57,7 @@ export default function Footer() {
 
 <li>
   <NavLink
-    to="/search"
+    to="/filters"
     end
     className={({ isActive }) =>
       isActive ? "footer-link active" : "footer-link"

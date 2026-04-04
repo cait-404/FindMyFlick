@@ -30,17 +30,22 @@ const MAJOR_PROVIDERS = [
 ];
 
 // Collapsible section wrapper — AO3-style
-function CollapsibleSection({ title, children, defaultOpen = false }) {
+function CollapsibleSection({ title, children, defaultOpen = false, headerExtra = null }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border border-purple-800 rounded-lg overflow-visible mb-4">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex justify-between items-center px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition text-left"
-      >
-        <span className="font-semibold text-pink-300">{title}</span>
-        <span className="text-gray-400">{open ? "▲" : "▼"}</span>
-      </button>
+      <div className="w-full flex justify-between items-center px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition">
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="flex-1 text-left"
+        >
+          <span className="font-semibold text-pink-300">{title}</span>
+        </button>
+        {headerExtra}
+        <button onClick={() => setOpen(o => !o)}>
+          <span className="text-gray-400">{open ? "▲" : "▼"}</span>
+        </button>
+      </div>
       {open && <div className="px-4 py-4 bg-black/40">{children}</div>}
     </div>
   );
@@ -154,6 +159,8 @@ export default function Filters() {
   const [taxonomy, setTaxonomy] = useState([]);
   const [includeWarningIds, setIncludeWarningIds] = useState(new Set());
   const [excludeWarningIds, setExcludeWarningIds] = useState(new Set());
+  const [includeCategoryIds, setIncludeCategoryIds] = useState(new Set());
+  const [excludeCategoryIds, setExcludeCategoryIds] = useState(new Set());
 
   const [allPlotTags, setAllPlotTags] = useState([]);
   const [includePlotTags, setIncludePlotTags] = useState([]);
@@ -232,6 +239,30 @@ export default function Filters() {
     });
   };
 
+  const toggleIncludeCategory = (id) => {
+    setIncludeCategoryIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); return next; }
+      const excl = new Set(excludeCategoryIds);
+      excl.delete(id);
+      setExcludeCategoryIds(excl);
+      next.add(id);
+      return next;
+    });
+  };
+
+  const toggleExcludeCategory = (id) => {
+    setExcludeCategoryIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); return next; }
+      const incl = new Set(includeCategoryIds);
+      incl.delete(id);
+      setIncludeCategoryIds(incl);
+      next.add(id);
+      return next;
+    });
+  };
+
   const handleSearch = async () => {
     setLoading(true);
     setSearched(true);
@@ -254,6 +285,8 @@ export default function Filters() {
         mpaaRatings: selectedRatings,
         includeWarningTopicIds: [...includeWarningIds],
         excludeWarningTopicIds: [...excludeWarningIds],
+        includeWarningCategoryIds: [...includeCategoryIds],
+        excludeWarningCategoryIds: [...excludeCategoryIds],
         tagNamesInclude: includePlotTags,
         tagNamesExclude: excludePlotTags,
         take: 50,
@@ -287,6 +320,8 @@ export default function Filters() {
     setSelectedRatings([]);
     setIncludeWarningIds(new Set());
     setExcludeWarningIds(new Set());
+    setIncludeCategoryIds(new Set());
+    setExcludeCategoryIds(new Set());
     setIncludePlotTags([]);
     setExcludePlotTags([]);
     setMovies([]);
@@ -294,7 +329,7 @@ export default function Filters() {
     setError(null);
   };
 
-  const activeWarningCount = includeWarningIds.size + excludeWarningIds.size;
+  const activeWarningCount = includeWarningIds.size + excludeWarningIds.size + includeCategoryIds.size + excludeCategoryIds.size;
 
   // Provider names not in the major list for the "other" autocomplete
   const otherProviderOptions = MAJOR_PROVIDERS.map(p => p.name);
@@ -418,7 +453,34 @@ export default function Filters() {
             or <span className="text-red-400 font-semibold">Exclude</span> to filter out movies containing it.
           </p>
           {taxonomy.map(category => (
-            <CollapsibleSection key={category.categoryId} title={category.categoryName}>
+            <CollapsibleSection
+              key={category.categoryId}
+              title={category.categoryName}
+              headerExtra={
+                <div className="flex gap-2 mr-2" onClick={e => e.stopPropagation()}>
+                  <button
+                    onClick={() => toggleIncludeCategory(category.categoryId)}
+                    className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
+                      includeCategoryIds.has(category.categoryId)
+                        ? "bg-green-600 text-white"
+                        : "border border-green-600 text-green-400 hover:bg-green-600/20"
+                    }`}
+                  >
+                    Include All
+                  </button>
+                  <button
+                    onClick={() => toggleExcludeCategory(category.categoryId)}
+                    className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
+                      excludeCategoryIds.has(category.categoryId)
+                        ? "bg-red-600 text-white"
+                        : "border border-red-600 text-red-400 hover:bg-red-600/20"
+                    }`}
+                  >
+                    Exclude All
+                  </button>
+                </div>
+              }
+            >
               {category.subcategories.map(sub => (
                 <div key={sub.subcategoryId} className="mb-4">
                   <h4 className="text-xs font-semibold text-purple-300 uppercase tracking-wide mb-2">

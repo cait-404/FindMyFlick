@@ -58,9 +58,9 @@ export default function App() {
       {/* NAVBAR */}
       <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
 
-        <h1 className="text-2xl font-bold text-pink-500">
+        <Link to="/" className="text-2xl font-bold text-pink-500">
           FindMyFlick
-        </h1>
+        </Link>
 
         <div className="flex gap-6 items-center flex-wrap">
 
