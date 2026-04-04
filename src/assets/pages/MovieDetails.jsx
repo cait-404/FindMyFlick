@@ -387,9 +387,13 @@ export default function MovieDetails() {
         {/* CREW */}
         <div className="bg-black/40 rounded-xl p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Crew</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="flex flex-col gap-1">
+            <div className="grid grid-cols-2 text-xs text-purple-300 font-semibold uppercase mb-1 px-1">
+              <span>Role</span>
+              <span>Name</span>
+            </div>
             {displayedCrew.map(c => (
-              <div key={c.tmdbPersonId} className="flex justify-between text-sm py-1 border-b border-purple-900/30">
+              <div key={c.tmdbPersonId} className="grid grid-cols-2 text-sm py-1.5 px-1 border-b border-purple-900/30">
                 <span className="text-gray-400">{c.jobs?.[0] || "—"}</span>
                 <span className="text-white font-medium">{c.personName}</span>
               </div>

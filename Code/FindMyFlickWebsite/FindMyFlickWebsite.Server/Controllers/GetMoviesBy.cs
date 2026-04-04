@@ -67,7 +67,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     !EF.Functions.ILike(ms.OfferType, "rent") &&
                     !EF.Functions.ILike(ms.OfferType, "buy")))
                 // Only movies with Does the Dog Die warning data
-                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 // Only movies with a poster
                 .Where(m => m.PosterUrl != null)
                 .Take(200)
@@ -110,7 +110,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     !EF.Functions.ILike(ms.OfferType, "rent") &&
                     !EF.Functions.ILike(ms.OfferType, "buy")))
                 // Only movies with Does the Dog Die warning data
-                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 // Pre-filter in SQL: titles starting with the letter directly,
                 // OR starting with "A ", "An ", or "The " (articles that may be stripped)
                 .Where(m =>
@@ -157,7 +157,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     !EF.Functions.ILike(ms.OfferType, "rent") &&
                     !EF.Functions.ILike(ms.OfferType, "buy")))
                 // Only movies with Does the Dog Die warning data
-                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
@@ -205,7 +205,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     !EF.Functions.ILike(ms.OfferType, "rent") &&
                     !EF.Functions.ILike(ms.OfferType, "buy")))
                 // Only movies with Does the Dog Die warning data
-                .Where(m => m.MovieWarnings.Any(w => w.Answer != null))
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
