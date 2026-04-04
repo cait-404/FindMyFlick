@@ -929,8 +929,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                     .AnyAsync(ms => ms.ImdbId == imdbId && ms.OfferType != null &&
                         !EF.Functions.ILike(ms.OfferType, "rent") &&
                         !EF.Functions.ILike(ms.OfferType, "buy"));
-
-                if (hadWarningsBefore && hadStreamableBefore) { skippedAlreadyEligible++; continue; }
+                // Note: we no longer skip already-eligible movies — we want to always
+                // process all TMDB candidates so sequels and series are fully added.
+                // Added with Claude (April 2026)
 
                 var movie = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
                 var wasNew = false;
