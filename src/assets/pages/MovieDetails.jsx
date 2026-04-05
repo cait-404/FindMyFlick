@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import API_URL from "../../config.js";
 
@@ -357,13 +357,13 @@ export default function MovieDetails() {
             <h2 className="text-xl font-bold text-pink-400 mb-4">Collection</h2>
             <div className="flex flex-wrap gap-2">
               {collections.map(c => (
-                <a
+                <Link
                   key={c}
-                  href={`/discover?collection=${encodeURIComponent(c)}`}
-                  className="px-3 py-1.5 rounded-full bg-purple-800/60 text-purple-200 text-sm hover:bg-purple-700/60 transition"
+                  to={`/collection/${encodeURIComponent(c)}`}
+                  className="px-3 py-1.5 rounded-full bg-purple-800/60 text-purple-200 text-sm hover:bg-purple-700/60 transition cursor-pointer"
                 >
                   {c}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

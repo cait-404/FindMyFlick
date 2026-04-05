@@ -1033,6 +1033,10 @@ namespace FindMyFlickWebsite.Server.Controllers
                         await TryEnrichMpaaRatingFromOmdbAsync(movie, omdbKey);
                 }
 
+                // Enrich collection data if not already present — added with Claude (April 2026)
+                if (!await _context.MovieCollections.AnyAsync(mc => mc.ImdbId == imdbId))
+                    await UpsertMovieCoreFromTmdbAsync(tmdbId, imdbId, tmdbKey);
+
 
                 if (wasNew || !(hadWarningsBefore && hadStreamableBefore)) added++;
             }
@@ -1230,6 +1234,9 @@ namespace FindMyFlickWebsite.Server.Controllers
             public string? OriginalLanguage { get; set; }
             public string? Tagline { get; set; }
             public string? Status { get; set; }
+            // Collection data added with Claude (April 2026)
+            public int? CollectionId { get; set; }
+            public string? CollectionName { get; set; }
         }
 
         private async Task<TmdbDetailsBasic?> FetchTmdbDetailsAsync(int tmdbId, string apiKey)
@@ -1257,6 +1264,17 @@ namespace FindMyFlickWebsite.Server.Controllers
             int? runtime = null;
             if (root.TryGetProperty("runtime", out var rtEl) && rtEl.TryGetInt32(out var rtVal)) runtime = rtVal;
 
+            // Extract collection data — added with Claude (April 2026)
+            int? collectionId = null;
+            string? collectionName = null;
+            if (root.TryGetProperty("belongs_to_collection", out var colEl) && colEl.ValueKind == JsonValueKind.Object)
+            {
+                if (colEl.TryGetProperty("id", out var colIdEl) && colIdEl.TryGetInt32(out var colIdVal))
+                    collectionId = colIdVal;
+                if (colEl.TryGetProperty("name", out var colNameEl))
+                    collectionName = colNameEl.GetString();
+            }
+
             return new TmdbDetailsBasic
             {
                 Title            = root.TryGetProperty("title",             out var tEl)   ? tEl.GetString()   : null,
@@ -1266,7 +1284,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                 PosterUrl        = posterUrl,
                 OriginalLanguage = root.TryGetProperty("original_language", out var langEl)? langEl.GetString(): null,
                 Tagline          = root.TryGetProperty("tagline",           out var tgEl)  ? tgEl.GetString()  : null,
-                Status           = root.TryGetProperty("status",            out var stEl)  ? stEl.GetString()  : null
+                Status           = root.TryGetProperty("status",            out var stEl)  ? stEl.GetString()  : null,
+                CollectionId     = collectionId,
+                CollectionName   = collectionName
             };
         }
 
@@ -1306,7 +1326,53 @@ namespace FindMyFlickWebsite.Server.Controllers
             existing.Status = details.Status;
             existing.UpdatedAt = now;
             await _context.SaveChangesAsync();
+
+            // Enrich collection data if available — added with Claude (April 2026)
+            if (details.CollectionId != null && !string.IsNullOrWhiteSpace(details.CollectionName))
+                await TryEnrichCollectionAsync(imdbId, details.CollectionId.Value, details.CollectionName, now);
+
             return true;
+        }
+
+        // Saves collection membership for a movie using data already returned by the TMDB details call.
+        // Added with Claude (April 2026)
+        private async Task TryEnrichCollectionAsync(string imdbId, int tmdbCollectionId, string collectionName, DateTime now)
+        {
+            try
+            {
+                // Upsert the collection itself
+                var collection = await _context.Collections
+                    .FirstOrDefaultAsync(c => c.TmdbCollectionId == tmdbCollectionId);
+
+                if (collection == null)
+                {
+                    _context.Collections.Add(new Collection
+                    {
+                        TmdbCollectionId = tmdbCollectionId,
+                        CollectionName = collectionName
+                    });
+                    await _context.SaveChangesAsync();
+                }
+
+                // Upsert the movie-collection link
+                var existing = await _context.MovieCollections
+                    .FirstOrDefaultAsync(mc => mc.ImdbId == imdbId && mc.TmdbCollectionId == tmdbCollectionId);
+
+                if (existing == null)
+                {
+                    _context.MovieCollections.Add(new MovieCollection
+                    {
+                        ImdbId = imdbId,
+                        TmdbCollectionId = tmdbCollectionId,
+                        CreatedAt = now
+                    });
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CollectionEnrich] Failed for {imdbId}: {ex.Message}");
+            }
         }
 
         private sealed class TmdbWatchProviderRow

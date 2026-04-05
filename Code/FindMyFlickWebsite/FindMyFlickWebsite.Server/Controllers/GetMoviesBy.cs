@@ -13,6 +13,7 @@ using FindMyFlickWebsite.Server.DataModels;
 // Article-stripping logic (A, An, The) for letter filtering added with Claude (April 2026)
 // 0-9 (numbers/symbols) filter endpoint added with Claude (April 2026)
 // Random movie endpoint added with Claude (April 2026)
+// Collection browse endpoint added with Claude (April 2026)
 
 namespace FindMyFlickWebsite.Server.Controllers
 {
@@ -85,6 +86,52 @@ namespace FindMyFlickWebsite.Server.Controllers
             var random = new Random();
             var shuffled = results.OrderBy(_ => random.Next()).Take(count).ToList();
             return Ok(shuffled);
+        }
+
+        // GET api/movies/getby/collection/{collectionName}?limit=200
+        // Returns all eligible movies belonging to the named collection (case-insensitive).
+        // Sorted by release year ascending so series appear in order.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        [HttpGet("collection/{collectionName}")]
+        public async Task<IActionResult> GetByCollection(string collectionName, int limit = 200)
+        {
+            if (string.IsNullOrWhiteSpace(collectionName))
+                return BadRequest("collectionName path parameter is required.");
+
+            var normalized = collectionName.Trim();
+
+            await using var ctx = _dbFactory.CreateDbContext();
+
+            var results = await ctx.MovieCollections
+                .AsNoTracking()
+                .Where(mc => EF.Functions.ILike(mc.TmdbCollection.CollectionName, normalized))
+                .Select(mc => mc.Imdb)
+                .Where(m => m != null)
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                .Select(m => new MovieSummary
+                {
+                    ImdbId = EF.Property<string>(m, "ImdbId"),
+                    TmdbId = m.TmdbId,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    PosterUrl = m.PosterUrl
+                })
+                .Distinct()
+                .Take(Math.Max(1, Math.Min(limit, 200)))
+                .ToListAsync();
+
+            // Sort by release year ascending so series appear in chronological order
+            results = results
+                .OrderBy(m => m.ReleaseYear)
+                .ThenBy(m => StripArticle(m.Title))
+                .ToList();
+
+            return Ok(results);
         }
 
         // GET api/movies/getby/starts-with/{letter}?limit=500
