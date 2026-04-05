@@ -192,6 +192,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                     relaxedSteps.Add($"Stale warnings refreshed: {staleRefreshed} movie(s) updated");
             }
 
+            // STEP 3b: Backfill plot tags for movies that have none — added with Claude (April 2026)
+            await BackfillPlotTagsAsync();
+
             // STEP 4: Primary query + progressive relaxation
             var effectiveReq = Clone(baseReq);
             var results = await RunQuery(effectiveReq, take: req.Take);
@@ -740,6 +743,37 @@ namespace FindMyFlickWebsite.Server.Controllers
             }
 
             return refreshed;
+        }
+
+        // Backfills plot tags for a small batch of movies that have none.
+        // Runs on every search to gradually cover the whole database.
+        // Added with Claude (April 2026)
+        private const int PlotTagBackfillBatchSize = 3;
+
+        private async Task BackfillPlotTagsAsync()
+        {
+            try
+            {
+                var untaggedMovies = await _context.Movies
+                    .AsNoTracking()
+                    .Where(m => !string.IsNullOrWhiteSpace(m.PlotSummary))
+                    .Where(m => !_context.MoviePlotTags.Any(mpt => mpt.ImdbId == m.ImdbId))
+                    .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                    .Where(m => m.MovieStreamings.Any(ms =>
+                        !EF.Functions.ILike(ms.OfferType, "rent") &&
+                        !EF.Functions.ILike(ms.OfferType, "buy")))
+                    .OrderBy(m => m.CreatedAt)
+                    .Take(PlotTagBackfillBatchSize)
+                    .Select(m => new { m.ImdbId, m.PlotSummary })
+                    .ToListAsync();
+
+                foreach (var movie in untaggedMovies)
+                    await AutoAssignPlotTagsAsync(movie.ImdbId, movie.PlotSummary);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PlotTagBackfill] Error: {ex.Message}");
+            }
         }
 
         // =========================================================================
