@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import API_URL from "../../config.js";
 
@@ -89,7 +89,7 @@ export default function MovieDetails() {
         setWarnings(warningsData.filter(w =>
           w.answer?.toLowerCase() === "yes" || w.answer === true
         ));
-        setCollections(collectionsData.map(c => c.name || "").filter(Boolean));
+        setCollections(collectionsData.map(c => c.collectionName || c.name || "").filter(Boolean));
         setWarningTaxonomy(taxonomyData);
         setAllPlotTags(allTagsData.map(t => t.tagText));
 
@@ -346,18 +346,28 @@ export default function MovieDetails() {
             )}
           </div>
 
-            {/* Collections */}
-            {collections.length > 0 && collections[0] !== "None" && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-pink-300 mb-1">Collection</h3>
-                <p className="text-gray-300 text-sm">{collections.join(", ")}</p>
-              </div>
-            )}
-          </div>
+            </div>
         </div>
 
-        
         </div>
+
+        {/* COLLECTIONS */}
+        {collections.length > 0 && collections[0] !== "None" && (
+          <div className="bg-black/40 rounded-xl p-6 mb-6">
+            <h2 className="text-xl font-bold text-pink-400 mb-4">Collection</h2>
+            <div className="flex flex-wrap gap-2">
+              {collections.map(c => (
+                <Link
+                  key={c}
+                  to={`/collection/${encodeURIComponent(c)}`}
+                  className="px-3 py-1.5 rounded-full bg-purple-800/60 text-purple-200 text-sm hover:bg-purple-700/60 transition cursor-pointer"
+                >
+                  {c}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* CAST */}
         <div className="bg-black/40 rounded-xl p-6 mb-6">
