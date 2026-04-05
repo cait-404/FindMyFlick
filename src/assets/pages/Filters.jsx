@@ -287,24 +287,47 @@ export default function Filters() {
         excludeWarningTopicIds: [...excludeWarningIds],
         includeWarningCategoryIds: [...includeCategoryIds],
         excludeWarningCategoryIds: [...excludeCategoryIds],
-        tagNamesInclude: includePlotTags,
-        tagNamesExclude: excludePlotTags,
+        tagNamesInclude: includePlotTags.map(t => t.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')),
+        tagNamesExclude: excludePlotTags.map(t => t.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')),
         take: 50,
         enableApiFallback: true,
         minMatches: 10,
         maxApiAdds: 5
       };
 
-      const res = await fetch(`${API_URL}/api/MovieSearch`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) throw new Error("Search failed");
-
-       const data = await res.json();
+      // Use Movies/search endpoint which supports plot tags
+      // MovieSearch endpoint does not handle plot tag filtering
+      const hasPlotTags = includePlotTags.length > 0 || excludePlotTags.length > 0;
       
+      let data;
+      if (hasPlotTags) {
+        // Build query string for GET endpoint
+        const params = new URLSearchParams();
+        body.tagNamesInclude?.forEach(t => params.append("tagNamesInclude", t));
+        body.tagNamesExclude?.forEach(t => params.append("tagNamesExclude", t));
+        body.genreNames?.forEach(g => params.append("genreNames", g));
+        body.personNames?.forEach(p => params.append("personNames", p));
+        body.mpaaRatings?.forEach(r => params.append("mpaaRatings", r));
+        body.streamingProviderNames?.forEach(s => params.append("streamingProviderNames", s));
+        if (body.take) params.append("take", body.take);
+        if (body.enableApiFallback) params.append("enableApiFallback", body.enableApiFallback);
+        
+        const res = await fetch(`${API_URL}/api/Movies/search?${params.toString()}`);
+        if (!res.ok) throw new Error("Search failed");
+        const rawData = await res.json();
+        // Movies/search returns array directly, not wrapped in results
+        data = { results: Array.isArray(rawData) ? rawData : (rawData.results || []), unresolvedNames: [] };
+      } else {
+        const res = await fetch(`${API_URL}/api/MovieSearch`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error("Search failed");
+        data = await res.json();
+      }
+
+
       // If person names were specified but none resolved, show no results
       // rather than returning 50 unrelated movies
       if (personNames.length > 0 && data.unresolvedNames?.length === personNames.length) {
@@ -573,13 +596,13 @@ export default function Filters() {
                 {movies.map((movie, index) => (
                   <Link
                     key={index}
-                    to={`/movie/${movie.imdbId}`}
+                    to={`/movie/${movie.imdbId || movie.id}`}
                     className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
                   >
-                    {movie.posterUrl ? (
+                    {movie.posterUrl || movie.poster_url || movie.poster ? (
                       <img
-                        src={movie.posterUrl}
-                        alt={movie.title}
+                        src={movie.posterUrl || movie.poster_url || movie.poster}
+                        alt={movie.title || movie.name}
                         className="w-full object-contain"
                       />
                     ) : (
@@ -588,8 +611,8 @@ export default function Filters() {
                       </div>
                     )}
                     <div className="p-2 flex flex-col gap-1">
-                      <h3 className="font-semibold text-sm text-white leading-snug">{movie.title}</h3>
-                      <p className="text-gray-400 text-xs">{movie.releaseYear || "N/A"}</p>
+                      <h3 className="font-semibold text-sm text-white leading-snug">{movie.title || movie.name}</h3>
+                      <p className="text-gray-400 text-xs">{movie.releaseYear || movie.release_year || movie.year || "N/A"}</p>
                       {movie.mpaaRating && (
                         <span className="text-xs border border-gray-500 px-1.5 py-0.5 rounded text-gray-400 w-fit">
                           {movie.mpaaRating}
