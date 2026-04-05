@@ -788,9 +788,55 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // =========================================================================
         // PRIMARY QUERY
+        // Priority ordering added with Claude (April 2026):
+        // - Multi-genre: movies matching ALL genres appear before movies matching ANY genre
+        // - Cast+crew: movies matching BOTH appear before movies matching EITHER
         // =========================================================================
 
         private async Task<List<MovieSearchResultCard>> RunQuery(MovieSearchRequest req, int take)
+        {
+            var multiGenre = req.GenreIds.Count > 1;
+            var hasCast = req.PersonIds.Count > 0;
+            var hasBothCastAndCrew = hasCast && (req.PersonRoles?.Count == 0 || req.PersonRoles == null);
+
+            // If we have multiple genres OR both cast and crew, use priority ordering
+            if (multiGenre || hasBothCastAndCrew)
+            {
+                var allResults = new List<MovieSearchResultCard>();
+                var seenIds = new HashSet<string>();
+
+                // PASS 1: strict match (ALL genres AND/OR BOTH cast+crew)
+                var strictResults = await RunQueryInternal(req, take, matchAllGenres: multiGenre, matchBothPersonRoles: hasBothCastAndCrew);
+                foreach (var r in strictResults)
+                {
+                    if (seenIds.Add(r.ImdbId))
+                        allResults.Add(r);
+                }
+
+                // PASS 2: loose match (ANY genre OR EITHER cast/crew) — fill remaining slots
+                if (allResults.Count < take)
+                {
+                    var looseResults = await RunQueryInternal(req, take - allResults.Count, matchAllGenres: false, matchBothPersonRoles: false, excludeIds: seenIds);
+                    foreach (var r in looseResults)
+                    {
+                        if (seenIds.Add(r.ImdbId))
+                            allResults.Add(r);
+                    }
+                }
+
+                return allResults.Take(take).ToList();
+            }
+
+            // Single genre or single person — use original logic
+            return await RunQueryInternal(req, take, matchAllGenres: false, matchBothPersonRoles: false);
+        }
+
+        private async Task<List<MovieSearchResultCard>> RunQueryInternal(
+            MovieSearchRequest req,
+            int take,
+            bool matchAllGenres,
+            bool matchBothPersonRoles,
+            HashSet<string>? excludeIds = null)
         {
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
@@ -798,6 +844,9 @@ namespace FindMyFlickWebsite.Server.Controllers
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")));
+
+            if (excludeIds != null && excludeIds.Count > 0)
+                q = q.Where(m => !excludeIds.Contains(m.ImdbId));
 
             if (!string.IsNullOrWhiteSpace(req.TitleContains))
                 q = q.Where(m => EF.Functions.ILike(m.Title!, $"%{req.TitleContains.Trim()}%"));
@@ -827,12 +876,27 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             }
 
+            // Genre filtering — ALL genres must match in strict pass, ANY in loose pass
             if (req.GenreIds.Count > 0)
-                q = q.Where(m => m.MovieGenres.Any(mg => req.GenreIds.Contains(mg.TmdbGenreId)));
+            {
+                if (matchAllGenres)
+                {
+                    foreach (var gid in req.GenreIds.Distinct())
+                    {
+                        var localGid = gid;
+                        q = q.Where(m => m.MovieGenres.Any(mg => mg.TmdbGenreId == localGid));
+                    }
+                }
+                else
+                {
+                    q = q.Where(m => m.MovieGenres.Any(mg => req.GenreIds.Contains(mg.TmdbGenreId)));
+                }
+            }
 
             if (req.KeywordIds.Count > 0)
                 q = q.Where(m => m.MovieKeywords.Any(mk => req.KeywordIds.Contains(mk.TmdbKeywordId)));
 
+            // Person filtering — BOTH cast and crew must match in strict pass, EITHER in loose pass
             if (req.PersonIds.Count > 0)
             {
                 var roleSet = (req.PersonRoles ?? new List<string>())
@@ -849,14 +913,25 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var writerJobs   = new List<string> { "Writer", "Screenplay", "Story", "Characters", "Screenstory" };
                 var producerJobs = new List<string> { "Producer", "Executive Producer", "Co-Producer" };
 
-                q = q.Where(m =>
-                    (includeCast && m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId))) ||
-                    (includeCrew && m.MovieCrews.Any(c =>
-                        req.PersonIds.Contains(c.TmdbPersonId) &&
-                        (roleSet.Count == 0 || roleSet.Contains("crew")
-                            || (roleSet.Contains("director") && c.Job != null && directorJobs.Contains(c.Job))
-                            || (roleSet.Contains("writer")   && c.Job != null && writerJobs.Contains(c.Job))
-                            || (roleSet.Contains("producer") && c.Job != null && producerJobs.Contains(c.Job))))));
+                if (matchBothPersonRoles && includeCast && includeCrew)
+                {
+                    // Strict: movie must have the person in BOTH cast AND crew
+                    q = q.Where(m =>
+                        m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId)) &&
+                        m.MovieCrews.Any(c => req.PersonIds.Contains(c.TmdbPersonId)));
+                }
+                else
+                {
+                    // Loose: movie must have the person in EITHER cast OR crew
+                    q = q.Where(m =>
+                        (includeCast && m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId))) ||
+                        (includeCrew && m.MovieCrews.Any(c =>
+                            req.PersonIds.Contains(c.TmdbPersonId) &&
+                            (roleSet.Count == 0 || roleSet.Contains("crew")
+                                || (roleSet.Contains("director") && c.Job != null && directorJobs.Contains(c.Job))
+                                || (roleSet.Contains("writer")   && c.Job != null && writerJobs.Contains(c.Job))
+                                || (roleSet.Contains("producer") && c.Job != null && producerJobs.Contains(c.Job))))));
+                }
             }
 
             if (req.IncludeWarningTopicIds.Count > 0)
