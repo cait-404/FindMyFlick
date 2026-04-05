@@ -566,26 +566,43 @@ namespace FindMyFlickWebsite.Server.Controllers
             var tmdbKeyForPeople = Environment.GetEnvironmentVariable("TMDB_API_KEY");
             foreach (var name in req.PersonNames.Where(n => !string.IsNullOrWhiteSpace(n)))
             {
+                var trimmed = name.Trim();
+
                 var ids = await _context.People
                     .AsNoTracking()
-                    .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
+                    .Where(p => EF.Functions.ILike(p.PersonName, $"%{trimmed}%"))
                     .Select(p => p.TmdbPersonId)
                     .ToListAsync();
 
                 if (ids.Count == 0 && !string.IsNullOrWhiteSpace(tmdbKeyForPeople))
                 {
-                    var tmdbPersonIds = await FetchAndUpsertTmdbPersonsByNameAsync(name.Trim(), tmdbKeyForPeople);
-                    if (tmdbPersonIds.Count > 0)
+                    // Try original name first, then alternative formats for initials
+                    // e.g. "J.K. Simmons" -> "J. K. Simmons" -> "JK Simmons"
+                    // Added with Claude (April 2026)
+                    var namesToTry = new List<string> { trimmed };
+
+                    // Add version with spaces after periods: "J.K." -> "J. K."
+                    var withSpaces = System.Text.RegularExpressions.Regex.Replace(trimmed, @"\.(?!\s)", ". ").Trim();
+                    if (withSpaces != trimmed) namesToTry.Add(withSpaces);
+
+                    // Add version without periods: "J.K." -> "JK"
+                    var withoutPeriods = trimmed.Replace(".", "").Trim();
+                    if (withoutPeriods != trimmed) namesToTry.Add(withoutPeriods);
+
+                    foreach (var nameVariant in namesToTry)
                     {
-                        ids = await _context.People
-                            .AsNoTracking()
-                            .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
-                            .Select(p => p.TmdbPersonId)
-                            .ToListAsync();
+                        var tmdbPersonIds = await FetchAndUpsertTmdbPersonsByNameAsync(nameVariant, tmdbKeyForPeople);
+                         if (tmdbPersonIds.Count > 0)
+                        {
+                            // Search by TMDB person IDs directly since the stored name
+                            // may differ from what the user typed (e.g. "jk simmons" vs "J.K. Simmons")
+                            ids = tmdbPersonIds;
+                            break;
+                        }
                     }
                 }
 
-                if (ids.Count == 0) unresolved.Add($"person: '{name.Trim()}'");
+                if (ids.Count == 0) unresolved.Add($"person: '{trimmed}'");
                 req.PersonIds.AddRange(ids);
             }
             req.PersonIds = req.PersonIds.Distinct().ToList();

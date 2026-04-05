@@ -303,7 +303,17 @@ export default function Filters() {
 
       if (!res.ok) throw new Error("Search failed");
 
-      const data = await res.json();
+       const data = await res.json();
+      
+      // If person names were specified but none resolved, show no results
+      // rather than returning 50 unrelated movies
+      if (personNames.length > 0 && data.unresolvedNames?.length === personNames.length) {
+        setMovies([]);
+        setError(`Could not find "${personNames.join(", ")}" in our database. Please check your spelling.`);
+        setLoading(false);
+        return;
+      }
+      
       setMovies(data.results || []);
     } catch (err) {
       console.error("Search error:", err);
