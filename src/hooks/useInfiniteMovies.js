@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import API_URL from "../config.js";
  
 const BATCH_SIZE = 20;
  
@@ -19,7 +20,7 @@ export function useInfiniteMovies(genreFilter = "") {
   const fetchBatch = useCallback(async (currentSkip, genre) => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5002/api/MovieSearch", {
+      const res = await fetch(`${API_URL}/api/MovieSearch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

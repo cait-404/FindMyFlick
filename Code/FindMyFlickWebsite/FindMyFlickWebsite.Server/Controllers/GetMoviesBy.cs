@@ -8,6 +8,13 @@ using FindMyFlickWebsite.Server.DataModels;
 
 //create me a controller that can get movies by the first letter in their title (so all movies that start with an
 //A) and another endpoint in the controller that can get all movies associated with a genre name
+
+// Streaming availability and Does the Dog Die warning filters added with Claude (April 2026)
+// Article-stripping logic (A, An, The) for letter filtering added with Claude (April 2026)
+// 0-9 (numbers/symbols) filter endpoint added with Claude (April 2026)
+// Random movie endpoint added with Claude (April 2026)
+// Collection browse endpoint added with Claude (April 2026)
+
 namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
@@ -31,24 +38,81 @@ namespace FindMyFlickWebsite.Server.Controllers
             public string? PosterUrl { get; set; }
         }
 
-        // GET api/movies/starts-with/{letter}?limit=100
-        // Returns movies whose Title starts with the specified letter (case-insensitive).
-        [HttpGet("starts-with/{letter}")]
-        public async Task<IActionResult> GetByFirstLetter(string letter, int limit = 100)
+        // Strips leading articles (A, An, The) from a title for sorting purposes.
+        // "The Dark Knight" -> "Dark Knight", "A Bug's Life" -> "Bug's Life"
+        private static string StripArticle(string title)
         {
-            if (string.IsNullOrWhiteSpace(letter))
-                return BadRequest("letter path parameter is required.");
+            if (string.IsNullOrWhiteSpace(title)) return title;
+            var t = title.Trim();
+            if (t.StartsWith("the ", StringComparison.OrdinalIgnoreCase)) return t.Substring(4).TrimStart();
+            if (t.StartsWith("an ", StringComparison.OrdinalIgnoreCase))  return t.Substring(3).TrimStart();
+            if (t.StartsWith("a ", StringComparison.OrdinalIgnoreCase))   return t.Substring(2).TrimStart();
+            return t;
+        }
 
-            var first = letter.Trim()[0].ToString();
+        // GET api/movies/getby/random?count=12
+        // Returns a random selection of eligible movies for the home page.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        // Randomizes in memory for compatibility — fetches 200 eligible movies then shuffles.
+        [HttpGet("random")]
+        public async Task<IActionResult> GetRandom(int count = 12)
+        {
+            count = Math.Max(1, Math.Min(count, 50)); // guard: between 1 and 50
 
             await using var ctx = _dbFactory.CreateDbContext();
 
-            // Use ILike for case-insensitive match on PostgreSQL; falls back to ToLower comparison otherwise.
-            var query = ctx.Movies
+            var results = await ctx.Movies
                 .AsNoTracking()
-                .Where(m =>
-                    EF.Functions.ILike(m.Title, $"{first}%")
-                )
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                // Only movies with a poster
+                .Where(m => m.PosterUrl != null)
+                .Take(200)
+                .Select(m => new MovieSummary
+                {
+                    ImdbId = EF.Property<string>(m, "ImdbId"),
+                    TmdbId = m.TmdbId,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    PosterUrl = m.PosterUrl
+                })
+                .ToListAsync();
+
+            // Randomize in memory instead of in SQL for better compatibility
+            var random = new Random();
+            var shuffled = results.OrderBy(_ => random.Next()).Take(count).ToList();
+            return Ok(shuffled);
+        }
+
+        // GET api/movies/getby/collection/{collectionName}?limit=200
+        // Returns all eligible movies belonging to the named collection (case-insensitive).
+        // Sorted by release year ascending so series appear in order.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        [HttpGet("collection/{collectionName}")]
+        public async Task<IActionResult> GetByCollection(string collectionName, int limit = 200)
+        {
+            if (string.IsNullOrWhiteSpace(collectionName))
+                return BadRequest("collectionName path parameter is required.");
+
+            var normalized = collectionName.Trim();
+
+            await using var ctx = _dbFactory.CreateDbContext();
+
+            var results = await ctx.MovieCollections
+                .AsNoTracking()
+                .Where(mc => EF.Functions.ILike(mc.TmdbCollection.CollectionName, normalized))
+                .Select(mc => mc.Imdb)
+                .Where(m => m != null)
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
@@ -58,15 +122,116 @@ namespace FindMyFlickWebsite.Server.Controllers
                     PosterUrl = m.PosterUrl
                 })
                 .Distinct()
-                .OrderBy(m => m.Title)
-                .Take(Math.Max(1, Math.Min(limit, 1000))); // guard limit
+                .Take(Math.Max(1, Math.Min(limit, 200)))
+                .ToListAsync();
 
-            var results = await query.ToListAsync();
+            // Sort by release year ascending so series appear in chronological order
+            results = results
+                .OrderBy(m => m.ReleaseYear)
+                .ThenBy(m => StripArticle(m.Title))
+                .ToList();
+
             return Ok(results);
         }
 
-        // GET api/movies/genre/{genreName}?limit=200
-        // Returns movies associated with the given genre name (case-insensitive)
+        // GET api/movies/getby/starts-with/{letter}?limit=500
+        // Returns movies whose Title (after stripping leading articles) starts with the specified letter.
+        // "A Bug's Life" appears under B, "The Dark Knight" under D, "An American Werewolf" under A.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        [HttpGet("starts-with/{letter}")]
+        public async Task<IActionResult> GetByFirstLetter(string letter, int limit = 500)
+        {
+            if (string.IsNullOrWhiteSpace(letter))
+                return BadRequest("letter path parameter is required.");
+
+            var first = letter.Trim()[0].ToString().ToUpperInvariant();
+
+            await using var ctx = _dbFactory.CreateDbContext();
+
+            // Fetch all eligible movies first, then filter by article-stripped letter in memory.
+            // This is necessary because EF Core cannot translate StripArticle() to SQL.
+            var allMovies = await ctx.Movies
+                .AsNoTracking()
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                // Pre-filter in SQL: titles starting with the letter directly,
+                // OR starting with "A ", "An ", or "The " (articles that may be stripped)
+                .Where(m =>
+                    EF.Functions.ILike(m.Title, $"{first}%") ||
+                    EF.Functions.ILike(m.Title, $"A {first}%") ||
+                    EF.Functions.ILike(m.Title, $"A {first.ToLower()}%") ||
+                    EF.Functions.ILike(m.Title, $"An {first}%") ||
+                    EF.Functions.ILike(m.Title, $"An {first.ToLower()}%") ||
+                    EF.Functions.ILike(m.Title, $"The {first}%") ||
+                    EF.Functions.ILike(m.Title, $"The {first.ToLower()}%"))
+                .Select(m => new MovieSummary
+                {
+                    ImdbId = EF.Property<string>(m, "ImdbId"),
+                    TmdbId = m.TmdbId,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    PosterUrl = m.PosterUrl
+                })
+                .ToListAsync();
+
+            // Apply article stripping in memory and filter to only the correct letter
+            var results = allMovies
+                .Where(m => StripArticle(m.Title).StartsWith(first, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(m => StripArticle(m.Title))
+                .Take(Math.Max(1, Math.Min(limit, 1000)))
+                .ToList();
+
+            return Ok(results);
+        }
+
+        // GET api/movies/getby/non-alpha?limit=500
+        // Returns movies whose Title (after stripping leading articles) starts with a number or symbol.
+        // Covers titles like "1408", "13 Hours", "(500) Days of Summer", "¡Three Amigos!"
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
+        [HttpGet("non-alpha")]
+        public async Task<IActionResult> GetByNonAlpha(int limit = 500)
+        {
+            await using var ctx = _dbFactory.CreateDbContext();
+
+            var allMovies = await ctx.Movies
+                .AsNoTracking()
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                .Select(m => new MovieSummary
+                {
+                    ImdbId = EF.Property<string>(m, "ImdbId"),
+                    TmdbId = m.TmdbId,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    PosterUrl = m.PosterUrl
+                })
+                .ToListAsync();
+
+            // Filter in memory: after stripping articles, title must start with a non-letter character
+            var results = allMovies
+                .Where(m => {
+                    var stripped = StripArticle(m.Title ?? "");
+                    return stripped.Length > 0 && !char.IsLetter(stripped[0]);
+                })
+                .OrderBy(m => StripArticle(m.Title))
+                .Take(Math.Max(1, Math.Min(limit, 1000)))
+                .ToList();
+
+            return Ok(results);
+        }
+
+        // GET api/movies/getby/genre/{genreName}?limit=200
+        // Returns movies associated with the given genre name (case-insensitive).
+        // Sorted by title with leading articles (A, An, The) stripped for ordering.
+        // Only returns movies that have US subscription/free streaming AND Does the Dog Die warning data.
         [HttpGet("genre/{genreName}")]
         public async Task<IActionResult> GetByGenre(string genreName, int limit = 200)
         {
@@ -77,14 +242,17 @@ namespace FindMyFlickWebsite.Server.Controllers
 
             await using var ctx = _dbFactory.CreateDbContext();
 
-            // Join via MovieGenres -> Genre -> Movie
-            // Select the Movie navigation, filter nulls, then group by ImdbId to remove duplicates.
-            var query = ctx.MovieGenres
+            var results = await ctx.MovieGenres
                 .AsNoTracking()
                 .Where(mg => EF.Functions.ILike(mg.TmdbGenre.GenreName, normalized))
                 .Select(mg => mg.Imdb)
                 .Where(m => m != null)
-                .OrderBy(m => m.Title)
+                // Only movies with at least one subscription or free streaming option (not rent/buy)
+                .Where(m => m.MovieStreamings.Any(ms =>
+                    !EF.Functions.ILike(ms.OfferType, "rent") &&
+                    !EF.Functions.ILike(ms.OfferType, "buy")))
+                // Only movies with Does the Dog Die warning data
+                .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
                 .Select(m => new MovieSummary
                 {
                     ImdbId = EF.Property<string>(m, "ImdbId"),
@@ -94,9 +262,14 @@ namespace FindMyFlickWebsite.Server.Controllers
                     PosterUrl = m.PosterUrl
                 })
                 .Distinct()
-                .Take(Math.Max(1, Math.Min(limit, 2000)));
+                .Take(Math.Max(1, Math.Min(limit, 2000)))
+                .ToListAsync();
 
-            var results = await query.ToListAsync();
+            // Sort by article-stripped title in memory
+            results = results
+                .OrderBy(m => StripArticle(m.Title))
+                .ToList();
+
             return Ok(results);
         }
     }

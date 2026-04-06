@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaChevronRight } from "react-icons/fa";
-import { useMovies } from "../../context/MovieContext";
+import API_URL from "../../config.js";
+
+// Genre taglines and navigation updated with Claude (April 2026)
 
 const genreColors = {
   action: "from-red-600/90 to-red-900/90",
@@ -13,49 +15,53 @@ const genreColors = {
   thriller: "from-indigo-600/90 to-indigo-900/90",
   mystery: "from-emerald-600/90 to-emerald-900/90",
   crime: "from-gray-600/90 to-gray-900/90",
-  animation: "from-orange-400/90 to-orange-700/90"
+  animation: "from-orange-400/90 to-orange-700/90",
+  adventure: "from-green-600/90 to-green-900/90",
+  documentary: "from-sky-600/90 to-sky-900/90",
+  family: "from-teal-500/90 to-teal-800/90",
+  fantasy: "from-violet-600/90 to-violet-900/90",
+  history: "from-amber-600/90 to-amber-900/90",
+  music: "from-fuchsia-500/90 to-fuchsia-900/90",
+  "science fiction": "from-blue-500/90 to-indigo-900/90",
+  "tv movie": "from-slate-600/90 to-slate-900/90",
+  war: "from-stone-600/90 to-stone-900/90",
+  western: "from-orange-700/90 to-orange-950/90"
 };
 
 const genreTaglines = {
   action: "High-octane thrills and epic battles",
+  adventure: "Bold journeys into the unknown",
+  animation: "Fun, colorful, and imaginative worlds",
   comedy: "Laughs, jokes, and feel-good moments",
-  drama: "Emotional stories that hit deep",
-  horror: "Scares, suspense, and dark mysteries",
-  "sci-fi": "Futuristic worlds and mind-bending adventures",
-  romance: "Love stories that warm the heart",
-  thriller: "Edge-of-your-seat tension and suspense",
-  mystery: "Intriguing puzzles and secrets",
   crime: "Heists, investigations, and dark deeds",
-  animation: "Fun, colorful, and imaginative worlds"
+  documentary: "Real stories that inform and inspire",
+  drama: "Emotional stories that hit deep",
+  family: "Something for everyone to enjoy together",
+  fantasy: "Magic, myth, and worlds beyond imagination",
+  history: "True events that shaped the world",
+  horror: "Scares, suspense, and dark mysteries",
+  music: "Rhythm, performance, and the power of song",
+  mystery: "Intriguing puzzles and secrets to unravel",
+  romance: "Love stories that warm the heart",
+  "science fiction": "Futuristic worlds and mind-bending adventures",
+  thriller: "Edge-of-your-seat tension and suspense",
+  "tv movie": "Feature-length stories made for the screen",
+  war: "Courage, sacrifice, and the cost of conflict",
+  western: "Outlaws, frontiers, and the wild west"
 };
 
 export default function Genres() {
-  const { movies, loading } = useMovies();
   const [genres, setGenres] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!movies.length) return;
-
-    const genreMap = {};
-
-    movies.forEach((movie) => {
-      const movieGenres = movie.genre || [];
-
-      movieGenres.forEach((g) => {
-        if (g) {
-          const key = g.toLowerCase();
-          genreMap[key] = (genreMap[key] || 0) + 1;
-        }
-      });
-    });
-
-    setGenres(
-      Object.entries(genreMap)
-        .sort((a, b) => b[1] - a[1])
-        .map(([name, count]) => ({ name, count }))
-    );
-  }, [movies]);
+    fetch(`${API_URL}/api/Genres`)
+      .then(res => res.json())
+      .then(data => setGenres(data.map(g => ({ name: g.name?.toLowerCase(), count: null }))))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   if (loading) {
     return (
@@ -95,10 +101,9 @@ export default function Genres() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
 
         {genres.map((genre, i) => (
-
           <button
             key={i}
-            onClick={() => navigate(`/discover?genre=${genre.name}`)}
+            onClick={() => navigate(`/genre/${encodeURIComponent(genre.name)}`)}
             className={`
               group relative rounded-2xl h-52 p-6 text-left
               bg-linear-to-br ${genreColors[genre.name] || "from-fuchsia-600/90 to-purple-900/90"}
@@ -124,9 +129,11 @@ export default function Genres() {
 
               <div className="flex items-center justify-between mt-4">
 
-                <span className="text-sm text-gray-200/90 font-semibold">
-                  {genre.count} movies
-                </span>
+                {genre.count !== null && (
+                  <span className="text-sm text-gray-200/90 font-semibold">
+                    {genre.count} movies
+                  </span>
+                )}
 
                 <FaChevronRight className="opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-pink-400" />
 
@@ -138,7 +145,6 @@ export default function Genres() {
             <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-pink-500 to-purple-600 opacity-30 blur-2xl animate-pulse pointer-events-none"></div>
 
           </button>
-
         ))}
 
       </div>

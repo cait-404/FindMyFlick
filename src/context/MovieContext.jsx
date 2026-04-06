@@ -17,11 +17,11 @@ export function MovieProvider({ children }) {
     let url = "";
 
     if (selectedLetter) {
-      url = `http://localhost:5002/api/movies/getby/starts-with/${selectedLetter}?limit=100`;
+      url = `${API_URL}/api/movies/getby/starts-with/${selectedLetter}?limit=100`;
     } else if (genre) {
-      url = `http://localhost:5002/api/movies/getby/genre/${genre}?limit=200`;
+      url = `${API_URL}/api/movies/getby/genre/${genre}?limit=200`;
     } else {
-      url = `http://localhost:5002/api/movies/getby/starts-with/a?limit=100`; // default to A
+      url = `${API_URL}/api/movies/getby/starts-with/a?limit=100`;
     }
 
     const res = await fetch(url);

@@ -19,7 +19,7 @@ function Search() {
   setError(null);
  
   // Step 1: Search by title first
-  fetch(`http://localhost:5002/api/MovieSearch`, {
+  fetch(`${API_URL}/api/MovieSearch`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -27,6 +27,7 @@ function Search() {
       minMatches: 1,
       enableApiFallback: true,
       alwaysAddFromApis: true,
+      minMatches: 5,
       titleContains: query,   // ✅ title-first search
       genreNames: [],
       keywordNames: [],
@@ -50,7 +51,7 @@ function Search() {
       }
  
       // Fallback: search by keyword and genre
-      return fetch(`http://localhost:5002/api/MovieSearch`, {
+      return fetch(`${API_URL}/api/MovieSearch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,7 +75,9 @@ function Search() {
     })
     .catch((err) => {
       console.error("Error fetching movies:", err);
-      setError("Failed to fetch movies. Try again later.");
+      if (movies.length === 0) {
+        setError("Failed to fetch movies. Try again later.");
+      }
     })
     .finally(() => setLoading(false));
 }, [query]);

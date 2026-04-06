@@ -18,9 +18,15 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173")
+                .WithOrigins(
+                    "http://localhost:5173",
+                    "https://thankful-mud-03220200f.4.azurestaticapps.net",
+                    "https://findmyflick.com",
+                    "https://www.findmyflick.com"
+                )
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .WithExposedHeaders("X-Total-Count", "X-Page", "X-Page-Size");
         });
 });
 
@@ -176,6 +182,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
+<<<<<<< HEAD
     app.Urls.Clear();
     app.Urls.Add("https://localhost:5002");
     app.Urls.Add("http://localhost:5003");
@@ -185,9 +192,17 @@ app.UseRouting();
 
 app.UseCors("AllowFrontend");
 
+=======
+//app.UseHttpsRedirection(); for prod
+app.UseRouting();
+app.UseCors("AllowFrontend");
+>>>>>>> 91dfee096c2e35927845d69a1afd8023822b154f
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+<<<<<<< HEAD
 app.MapGet("/", () => "API is running");
+=======
+>>>>>>> 91dfee096c2e35927845d69a1afd8023822b154f
 app.Run();

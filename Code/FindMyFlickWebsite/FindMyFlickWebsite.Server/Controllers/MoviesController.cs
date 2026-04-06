@@ -743,19 +743,27 @@ namespace FindMyFlickWebsite.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMoviesView_ParseImdb(
             [FromQuery] int page = 1,
-            [FromQuery] string? order = "release_year")
+            [FromQuery] string? order = "release_year",
+            [FromQuery] int limit = 50)
         {
             try
             {
                 if (page <= 0) page = 1;
-                const int PageSize = 50;
+                if (limit <= 0 || limit > 1000) limit = 50;
+                int PageSize = limit;
 
                 // Build base query (no ordering yet)
+                // Only movies with US subscription/free streaming AND Does the Dog Die warning data
+                // Filter added with Claude (April 2026)
                 IQueryable<Movie> query = _context.Movies
                     .Include(m => m.MovieGenres).ThenInclude(g => g.TmdbGenre)
                     .Include(m => m.MovieStreamings).ThenInclude(s => s.TmdbProvider)
                     .Include(m => m.MovieWarnings).ThenInclude(w => w.DtddTopic)
-                    .AsNoTracking();
+                    .AsNoTracking()
+                    .Where(m => m.MovieStreamings.Any(ms =>
+                        !EF.Functions.ILike(ms.OfferType, "rent") &&
+                        !EF.Functions.ILike(ms.OfferType, "buy")))
+                    .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")));
 
                 // Normalise order param
                 var ord = (order ?? "release_year").Trim().ToLowerInvariant();

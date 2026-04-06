@@ -14,6 +14,8 @@ import Search from './assets/pages/Search';
 import LoginSignup from './assets/pages/LoginSignup';
 import MovieDetails from './assets/pages/MovieDetails';
 import Filters from './assets/pages/Filters';
+import GenreBrowse from './assets/pages/GenreBrowse';
+import CollectionBrowse from "./assets/pages/CollectionBrowse.jsx";
 
 import API_URL from './config'; // Make sure this points to your new backend
 
@@ -26,13 +28,14 @@ export default function App() {
 
   const token = localStorage.getItem("token"); 
 
-  // Fetch movies from new endpoint
+  // Fetch random movies for home page — different selection each visit
+  // Updated with Claude (April 2026)
   useEffect(() => {
     const fetchMovies = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://localhost:5002/movies?limit=100"); // Update endpoint if needed
+        const res = await fetch(`${API_URL}/api/movies/getby/random?count=12`);
         if (!res.ok) throw new Error("Server error");
         const data = await res.json();
         setMovies(data);
@@ -57,9 +60,9 @@ export default function App() {
       {/* NAVBAR */}
       <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
 
-        <h1 className="text-2xl font-bold text-pink-500">
+        <Link to="/" className="text-2xl font-bold text-pink-500">
           FindMyFlick
-        </h1>
+        </Link>
 
         <div className="flex gap-6 items-center flex-wrap">
 
@@ -131,6 +134,8 @@ export default function App() {
         <Route path="/profile" element={<Profile movies={movies} loading={loading} error={error} />} />
         <Route path="/search" element={<Search movies={movies} loading={loading} error={error} />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/genre/:genreName" element={<GenreBrowse />} />
+        <Route path="/collection/:collectionName" element={<CollectionBrowse />} />
         <Route path="/auth" element={<LoginSignup />} />
         <Route path="/terms" element={<About />} />
         <Route path="/privacy" element={<About />} />

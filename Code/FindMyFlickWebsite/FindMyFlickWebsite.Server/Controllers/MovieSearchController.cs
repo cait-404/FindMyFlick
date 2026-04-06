@@ -192,6 +192,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                     relaxedSteps.Add($"Stale warnings refreshed: {staleRefreshed} movie(s) updated");
             }
 
+            // STEP 3b: Backfill plot tags for movies that have none — added with Claude (April 2026)
+            await BackfillPlotTagsAsync();
+
             // STEP 4: Primary query + progressive relaxation
             var effectiveReq = Clone(baseReq);
             var results = await RunQuery(effectiveReq, take: req.Take);
@@ -433,7 +436,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
             // Global rules — always applied
-            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null));
+            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")));
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")));
@@ -566,26 +569,43 @@ namespace FindMyFlickWebsite.Server.Controllers
             var tmdbKeyForPeople = Environment.GetEnvironmentVariable("TMDB_API_KEY");
             foreach (var name in req.PersonNames.Where(n => !string.IsNullOrWhiteSpace(n)))
             {
+                var trimmed = name.Trim();
+
                 var ids = await _context.People
                     .AsNoTracking()
-                    .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
+                    .Where(p => EF.Functions.ILike(p.PersonName, $"%{trimmed}%"))
                     .Select(p => p.TmdbPersonId)
                     .ToListAsync();
 
                 if (ids.Count == 0 && !string.IsNullOrWhiteSpace(tmdbKeyForPeople))
                 {
-                    var tmdbPersonIds = await FetchAndUpsertTmdbPersonsByNameAsync(name.Trim(), tmdbKeyForPeople);
-                    if (tmdbPersonIds.Count > 0)
+                    // Try original name first, then alternative formats for initials
+                    // e.g. "J.K. Simmons" -> "J. K. Simmons" -> "JK Simmons"
+                    // Added with Claude (April 2026)
+                    var namesToTry = new List<string> { trimmed };
+
+                    // Add version with spaces after periods: "J.K." -> "J. K."
+                    var withSpaces = System.Text.RegularExpressions.Regex.Replace(trimmed, @"\.(?!\s)", ". ").Trim();
+                    if (withSpaces != trimmed) namesToTry.Add(withSpaces);
+
+                    // Add version without periods: "J.K." -> "JK"
+                    var withoutPeriods = trimmed.Replace(".", "").Trim();
+                    if (withoutPeriods != trimmed) namesToTry.Add(withoutPeriods);
+
+                    foreach (var nameVariant in namesToTry)
                     {
-                        ids = await _context.People
-                            .AsNoTracking()
-                            .Where(p => EF.Functions.ILike(p.PersonName, $"%{name.Trim()}%"))
-                            .Select(p => p.TmdbPersonId)
-                            .ToListAsync();
+                        var tmdbPersonIds = await FetchAndUpsertTmdbPersonsByNameAsync(nameVariant, tmdbKeyForPeople);
+                         if (tmdbPersonIds.Count > 0)
+                        {
+                            // Search by TMDB person IDs directly since the stored name
+                            // may differ from what the user typed (e.g. "jk simmons" vs "J.K. Simmons")
+                            ids = tmdbPersonIds;
+                            break;
+                        }
                     }
                 }
 
-                if (ids.Count == 0) unresolved.Add($"person: '{name.Trim()}'");
+                if (ids.Count == 0) unresolved.Add($"person: '{trimmed}'");
                 req.PersonIds.AddRange(ids);
             }
             req.PersonIds = req.PersonIds.Distinct().ToList();
@@ -725,6 +745,37 @@ namespace FindMyFlickWebsite.Server.Controllers
             return refreshed;
         }
 
+        // Backfills plot tags for a small batch of movies that have none.
+        // Runs on every search to gradually cover the whole database.
+        // Added with Claude (April 2026)
+        private const int PlotTagBackfillBatchSize = 3;
+
+        private async Task BackfillPlotTagsAsync()
+        {
+            try
+            {
+                var untaggedMovies = await _context.Movies
+                    .AsNoTracking()
+                    .Where(m => !string.IsNullOrWhiteSpace(m.PlotSummary))
+                    .Where(m => !_context.MoviePlotTags.Any(mpt => mpt.ImdbId == m.ImdbId))
+                    .Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")))
+                    .Where(m => m.MovieStreamings.Any(ms =>
+                        !EF.Functions.ILike(ms.OfferType, "rent") &&
+                        !EF.Functions.ILike(ms.OfferType, "buy")))
+                    .OrderBy(m => m.CreatedAt)
+                    .Take(PlotTagBackfillBatchSize)
+                    .Select(m => new { m.ImdbId, m.PlotSummary })
+                    .ToListAsync();
+
+                foreach (var movie in untaggedMovies)
+                    await AutoAssignPlotTagsAsync(movie.ImdbId, movie.PlotSummary);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PlotTagBackfill] Error: {ex.Message}");
+            }
+        }
+
         // =========================================================================
         // CLONE
         // =========================================================================
@@ -771,16 +822,64 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         // =========================================================================
         // PRIMARY QUERY
+        // Priority ordering added with Claude (April 2026):
+        // - Multi-genre: movies matching ALL genres appear before movies matching ANY genre
+        // - Cast+crew: movies matching BOTH appear before movies matching EITHER
         // =========================================================================
 
         private async Task<List<MovieSearchResultCard>> RunQuery(MovieSearchRequest req, int take)
         {
+            var multiGenre = req.GenreIds.Count > 1;
+            var hasMultiplePeople = req.PersonIds.Count > 1;
+
+            // If we have multiple genres OR both cast and crew, use priority ordering
+            if (multiGenre || hasMultiplePeople)
+            {
+                var allResults = new List<MovieSearchResultCard>();
+                var seenIds = new HashSet<string>();
+
+                // PASS 1: strict match (ALL genres AND/OR BOTH cast+crew)
+                var strictResults = await RunQueryInternal(req, take, matchAllGenres: multiGenre, matchBothPersonRoles: hasMultiplePeople);
+                foreach (var r in strictResults)
+                {
+                    if (seenIds.Add(r.ImdbId))
+                        allResults.Add(r);
+                }
+
+                // PASS 2: loose match (ANY genre OR EITHER cast/crew) — fill remaining slots
+                if (allResults.Count < take)
+                {
+                    var looseResults = await RunQueryInternal(req, take - allResults.Count, matchAllGenres: false, matchBothPersonRoles: false, excludeIds: seenIds);
+                    foreach (var r in looseResults)
+                    {
+                        if (seenIds.Add(r.ImdbId))
+                            allResults.Add(r);
+                    }
+                }
+
+                return allResults.Take(take).ToList();
+            }
+
+            // Single genre or single person — use original logic
+            return await RunQueryInternal(req, take, matchAllGenres: false, matchBothPersonRoles: false);
+        }
+
+        private async Task<List<MovieSearchResultCard>> RunQueryInternal(
+            MovieSearchRequest req,
+            int take,
+            bool matchAllGenres,
+            bool matchBothPersonRoles,
+            HashSet<string>? excludeIds = null)
+        {
             IQueryable<Movie> q = _context.Movies.AsNoTracking();
 
-            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null));
+            q = q.Where(m => m.MovieWarnings.Any(w => w.Answer != null && EF.Functions.ILike(w.Answer, "yes")));
             q = q.Where(m => m.MovieStreamings.Any(ms =>
                 !EF.Functions.ILike(ms.OfferType, "rent") &&
                 !EF.Functions.ILike(ms.OfferType, "buy")));
+
+            if (excludeIds != null && excludeIds.Count > 0)
+                q = q.Where(m => !excludeIds.Contains(m.ImdbId));
 
             if (!string.IsNullOrWhiteSpace(req.TitleContains))
                 q = q.Where(m => EF.Functions.ILike(m.Title!, $"%{req.TitleContains.Trim()}%"));
@@ -810,12 +909,27 @@ namespace FindMyFlickWebsite.Server.Controllers
                 }
             }
 
+            // Genre filtering — ALL genres must match in strict pass, ANY in loose pass
             if (req.GenreIds.Count > 0)
-                q = q.Where(m => m.MovieGenres.Any(mg => req.GenreIds.Contains(mg.TmdbGenreId)));
+            {
+                if (matchAllGenres)
+                {
+                    foreach (var gid in req.GenreIds.Distinct())
+                    {
+                        var localGid = gid;
+                        q = q.Where(m => m.MovieGenres.Any(mg => mg.TmdbGenreId == localGid));
+                    }
+                }
+                else
+                {
+                    q = q.Where(m => m.MovieGenres.Any(mg => req.GenreIds.Contains(mg.TmdbGenreId)));
+                }
+            }
 
             if (req.KeywordIds.Count > 0)
                 q = q.Where(m => m.MovieKeywords.Any(mk => req.KeywordIds.Contains(mk.TmdbKeywordId)));
 
+            // Person filtering — BOTH cast and crew must match in strict pass, EITHER in loose pass
             if (req.PersonIds.Count > 0)
             {
                 var roleSet = (req.PersonRoles ?? new List<string>())
@@ -832,14 +946,31 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var writerJobs   = new List<string> { "Writer", "Screenplay", "Story", "Characters", "Screenstory" };
                 var producerJobs = new List<string> { "Producer", "Executive Producer", "Co-Producer" };
 
-                q = q.Where(m =>
-                    (includeCast && m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId))) ||
-                    (includeCrew && m.MovieCrews.Any(c =>
-                        req.PersonIds.Contains(c.TmdbPersonId) &&
-                        (roleSet.Count == 0 || roleSet.Contains("crew")
-                            || (roleSet.Contains("director") && c.Job != null && directorJobs.Contains(c.Job))
-                            || (roleSet.Contains("writer")   && c.Job != null && writerJobs.Contains(c.Job))
-                            || (roleSet.Contains("producer") && c.Job != null && producerJobs.Contains(c.Job))))));
+                if (matchBothPersonRoles && req.PersonIds.Count > 1)
+                {
+                    // Strict: movie must have ALL searched people (in any role)
+                    foreach (var pid in req.PersonIds.Distinct())
+                    {
+                        var localPid = pid;
+                        q = q.Where(m =>
+                            m.MovieCasts.Any(c => c.TmdbPersonId == localPid) ||
+                            m.MovieCrews.Any(c => c.TmdbPersonId == localPid));
+                    }
+                }
+                else
+                {
+                    // Loose: movie must have the person in EITHER cast OR crew (excluding trivial credits)
+                    var trivialJobs = new List<string> { "Thanks", "Special Thanks" };
+                    q = q.Where(m =>
+                        (includeCast && m.MovieCasts.Any(c => req.PersonIds.Contains(c.TmdbPersonId))) ||
+                        (includeCrew && m.MovieCrews.Any(c =>
+                            req.PersonIds.Contains(c.TmdbPersonId) &&
+                            (c.Job == null || !trivialJobs.Contains(c.Job)) &&
+                            (roleSet.Count == 0 || roleSet.Contains("crew")
+                                || (roleSet.Contains("director") && c.Job != null && directorJobs.Contains(c.Job))
+                                || (roleSet.Contains("writer")   && c.Job != null && writerJobs.Contains(c.Job))
+                                || (roleSet.Contains("producer") && c.Job != null && producerJobs.Contains(c.Job))))));
+                }
             }
 
             if (req.IncludeWarningTopicIds.Count > 0)
@@ -929,8 +1060,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                     .AnyAsync(ms => ms.ImdbId == imdbId && ms.OfferType != null &&
                         !EF.Functions.ILike(ms.OfferType, "rent") &&
                         !EF.Functions.ILike(ms.OfferType, "buy"));
-
-                if (hadWarningsBefore && hadStreamableBefore) { skippedAlreadyEligible++; continue; }
+                // Note: we no longer skip already-eligible movies — we want to always
+                // process all TMDB candidates so sequels and series are fully added.
+                // Added with Claude (April 2026)
 
                 var movie = await _context.Movies.FirstOrDefaultAsync(m => m.ImdbId == imdbId);
                 var wasNew = false;
@@ -1015,6 +1147,19 @@ namespace FindMyFlickWebsite.Server.Controllers
                         await TryEnrichMpaaRatingFromOmdbAsync(movie, omdbKey);
                 }
 
+                // Enrich collection data if not already present — added with Claude (April 2026)
+                if (!await _context.MovieCollections.AnyAsync(mc => mc.ImdbId == imdbId))
+                    await UpsertMovieCoreFromTmdbAsync(tmdbId, imdbId, tmdbKey);
+
+                // Auto-assign plot tags from plot summary if none exist — added with Claude (April 2026)
+                if (!await _context.MoviePlotTags.AnyAsync(mpt => mpt.ImdbId == imdbId))
+                {
+                    var plotSummary = await _context.Movies
+                        .Where(m => m.ImdbId == imdbId)
+                        .Select(m => m.PlotSummary)
+                        .FirstOrDefaultAsync();
+                    await AutoAssignPlotTagsAsync(imdbId, plotSummary);
+                }
 
                 if (wasNew || !(hadWarningsBefore && hadStreamableBefore)) added++;
             }
@@ -1212,6 +1357,9 @@ namespace FindMyFlickWebsite.Server.Controllers
             public string? OriginalLanguage { get; set; }
             public string? Tagline { get; set; }
             public string? Status { get; set; }
+            // Collection data added with Claude (April 2026)
+            public int? CollectionId { get; set; }
+            public string? CollectionName { get; set; }
         }
 
         private async Task<TmdbDetailsBasic?> FetchTmdbDetailsAsync(int tmdbId, string apiKey)
@@ -1239,6 +1387,17 @@ namespace FindMyFlickWebsite.Server.Controllers
             int? runtime = null;
             if (root.TryGetProperty("runtime", out var rtEl) && rtEl.TryGetInt32(out var rtVal)) runtime = rtVal;
 
+            // Extract collection data — added with Claude (April 2026)
+            int? collectionId = null;
+            string? collectionName = null;
+            if (root.TryGetProperty("belongs_to_collection", out var colEl) && colEl.ValueKind == JsonValueKind.Object)
+            {
+                if (colEl.TryGetProperty("id", out var colIdEl) && colIdEl.TryGetInt32(out var colIdVal))
+                    collectionId = colIdVal;
+                if (colEl.TryGetProperty("name", out var colNameEl))
+                    collectionName = colNameEl.GetString();
+            }
+
             return new TmdbDetailsBasic
             {
                 Title            = root.TryGetProperty("title",             out var tEl)   ? tEl.GetString()   : null,
@@ -1248,7 +1407,9 @@ namespace FindMyFlickWebsite.Server.Controllers
                 PosterUrl        = posterUrl,
                 OriginalLanguage = root.TryGetProperty("original_language", out var langEl)? langEl.GetString(): null,
                 Tagline          = root.TryGetProperty("tagline",           out var tgEl)  ? tgEl.GetString()  : null,
-                Status           = root.TryGetProperty("status",            out var stEl)  ? stEl.GetString()  : null
+                Status           = root.TryGetProperty("status",            out var stEl)  ? stEl.GetString()  : null,
+                CollectionId     = collectionId,
+                CollectionName   = collectionName
             };
         }
 
@@ -1288,7 +1449,309 @@ namespace FindMyFlickWebsite.Server.Controllers
             existing.Status = details.Status;
             existing.UpdatedAt = now;
             await _context.SaveChangesAsync();
+
+            // Enrich collection data if available — added with Claude (April 2026)
+            if (details.CollectionId != null && !string.IsNullOrWhiteSpace(details.CollectionName))
+                await TryEnrichCollectionAsync(imdbId, details.CollectionId.Value, details.CollectionName, now);
+
             return true;
+        }
+
+        // Saves collection membership for a movie using data already returned by the TMDB details call.
+        // Added with Claude (April 2026)
+        private async Task TryEnrichCollectionAsync(string imdbId, int tmdbCollectionId, string collectionName, DateTime now)
+        {
+            try
+            {
+                // Upsert the collection itself
+                var collection = await _context.Collections
+                    .FirstOrDefaultAsync(c => c.TmdbCollectionId == tmdbCollectionId);
+
+                if (collection == null)
+                {
+                    _context.Collections.Add(new Collection
+                    {
+                        TmdbCollectionId = tmdbCollectionId,
+                        CollectionName = collectionName
+                    });
+                    await _context.SaveChangesAsync();
+                }
+
+                // Upsert the movie-collection link
+                var existing = await _context.MovieCollections
+                    .FirstOrDefaultAsync(mc => mc.ImdbId == imdbId && mc.TmdbCollectionId == tmdbCollectionId);
+
+                if (existing == null)
+                {
+                    _context.MovieCollections.Add(new MovieCollection
+                    {
+                        ImdbId = imdbId,
+                        TmdbCollectionId = tmdbCollectionId,
+                        CreatedAt = now
+                    });
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CollectionEnrich] Failed for {imdbId}: {ex.Message}");
+            }
+        }
+
+        // Auto-assigns plot tags to a movie based on keyword matching against its plot summary.
+        // Tags are assigned with "pending" status so they appear but can be voted on.
+        // Added with Claude (April 2026)
+        private async Task AutoAssignPlotTagsAsync(string imdbId, string? plotSummary)
+        {
+            if (string.IsNullOrWhiteSpace(plotSummary)) return;
+
+            var plot = plotSummary.ToLowerInvariant();
+
+            // Keyword map: plot_tag_id -> keywords to match against plot summary
+            var tagKeywords = new Dictionary<int, string[]>
+            {
+                { 1,  new[] { "coming of age", "growing up", "teenager", "adolescent", "youth", "young adult", "childhood" } },
+                { 2,  new[] { "redemption", "redeem", "atone", "second chance", "make amends" } },
+                { 3,  new[] { "revenge", "vengeance", "avenge", "retaliate", "payback" } },
+                { 4,  new[] { "love triangle", "torn between", "two lovers", "choose between" } },
+                { 5,  new[] { "forbidden love", "forbidden romance", "star-crossed", "taboo relationship" } },
+                { 6,  new[] { "fish out of water", "out of place", "new environment", "unfamiliar world", "stranger in" } },
+                { 7,  new[] { "rags to riches", "poverty to wealth", "rise from nothing", "humble beginnings" } },
+                { 8,  new[] { "riches to rags", "loses everything", "fall from wealth", "loses fortune" } },
+                { 9,  new[] { "underdog", "unlikely hero", "against all odds", "nobody believes" } },
+                { 10, new[] { "hero's journey", "hero journey", "chosen path", "quest for greatness" } },
+                { 11, new[] { "tragic hero", "fatal flaw", "downfall", "tragic fate" } },
+                { 12, new[] { "anti-hero", "antihero", "morally ambiguous", "flawed hero", "reluctant criminal" } },
+                { 13, new[] { "villain origin", "becomes the villain", "path to darkness", "origin of evil" } },
+                { 14, new[] { "good vs evil", "good versus evil", "battle between good", "fight against evil" } },
+                { 15, new[] { "moral dilemma", "ethical choice", "impossible choice", "moral conflict", "right thing to do" } },
+                { 16, new[] { "identity crisis", "who am i", "sense of self", "true identity", "question their identity" } },
+                { 17, new[] { "doppelganger", "double", "look-alike", "identical stranger" } },
+                { 18, new[] { "amnesia", "memory loss", "lost memories", "can't remember", "forgotten past" } },
+                { 19, new[] { "secret identity", "hidden identity", "disguise", "living a double life" } },
+                { 20, new[] { "hidden past", "dark past", "secret past", "mysterious past", "past catches up" } },
+                { 21, new[] { "found family", "unlikely family", "new family", "makeshift family", "band together" } },
+                { 22, new[] { "broken family", "dysfunctional family", "estranged family", "broken home", "troubled family" } },
+                { 23, new[] { "family reunion", "reunited with family", "reconnects with family", "long-lost family" } },
+                { 24, new[] { "sibling rivalry", "brothers compete", "sisters compete", "sibling conflict", "brothers clash" } },
+                { 25, new[] { "mentor", "teacher", "guide", "trains under", "learns from", "apprentice" } },
+                { 26, new[] { "betrayal", "betrayed", "backstab", "double cross", "turns against", "sold out" } },
+                { 27, new[] { "double cross", "double-cross", "set up", "framed", "deceived by ally" } },
+                { 28, new[] { "heist", "robbery", "steal", "theft", "burglary", "break in", "caper" } },
+                { 29, new[] { "conspiracy", "cover-up", "cover up", "secret plot", "shadowy organization" } },
+                { 30, new[] { "political intrigue", "political scandal", "power struggle", "government corruption" } },
+                { 31, new[] { "espionage", "spy", "intelligence", "secret agent", "covert operation" } },
+                { 32, new[] { "spy thriller", "spy mission", "undercover agent", "intelligence agency" } },
+                { 33, new[] { "time travel", "travels back in time", "travels to the future", "time machine" } },
+                { 34, new[] { "time loop", "reliving", "stuck in time", "same day over", "groundhog" } },
+                { 35, new[] { "alternate reality", "alternate timeline", "parallel world", "different version of" } },
+                { 36, new[] { "parallel universe", "parallel world", "alternate dimension", "different dimension" } },
+                { 37, new[] { "multiverse", "multiple universes", "across universes" } },
+                { 38, new[] { "groundhog day", "relives the same", "repeating day", "stuck repeating" } },
+                { 39, new[] { "fate", "destiny", "free will", "predetermined", "written in the stars" } },
+                { 40, new[] { "destiny fulfilled", "fulfills destiny", "meant to be", "destined for greatness" } },
+                { 41, new[] { "prophecy", "foretold", "prophesied", "ancient prophecy" } },
+                { 42, new[] { "chosen one", "the chosen", "only one who can", "destined to save" } },
+                { 43, new[] { "reluctant hero", "doesn't want to", "forced into", "unlikely savior" } },
+                { 44, new[] { "quest", "journey to find", "search for", "mission to retrieve" } },
+                { 45, new[] { "treasure hunt", "buried treasure", "search for treasure", "lost artifact" } },
+                { 46, new[] { "survival", "survive", "fight to survive", "staying alive" } },
+                { 47, new[] { "disaster", "catastrophe", "earthquake", "tsunami", "hurricane", "flood", "tornado" } },
+                { 48, new[] { "post-apocalyptic", "post apocalyptic", "after the apocalypse", "end of civilization", "collapsed society" } },
+                { 49, new[] { "dystopia", "dystopian", "totalitarian", "oppressive regime", "authoritarian" } },
+                { 50, new[] { "utopia gone wrong", "perfect society", "paradise turns", "utopia that hides" } },
+                { 51, new[] { "artificial intelligence", "ai ", "sentient machine", "robot learns", "machine thinks" } },
+                { 52, new[] { "robot uprising", "robots rebel", "machines rise", "robot revolution" } },
+                { 53, new[] { "human vs machine", "humans versus robots", "fight against ai", "machine takeover" } },
+                { 54, new[] { "space exploration", "space mission", "outer space", "galaxy", "astronaut", "space station" } },
+                { 55, new[] { "alien invasion", "aliens attack", "extraterrestrial invasion", "otherworldly attack" } },
+                { 56, new[] { "first contact", "first encounter with aliens", "meet extraterrestrials" } },
+                { 57, new[] { "body swap", "switches bodies", "body switch", "swapped bodies" } },
+                { 58, new[] { "transformation", "transforms into", "changed forever", "metamorphosis", "becomes something" } },
+                { 59, new[] { "curse", "cursed", "ancient curse", "placed under a spell" } },
+                { 60, new[] { "haunting", "haunted house", "ghost haunts", "supernatural presence", "poltergeist" } },
+                { 61, new[] { "possession", "possessed by", "demonic possession", "takes over their body" } },
+                { 62, new[] { "exorcism", "cast out demon", "demonic exorcism", "rid of demon" } },
+                { 63, new[] { "monster hunt", "hunting monsters", "monster hunter", "creature hunt" } },
+                { 64, new[] { "vampire", "vampires", "blood-sucking", "undead creature" } },
+                { 65, new[] { "werewolf", "lycanthrope", "transforms into wolf", "wolf creature" } },
+                { 66, new[] { "ghost story", "ghost", "spirit", "apparition", "haunted by the dead" } },
+                { 67, new[] { "psychological horror", "psychological terror", "mind games", "psychological thriller", "paranoia" } },
+                { 68, new[] { "slasher", "serial killer stalks", "masked killer", "knife-wielding" } },
+                { 69, new[] { "serial killer", "kills multiple", "murderer on the loose", "hunting victims" } },
+                { 70, new[] { "whodunit", "who did it", "who is the killer", "mystery to solve", "murder mystery" } },
+                { 71, new[] { "detective", "investigator", "sleuth", "private eye", "solve the case" } },
+                { 72, new[] { "noir", "hard-boiled", "femme fatale", "dark city", "shadowy underworld" } },
+                { 73, new[] { "crime drama", "criminal underworld", "organized crime", "mob", "gang" } },
+                { 74, new[] { "courtroom", "trial", "lawyer", "prosecutor", "defendant", "verdict" } },
+                { 75, new[] { "legal battle", "lawsuit", "court case", "fight in court", "legal fight" } },
+                { 76, new[] { "prison escape", "escape from prison", "break out of jail", "escapes captivity" } },
+                { 77, new[] { "corruption", "corrupt", "bribery", "scandal", "abuse of power" } },
+                { 78, new[] { "redemption in prison", "finds redemption behind bars", "prison redemption" } },
+                { 79, new[] { "war", "battle", "combat", "warfare", "soldiers fight", "military conflict" } },
+                { 80, new[] { "soldier", "soldier's journey", "soldier returns", "life of a soldier" } },
+                { 81, new[] { "veteran", "ptsd", "post-traumatic", "war trauma", "returning soldier" } },
+                { 82, new[] { "brotherhood in battle", "brothers in arms", "comrades in war", "bond of soldiers" } },
+                { 83, new[] { "resistance movement", "resistance fighter", "underground resistance", "fight against occupation" } },
+                { 84, new[] { "revolution", "revolutionary", "overthrow", "uprising against" } },
+                { 85, new[] { "civil unrest", "riots", "civil war", "social uprising", "political unrest" } },
+                { 86, new[] { "historical drama", "based on history", "period drama", "historical setting", "set in the" } },
+                { 87, new[] { "based on a true story", "real-life", "biographical", "true events", "life of" } },
+                { 88, new[] { "rise to fame", "becomes famous", "road to stardom", "rises to celebrity" } },
+                { 89, new[] { "fall from grace", "loses everything", "downfall", "disgraced", "falls from power" } },
+                { 90, new[] { "music", "musician", "band", "singer", "songwriter", "rock star", "concert" } },
+                { 91, new[] { "sports underdog", "underdog team", "unlikely sports", "against the odds in sports" } },
+                { 92, new[] { "championship", "win the championship", "final game", "tournament", "compete for the title" } },
+                { 93, new[] { "coach", "player relationship", "coach trains", "team coach", "athletic mentor" } },
+                { 94, new[] { "rivalry", "rival", "fierce competition", "arch enemy", "competing against" } },
+                { 95, new[] { "training montage", "trains hard", "rigorous training", "prepares for battle" } },
+                { 96, new[] { "competition", "compete", "contest", "tournament", "challenge each other" } },
+                { 97, new[] { "workplace drama", "office politics", "coworkers clash", "workplace conflict" } },
+                { 98, new[] { "office romance", "falls for coworker", "workplace romance", "love at work" } },
+                { 99, new[] { "corporate greed", "corrupt corporation", "greedy executives", "corporate corruption" } },
+                { 100, new[] { "startup", "entrepreneur", "build a company", "new business", "tech startup" } },
+                { 101, new[] { "midlife crisis", "middle age", "questions life choices", "turning point in life" } },
+                { 102, new[] { "second chance", "fresh start", "new beginning", "start over", "another chance" } },
+                { 103, new[] { "self-discovery", "finds herself", "finds himself", "journey of self", "discover who they are" } },
+                { 104, new[] { "road trip", "cross-country", "journey across", "travels across", "road movie" } },
+                { 105, new[] { "buddy comedy", "unlikely duo", "mismatched pair", "two friends", "buddy film" } },
+                { 106, new[] { "odd couple", "unlikely pair", "opposites", "mismatched roommates" } },
+                { 107, new[] { "enemies to lovers", "enemies fall in love", "rivals become lovers", "hate turns to love" } },
+                { 108, new[] { "friends to lovers", "best friends fall in love", "friendship becomes romance" } },
+                { 109, new[] { "love at first sight", "falls instantly in love", "instant connection", "meet and instantly" } },
+                { 110, new[] { "unrequited love", "one-sided love", "loves someone who doesn't", "feelings aren't returned" } },
+                { 111, new[] { "long-distance relationship", "long distance", "separated by distance", "miles apart" } },
+                { 112, new[] { "breakup", "reconciliation", "get back together", "second chance at love", "reunite as lovers" } },
+                { 113, new[] { "marriage", "married couple", "troubled marriage", "saving their marriage" } },
+                { 114, new[] { "parenting", "parent", "raising children", "single parent", "new parent", "fatherhood", "motherhood" } },
+                { 115, new[] { "adoption", "adopted", "foster", "takes in a child" } },
+                { 116, new[] { "missing child", "lost child", "kidnapped child", "search for their child" } },
+                { 117, new[] { "reunion", "reunited after years", "reconnect after", "long separation" } },
+                { 118, new[] { "secret child", "hidden child", "discovers they have a child", "unknown offspring" } },
+                { 119, new[] { "hidden inheritance", "secret inheritance", "left a fortune", "discovers they inherited" } },
+                { 120, new[] { "small town secrets", "small town", "secrets of a town", "hidden truth in town" } },
+                { 121, new[] { "big city dreams", "moves to the city", "city life", "dreams of making it in" } },
+                { 122, new[] { "culture clash", "cultural differences", "different cultures", "two worlds collide" } },
+                { 123, new[] { "immigration", "immigrant", "new country", "leaving their homeland", "seeking a new life" } },
+                { 124, new[] { "identity and belonging", "sense of belonging", "where they belong", "searching for identity" } },
+                { 125, new[] { "social injustice", "injustice", "inequality", "fight for rights", "systemic oppression" } },
+                { 126, new[] { "racism", "racial discrimination", "racial prejudice", "segregation", "bigotry" } },
+                { 127, new[] { "class divide", "class difference", "rich and poor", "social class", "wealth gap" } },
+                { 128, new[] { "gender roles", "gender expectations", "breaking gender", "defying gender" } },
+                { 129, new[] { "lgbtq", "gay", "lesbian", "bisexual", "transgender", "queer", "same-sex" } },
+                { 130, new[] { "activism", "activist", "fight for change", "social movement", "protest" } },
+                { 131, new[] { "environmental crisis", "climate change", "environmental disaster", "ecological threat" } },
+                { 132, new[] { "pandemic", "outbreak", "epidemic", "virus spreads", "deadly disease spreads" } },
+                { 133, new[] { "medical drama", "hospital", "doctor", "patient", "medical emergency", "surgery" } },
+                { 134, new[] { "doctor-patient", "doctor and patient", "patient bond", "healing relationship" } },
+                { 135, new[] { "terminal illness", "dying", "terminal diagnosis", "given months to live", "fatal illness" } },
+                { 136, new[] { "miracle cure", "miraculous recovery", "unexpected healing", "inexplicable cure" } },
+                { 137, new[] { "addiction", "addict", "substance abuse", "drug abuse", "alcoholism" } },
+                { 138, new[] { "recovery", "sobriety", "rehab", "overcoming addiction", "path to recovery" } },
+                { 139, new[] { "mental health", "mental illness", "depression", "anxiety", "psychological disorder" } },
+                { 140, new[] { "obsession", "obsessed", "fixated", "can't stop thinking about", "unhealthy obsession" } },
+                { 141, new[] { "paranoia", "paranoid", "trusts no one", "everyone is watching", "feels followed" } },
+                { 142, new[] { "isolation", "isolated", "cut off from", "alone in", "solitary" } },
+                { 143, new[] { "cabin in the woods", "remote cabin", "isolated cabin", "woods cabin" } },
+                { 144, new[] { "stranded", "stranded on", "marooned", "trapped on", "cut off from civilization" } },
+                { 145, new[] { "survival against nature", "survive the wilderness", "nature threatens", "elements threaten" } },
+                { 146, new[] { "survival against odds", "beat the odds", "impossible situation", "fight to stay alive" } },
+                { 147, new[] { "lost in wilderness", "lost in the wild", "stranded in nature", "wilderness survival" } },
+                { 148, new[] { "shipwreck", "ship sinks", "stranded at sea", "survivors of a shipwreck" } },
+                { 149, new[] { "treasure curse", "cursed treasure", "cursed gold", "curse of the treasure" } },
+                { 150, new[] { "mythology", "myth", "legend", "ancient gods", "folklore", "mythological" } },
+                { 151, new[] { "gods among humans", "deity walks", "god on earth", "divine being among mortals" } },
+                { 152, new[] { "magic school", "school of magic", "learns magic", "magical academy" } },
+                { 153, new[] { "forbidden magic", "dark magic", "magic is forbidden", "outlawed magic" } },
+                { 154, new[] { "dark fantasy", "dark magical", "sinister fantasy", "grim fairy tale" } },
+                { 155, new[] { "epic fantasy", "epic quest", "vast magical world", "high fantasy", "fantasy kingdom" } },
+                { 156, new[] { "sword and sorcery", "swords and magic", "warriors and wizards", "fantasy warrior" } },
+                { 157, new[] { "kingdom politics", "political scheming", "royal court", "kingdom's power struggle" } },
+                { 158, new[] { "royal intrigue", "royal conspiracy", "intrigue in the palace", "throne room scheming" } },
+                { 159, new[] { "succession battle", "fight for the throne", "who will rule", "heir to the throne" } },
+                { 160, new[] { "assassination plot", "plot to kill", "planned assassination", "murder plot" } },
+                { 161, new[] { "bodyguard", "protect the", "assigned to protect", "personal security" } },
+                { 162, new[] { "kidnapping", "kidnapped", "abducted", "taken hostage", "snatched" } },
+                { 163, new[] { "rescue mission", "rescue", "save them", "mount a rescue", "go after them" } },
+                { 164, new[] { "hostage", "held hostage", "taken captive", "negotiate for release" } },
+                { 165, new[] { "chase", "pursuit", "chased by", "on the run", "fleeing from" } },
+                { 166, new[] { "cat and mouse", "cat-and-mouse", "hunter and hunted", "playing games with" } },
+                { 167, new[] { "race against time", "running out of time", "before it's too late", "countdown" } },
+                { 168, new[] { "countdown", "ticking clock", "limited time", "must stop before" } },
+                { 169, new[] { "ticking bomb", "bomb threat", "explosive device", "defuse the bomb" } },
+                { 170, new[] { "hidden object", "something is hidden", "locate the object", "find the item" } },
+                { 171, new[] { "secret society", "secret organization", "shadowy group", "underground organization" } },
+                { 172, new[] { "cult", "cult leader", "religious cult", "follows a cult" } },
+                { 173, new[] { "ritual", "dark ritual", "ancient ritual", "forbidden ritual" } },
+                { 174, new[] { "ancient evil", "ancient darkness", "awakened evil", "evil awakens" } },
+                { 175, new[] { "awakening power", "discovers their power", "power awakens", "new abilities emerge" } },
+                { 176, new[] { "superhero origin", "becomes a superhero", "origin of their powers", "how they got their powers" } },
+                { 177, new[] { "superhero team", "team of heroes", "heroes unite", "assemble a team of" } },
+                { 178, new[] { "vigilante", "takes justice into their own hands", "outside the law", "vigilante justice" } },
+                { 179, new[] { "power corrupts", "corrupted by power", "absolute power", "power changes them" } },
+                { 180, new[] { "hidden abilities", "secret powers", "discovers abilities", "powers they didn't know" } },
+                { 181, new[] { "clone", "cloning", "exact copy", "genetic duplicate" } },
+                { 182, new[] { "genetic experiment", "genetic engineering", "dna experiment", "genetic modification" } },
+                { 183, new[] { "scientific breakthrough", "groundbreaking discovery", "scientific discovery", "revolutionary invention" } },
+                { 184, new[] { "ethical science", "science ethics", "should science go this far", "moral implications of science" } },
+                { 185, new[] { "virtual reality", "vr ", "simulated world", "enters virtual" } },
+                { 186, new[] { "simulation theory", "living in a simulation", "reality is a simulation", "simulated reality" } },
+                { 187, new[] { "game world", "enters a game", "trapped in a game", "video game world" } },
+                { 188, new[] { "reality vs illusion", "what is real", "can't tell what's real", "blurs reality" } },
+                { 189, new[] { "memory manipulation", "memories altered", "false memories", "implanted memories" } },
+                { 190, new[] { "surveillance state", "surveillance", "watched by the government", "monitored by" } },
+                { 191, new[] { "hacker", "hacking", "cyber attack", "breaks into computer" } },
+                { 192, new[] { "cybercrime", "online crime", "digital theft", "cyber criminal" } },
+                { 193, new[] { "identity theft", "stolen identity", "someone steals their identity", "impersonates them" } },
+                { 194, new[] { "imposter", "pretending to be", "impersonating", "not who they claim" } },
+                { 195, new[] { "hidden agenda", "secret motive", "ulterior motive", "not what they seem" } },
+                { 196, new[] { "redemption through sacrifice", "sacrifices themselves", "gives their life", "ultimate sacrifice" } },
+                { 197, new[] { "bittersweet ending", "bittersweet", "happy but sad", "mixed feelings at the end" } },
+                { 198, new[] { "twist ending", "unexpected twist", "shocking ending", "reveals at the end" } },
+                { 199, new[] { "open ending", "ambiguous ending", "left unresolved", "no clear conclusion" } },
+                { 200, new[] { "full circle", "comes full circle", "back to where it started", "ends where it began" } },
+            };
+
+            var now = DateTime.UtcNow;
+            var tagsToAdd = new List<int>();
+
+            foreach (var (tagId, keywords) in tagKeywords)
+            {
+                if (keywords.Any(kw => plot.Contains(kw)))
+                    tagsToAdd.Add(tagId);
+            }
+
+            if (tagsToAdd.Count == 0) return;
+
+            try
+            {
+                // Get existing tags for this movie to avoid duplicates
+                var existingTagIds = await _context.MoviePlotTags
+                    .Where(mpt => mpt.ImdbId == imdbId)
+                    .Select(mpt => mpt.PlotTagId)
+                    .ToListAsync();
+
+                var existingSet = new HashSet<int>(existingTagIds);
+
+                foreach (var tagId in tagsToAdd)
+                {
+                    if (existingSet.Contains(tagId)) continue;
+
+                    _context.MoviePlotTags.Add(new MoviePlotTag
+                    {
+                        ImdbId = imdbId,
+                        PlotTagId = tagId,
+                        Status = "approved",
+                        CreatedAt = now
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[PlotTagAutoAssign] Failed for {imdbId}: {ex.Message}");
+            }
         }
 
         private sealed class TmdbWatchProviderRow
