@@ -312,6 +312,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             try
             {
                 var titleFilter = string.IsNullOrWhiteSpace(titleContains) ? name : titleContains;
+                
 
                 genreNames = genreNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();
                 personNames = personNames?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList() ?? new List<string>();

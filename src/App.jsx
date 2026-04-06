@@ -1,6 +1,6 @@
 import './App.css'; 
-import { Routes, Route, NavLink, useNavigate, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Routes, Route, NavLink, Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
 import { FaSearch } from 'react-icons/fa';
 import Footer from "./components/Footer";
 import ProfileMenu from "./components/ProfileMenu"; 
@@ -15,36 +15,13 @@ import LoginSignup from './assets/pages/LoginSignup';
 import MovieDetails from './assets/pages/MovieDetails';
 import Filters from './assets/pages/Filters';
 
-import API_URL from './config'; // Make sure this points to your new backend
+import { MovieProvider } from './context/MovieContext'; // Use the context provider
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token"); 
-
-  // Fetch movies from new endpoint
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("http://localhost:5002/movies?limit=100"); // Update endpoint if needed
-        if (!res.ok) throw new Error("Server error");
-        const data = await res.json();
-        setMovies(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMovies();
-  }, []);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
@@ -53,35 +30,17 @@ export default function App() {
   };
 
   return (
-    <>
+    <MovieProvider>
       {/* NAVBAR */}
       <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
-
-        <h1 className="text-2xl font-bold text-pink-500">
-          FindMyFlick
-        </h1>
+        <h1 className="text-2xl font-bold text-pink-500">FindMyFlick</h1>
 
         <div className="flex gap-6 items-center flex-wrap">
-
-          <NavLink to="/" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Home
-          </NavLink>
-
-          <NavLink to="/discover" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Discover
-          </NavLink>
-
-          <NavLink to="/filters" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Advanced Search
-          </NavLink>
-
-          <NavLink to="/genres" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            Genres
-          </NavLink>
-
-          <NavLink to="/about" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
-            About
-          </NavLink>
+          <NavLink to="/" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>Home</NavLink>
+          <NavLink to="/discover" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>Discover</NavLink>
+          <NavLink to="/filters" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>Advanced Search</NavLink>
+          <NavLink to="/genres" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>Genres</NavLink>
+          <NavLink to="/about" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>About</NavLink>
 
           {/* SEARCH BAR */}
           <div className="flex gap-2 items-center">
@@ -93,7 +52,6 @@ export default function App() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="p-2 rounded-md text-black text-sm"
             />
-
             <button
               onClick={handleSearch}
               className="btn-neon disco-glow px-3 py-2 rounded-md flex items-center justify-center"
@@ -117,19 +75,18 @@ export default function App() {
           ) : (
             <ProfileMenu />
           )}
-
         </div>
       </nav>
 
       {/* ROUTES */}
       <Routes>
-        <Route path="/" element={<Home movies={movies} loading={loading} error={error} />} />
-        <Route path="/discover" element={<Discover movies={movies} loading={loading} error={error} />} />
-        <Route path="/filters" element={<Filters movies={movies} />} />
-        <Route path="/genres" element={<Genres movies={movies} loading={loading} error={error} />} />
-        <Route path="/about" element={<About movies={movies} loading={loading} error={error} />} />
-        <Route path="/profile" element={<Profile movies={movies} loading={loading} error={error} />} />
-        <Route path="/search" element={<Search movies={movies} loading={loading} error={error} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/filters" element={<Filters />} />
+        <Route path="/genres" element={<Genres />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/movie/:id" element={<MovieDetails />} />
         <Route path="/auth" element={<LoginSignup />} />
         <Route path="/terms" element={<About />} />
@@ -138,6 +95,6 @@ export default function App() {
       </Routes>
 
       <Footer />
-    </>
+    </MovieProvider>
   );
 }

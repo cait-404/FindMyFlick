@@ -1,64 +1,122 @@
 import { useState, useEffect, useCallback } from "react";
  
-const BATCH_SIZE = 20;
+const PAGE_SIZE = 20; // how many to show at a time
  
 export function useInfiniteMovies(genreFilter = "") {
-  const [movies, setMovies] = useState([]);
+
+  const [allMovies, setAllMovies] = useState([]); // full list from API
+
+  const [displayed, setDisplayed] = useState([]);  // what's shown on screen
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
-  const [skip, setSkip] = useState(0);
+
   const [hasMore, setHasMore] = useState(true);
+
+  const [page, setPage] = useState(1);
  
-  // Reset everything when genre filter changes
+  // Fetch all movies once (or when genre changes)
+
   useEffect(() => {
-    setMovies([]);
-    setSkip(0);
+
+    setAllMovies([]);
+
+    setDisplayed([]);
+
+    setPage(1);
+
     setHasMore(true);
+
+    setError(null);
+ 
+    const fetchAll = async () => {
+
+      setLoading(true);
+
+      try {
+
+        const res = await fetch("https://localhost:5002/api/MovieSearch", {
+
+          method: "POST",
+
+          headers: { "Content-Type": "application/json" },
+
+          body: JSON.stringify({
+
+            take: 500,
+
+            minMatches: 1,
+
+            enableApiFallback: false,
+
+            alwaysAddFromApis: false,
+
+            genreNames: genreFilter ? [genreFilter] : [],
+
+            keywordNames: [],
+
+            personNames: [],
+
+            personRoles: [],
+
+            streamingProviderNames: []
+
+          }),
+
+        });
+ 
+        if (!res.ok) throw new Error("Failed to fetch movies");
+
+        const data = await res.json();
+
+        const all = data.results || [];
+ 
+        setAllMovies(all);
+
+        // Show first page immediately
+
+        setDisplayed(all.slice(0, PAGE_SIZE));
+
+        setHasMore(all.length > PAGE_SIZE);
+ 
+      } catch (err) {
+
+        setError(err.message);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+ 
+    fetchAll();
+
   }, [genreFilter]);
  
-  const fetchBatch = useCallback(async (currentSkip, genre) => {
-    setLoading(true);
-    try {
-      const res = await fetch("http://localhost:5002/api/MovieSearch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          take: BATCH_SIZE,
-          skip: currentSkip,
-          minMatches: 1,
-          enableApiFallback: false,
-          alwaysAddFromApis: false,
-          genreNames: genre ? [genre] : [],
-          keywordNames: [],
-          personNames: [],
-          personRoles: [],
-          streamingProviderNames: []
-        }),
-      });
- 
-      if (!res.ok) throw new Error("Failed to fetch movies");
-      const data = await res.json();
-      const batch = data.results || data;
- 
-      setMovies((prev) => [...prev, ...batch]);
-      setSkip(currentSkip + BATCH_SIZE);
-      if (batch.length < BATCH_SIZE) setHasMore(false);
- 
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
- 
-  // Load first batch on mount or when genre changes
-  useEffect(() => {
-    fetchBatch(0, genreFilter);
-  }, [genreFilter]);
- 
+  // Load next page from already-fetched data — no extra API call
+
   const loadMore = useCallback(() => {
-    if (!loading && hasMore) fetchBatch(skip, genreFilter);
-  }, [loading, hasMore, skip, genreFilter, fetchBatch]);
+
+    setPage((prev) => {
+
+      const nextPage = prev + 1;
+
+      const nextSlice = allMovies.slice(0, nextPage * PAGE_SIZE);
+
+      setDisplayed(nextSlice);
+
+      setHasMore(nextSlice.length < allMovies.length);
+
+      return nextPage;
+
+    });
+
+  }, [allMovies]);
  
-  return { movies, loading, error, hasMore, loadMore };
+  return { movies: displayed, loading, error, hasMore, loadMore };
+
 }
+ 

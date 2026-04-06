@@ -12,11 +12,11 @@ namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
     [Route("api/movies/getby")]
-    public class GetMoviesByControllerr : ControllerBase
+    public class GetMoviesBy : ControllerBase
     {
         private readonly IDbContextFactory<FindmyflickContext> _dbFactory;
 
-        public GetMoviesByControllerr(IDbContextFactory<FindmyflickContext> dbFactory)
+        public GetMoviesBy(IDbContextFactory<FindmyflickContext> dbFactory)
         {
             _dbFactory = dbFactory;
         }

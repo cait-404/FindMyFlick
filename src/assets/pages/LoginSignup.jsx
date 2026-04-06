@@ -22,7 +22,7 @@ export default function LoginSignup() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const API = "http://localhost:5002";
+  const API = "https://localhost:5002";
 
   const handleChange = (e) => {
     setFormData({
@@ -129,7 +129,7 @@ export default function LoginSignup() {
   }, 1000);
 
 } else {
-  // 🔥 LOGIN AFTER REGISTER
+  //  LOGIN AFTER REGISTER
   const loginRes = await fetch(`${API}/api/Account/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -144,7 +144,7 @@ export default function LoginSignup() {
 
   localStorage.setItem("token", token);
 
-  // 🔥 THIS IS WHAT YOU JUST TESTED (AUTO RUN IT)
+  //  THIS IS WHAT YOU JUST TESTED (AUTO RUN IT)
   await fetch(`${API}/api/Profile`, {
     method: "PUT",
     headers: {
