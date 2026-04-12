@@ -5,6 +5,8 @@ import { FaSearch } from 'react-icons/fa';
 import Footer from "./components/Footer";
 import ProfileMenu from "./components/ProfileMenu"; 
 
+
+
 import Home from './assets/pages/Home';
 import Discover from './assets/pages/Discover';
 import Genres from './assets/pages/Genres';
@@ -16,6 +18,9 @@ import MovieDetails from './assets/pages/MovieDetails';
 import Filters from './assets/pages/Filters';
 import GenreBrowse from './assets/pages/GenreBrowse';
 import CollectionBrowse from "./assets/pages/CollectionBrowse.jsx";
+import TechStack from './assets/pages/TechStack';
+import Roadmap from './assets/pages/Roadmap';
+import Contact from './assets/pages/Contact';
 
 import API_URL from './config'; // Make sure this points to your new backend
 
@@ -60,7 +65,7 @@ export default function App() {
       {/* NAVBAR */}
       <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
 
-        <Link to="/" className="text-2xl font-bold text-pink-500">
+        <Link to="/" className="text-2xl font-bold text-white-500">
           FindMyFlick
         </Link>
 
@@ -140,6 +145,10 @@ export default function App() {
         <Route path="/terms" element={<About />} />
         <Route path="/privacy" element={<About />} />
         <Route path="/project-info" element={<About />} />
+        
+    <Route path="/tech-stack" element={<TechStack />} />
+<Route path="/roadmap" element={<Roadmap />} />
+<Route path="/contact" element={<Contact />} />
       </Routes>
 
       <Footer />

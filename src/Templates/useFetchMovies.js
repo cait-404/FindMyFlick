@@ -11,7 +11,9 @@ export default function useFetchMovies(endpoint) {
     if (!endpoint) return;
 
     setLoading(true);
-    fetch(`http://localhost:5135/api/${endpoint}`)
+
+    // Use API_URL from config.js
+    fetch(`${API_URL}/${endpoint}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch data");
         return res.json();

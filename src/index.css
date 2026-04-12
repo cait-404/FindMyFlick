@@ -16,20 +16,17 @@ a {
 
 /* -------------------- Neon Text -------------------- */
 .neon-text {
+  color: white;
   text-shadow:
-    0 0 5px #ff39e1,
-    0 0 10px #ff39e1,
-    0 0 20px #ff39e1,
-    0 0 40px #ff39e1;
-  transition: text-shadow 0.3s ease;
+    0 0 2px #ff52d9,
+    0 0 4px rgba(255, 82, 217, 0.4);
+  transition: text-shadow 0.2s ease;
 }
 
 .neon-text:hover {
   text-shadow:
-    0 0 8px #ff52d9,
-    0 0 16px #ff52d9,
-    0 0 25px #ff52d9,
-    0 0 50px #ff52d9;
+    0 0 6px #ff52d9,
+    0 0 12px rgba(255, 82, 217, 0.6);
 }
 
 /* -------------------- Disco Glow -------------------- */

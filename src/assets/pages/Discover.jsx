@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import API_URL from "../../config.js";
 
-// Pagination, 0-9 filter, and article-stripping sort added with Claude (April 2026)
-
 const PAGE_SIZE = 24;
 
 export default function Discover() {
@@ -13,18 +11,15 @@ export default function Discover() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [searchParams] = useSearchParams();
-  // Default to "A" instead of "All"
   const [selectedLetter, setSelectedLetter] = useState("A");
 
   const genre = searchParams.get("genre");
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  // When a genre is active, apply letter filter client-side on fetched results
   const filteredMovies = genre && selectedLetter
     ? movies.filter(m => m.title?.toUpperCase().startsWith(selectedLetter))
     : movies;
 
-  // Strip leading articles (A, An, The) for sorting — matches backend behavior
   const stripArticle = (title) => {
     if (!title) return "";
     if (title.match(/^the /i)) return title.substring(4).trimStart();
@@ -37,19 +32,16 @@ export default function Discover() {
     stripArticle(a.title || "").localeCompare(stripArticle(b.title || ""))
   );
 
-  // Pagination
   const totalPages = Math.ceil(sortedMovies.length / PAGE_SIZE);
   const paginatedMovies = sortedMovies.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
 
-  // Reset to page 1 when letter or genre changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedLetter, genre]);
 
-  // Fetch movies from API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -58,10 +50,8 @@ export default function Discover() {
 
         let url;
         if (genre) {
-          // Fetch all movies for this genre; letter filtering is applied client-side
           url = `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genre)}?limit=500`;
         } else if (selectedLetter === "0-9") {
-          // Fetch movies starting with numbers or symbols
           url = `${API_URL}/api/movies/getby/non-alpha?limit=500`;
         } else {
           url = `${API_URL}/api/movies/getby/starts-with/${encodeURIComponent(selectedLetter)}?limit=500`;
@@ -84,83 +74,117 @@ export default function Discover() {
     };
 
     fetchMovies();
-  // ✅ FIX: Proper dependency array so letter filter actually triggers a re-fetch
   }, [genre, selectedLetter]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-4">Discover Movies</h1>
+    <div className="min-h-screen p-4 sm:p-6 md:p-8 text-white bg-gradient-to-b from-black via-[#12001a] to-black overflow-x-hidden">
+
+      {/* Header */}
+      <div className="max-w-6xl mx-auto mb-8">
+        <h1 className="text-4xl font-extrabold neon-text capitalize">
+          {genre ? `${genre} Movies` : "Discover Movies"}
+        </h1>
+        <p className="opacity-80 mt-2">
+          {genre
+            ? `Browsing movies in the ${genre} genre`
+            : "Explore movies from every genre"}
+        </p>
+      </div>
 
       {/* Alphabet filter buttons */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {alphabet.map((letter) => (
+      <div className="max-w-6xl mx-auto mb-8 overflow-x-auto px-4">
+        <div className="flex justify-start sm:justify-center items-center gap-2 whitespace-nowrap py-2 px-2">
+          {alphabet.map((letter) => (
+            <button
+              key={letter}
+              onClick={() => setSelectedLetter(letter)}
+              className={`w-8 h-8 sm:w-9 sm:h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+                ${selectedLetter === letter
+                  ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]"
+                  : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"
+                }`}
+            >
+              {letter}
+            </button>
+          ))}
           <button
-            key={letter}
-            className={`px-3 py-1 rounded ${
-              selectedLetter === letter
-                ? "bg-purple-700 text-white"
-                : "bg-gray-200 text-gray-800"
-            }`}
-            onClick={() => setSelectedLetter(letter)}
+            onClick={() => setSelectedLetter("0-9")}
+            className={`w-12 h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+              ${selectedLetter === "0-9"
+                ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]"
+                : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"
+              }`}
           >
-            {letter}
+            0-9
           </button>
-        ))}
-        {/* 0-9 button at the end for numbers and symbols */}
-        <button
-          className={`px-3 py-1 rounded ${
-            selectedLetter === "0-9"
-              ? "bg-purple-700 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-          onClick={() => setSelectedLetter("0-9")}
-        >
-          0-9
-        </button>
+        </div>
       </div>
 
       {/* Loading / Error */}
-      {loading && <p>Loading movies...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {loading && <p className="text-center mt-20 opacity-70">Loading movies...</p>}
+      {error && <p className="text-center mt-20 text-red-400">{error}</p>}
 
-      {/* Movie count and page info */}
+      {/* Movie count */}
       {!loading && !error && (
-        <p className="text-gray-400 text-sm mb-3">
+        <p className="text-gray-400 text-sm mb-3 max-w-6xl mx-auto text-center">
           Showing {paginatedMovies.length} of {sortedMovies.length} movies
           {totalPages > 1 && ` — Page ${currentPage} of ${totalPages}`}
         </p>
       )}
 
-      {/* Cards */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-3">
-        {paginatedMovies.map((movie) => (
-          <Link
-            key={movie.imdbId || movie.id}
-            to={`/movie/${movie.imdbId || movie.id}`}
-            className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
-          >
-            {movie.poster_url || movie.posterUrl ? (
-              <img
-                src={movie.poster_url || movie.posterUrl}
-                alt={movie.title}
-                className="w-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
+      {/* Movie cards */}
+      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        {paginatedMovies.map((movie) => {
+          const poster = movie.poster_url || movie.posterUrl;
+          const year = movie.release_year || movie.releaseYear;
+          const id = movie.id || movie.imdbId;
+
+          return id ? (
+            <Link
+              key={id}
+              to={`/movie/${id}`}
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-800/80 border border-gray-700 shadow-lg transform transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+            >
+              {/* Poster */}
+<div className="w-full h-79.9 bg-black flex items-center justify-center overflow-hidden">
+  {poster ? (
+    <img
+      src={poster}
+      alt={movie.title}
+      className="max-h-full max-w-full object-contain"
+    />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center text-gray-400">
+      No Image
+    </div>
+  )}
+</div>
+
+              {/* Title & Year Box */}
+        <div className="p-3 flex flex-col h-24">
+      <h3 className="font-bold text-sm neon-text break-words text-center flex-grow">
+      {movie.title}
+     </h3>
+     <p className="text-xs opacity-70 text-center mt-2">
+    {year || "N/A"}
+  </p>
+</div>
+            </Link>
+          ) : (
+            <div
+              key={movie.title}
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-700/60 border border-gray-600"
+            >
+              <div className="relative w-full h-64 sm:h-72 md:h-80 bg-black flex items-center justify-center overflow-hidden">
                 No Image
               </div>
-            )}
-            <div className="p-2 flex flex-col gap-1">
-              {/* ✅ FIX: No truncation, title wraps fully */}
-              <h2 className="font-semibold text-sm text-white leading-snug">
-                {movie.title}
-              </h2>
-              <p className="text-gray-400 text-xs">
-                {movie.releaseYear || movie.release_year}
-              </p>
+              <div className="p-3">
+                <h3 className="font-bold text-lg break-words">{movie.title}</h3>
+                <p className="text-sm opacity-70 mt-1">{year || "N/A"}</p>
+              </div>
             </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
       {/* Pagination controls */}
@@ -169,7 +193,7 @@ export default function Discover() {
           <button
             onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === 1}
-            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
           >
             ← Previous
           </button>
@@ -181,7 +205,7 @@ export default function Discover() {
           <button
             onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
           >
             Next →
           </button>

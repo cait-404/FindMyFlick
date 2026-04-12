@@ -94,11 +94,6 @@ export default function Footer() {
   </NavLink>
 </li>
 
-<li>
-  <NavLink to="/tech" end className={({ isActive }) => isActive ? "footer-link active" : "footer-link"}>
-    Tech Stack
-  </NavLink>
-</li>
 
 <li>
   <NavLink to="/roadmap" end className={({ isActive }) => isActive ? "footer-link active" : "footer-link"}>

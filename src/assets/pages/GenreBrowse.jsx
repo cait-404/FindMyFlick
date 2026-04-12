@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { useParams, Link } from "react-router-dom";
 import API_URL from "../../config.js";
-
-// Genre Browse page — dedicated page for browsing movies within a single genre
-// Created with Claude (April 2026)
 
 const PAGE_SIZE = 24;
 
@@ -17,7 +14,6 @@ export default function GenreBrowse() {
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  // Strip leading articles (A, An, The) for sorting — matches backend behavior
   const stripArticle = (title) => {
     if (!title) return "";
     if (title.match(/^the /i)) return title.substring(4).trimStart();
@@ -26,14 +22,15 @@ export default function GenreBrowse() {
     return title;
   };
 
-  // Fetch all movies for this genre from the backend
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          `${API_URL}/api/movies/getby/genre/${encodeURIComponent(genreName)}?limit=2000`
+          `${API_URL}/api/movies/getby/genre/${encodeURIComponent(
+            genreName
+          )}?limit=2000`
         );
         if (!res.ok) throw new Error("Failed to fetch movies");
         const data = await res.json();
@@ -48,14 +45,12 @@ export default function GenreBrowse() {
     fetchMovies();
   }, [genreName]);
 
-  // Reset to page 1 when letter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedLetter]);
 
-  // Filter by selected letter (after stripping articles)
   const filteredMovies = selectedLetter
-    ? movies.filter(m =>
+    ? movies.filter((m) =>
         stripArticle(m.title || "").toUpperCase().startsWith(selectedLetter)
       )
     : movies;
@@ -64,7 +59,6 @@ export default function GenreBrowse() {
     stripArticle(a.title || "").localeCompare(stripArticle(b.title || ""))
   );
 
-  // Pagination
   const totalPages = Math.ceil(sortedMovies.length / PAGE_SIZE);
   const paginatedMovies = sortedMovies.slice(
     (currentPage - 1) * PAGE_SIZE,
@@ -76,16 +70,17 @@ export default function GenreBrowse() {
     : "";
 
   return (
-    <div className="p-4 text-white">
+    <div className="min-h-screen p-6 text-white bg-gradient-to-b from-black via-[#12001a] to-black">
+
       {/* Header */}
-      <div className="mb-6">
+      <div className="max-w-6xl mx-auto mb-6">
         <Link
           to="/genres"
           className="text-pink-400 hover:text-pink-300 text-sm mb-2 inline-block"
         >
           ← Back to Genres
         </Link>
-        <h1 className="text-3xl font-bold">{displayName} Movies</h1>
+        <h1 className="text-3xl md:text-4xl font-bold neon-text">{displayName} Movies</h1>
         {!loading && !error && (
           <p className="text-gray-400 text-sm mt-1">
             {sortedMovies.length} movies available
@@ -93,83 +88,88 @@ export default function GenreBrowse() {
         )}
       </div>
 
-      {/* Alphabet filter buttons */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          className={`px-3 py-1 rounded ${
-            selectedLetter === ""
-              ? "bg-purple-700 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-          onClick={() => setSelectedLetter("")}
-        >
-          All
-        </button>
-        {alphabet.map((letter) => (
+      {/* Alphabet Filter */}
+      <div className="max-w-6xl mx-auto mb-6 overflow-x-auto px-2">
+        <div className="flex justify-center gap-2 whitespace-nowrap py-2">
           <button
-            key={letter}
-            className={`px-3 py-1 rounded ${
-              selectedLetter === letter
-                ? "bg-purple-700 text-white"
-                : "bg-gray-200 text-gray-800"
-            }`}
-            onClick={() => setSelectedLetter(letter)}
+            className={`w-12 h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+              ${selectedLetter === "" ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]" : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"}`}
+            onClick={() => setSelectedLetter("")}
           >
-            {letter}
+            All
           </button>
-        ))}
+          {alphabet.map((letter) => (
+            <button
+              key={letter}
+              className={`w-9 h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+                ${selectedLetter === letter ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]" : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"}`}
+              onClick={() => setSelectedLetter(letter)}
+            >
+              {letter}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Loading / Error */}
-      {loading && <p className="text-gray-400">Loading movies...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {loading && <p className="text-center mt-20 opacity-70">Loading movies...</p>}
+      {error && <p className="text-center mt-20 text-red-400">{error}</p>}
 
-      {/* Movie count and page info */}
+      {/* Movie Count */}
       {!loading && !error && (
-        <p className="text-gray-400 text-sm mb-3">
+        <p className="text-gray-400 text-sm mb-3 max-w-6xl mx-auto text-center">
           Showing {paginatedMovies.length} of {sortedMovies.length} movies
           {totalPages > 1 && ` — Page ${currentPage} of ${totalPages}`}
         </p>
       )}
 
-      {/* Cards */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-3">
-        {paginatedMovies.map((movie) => (
-          <Link
-            key={movie.imdbId || movie.id}
-            to={`/movie/${movie.imdbId || movie.id}`}
-            className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
-          >
-            {movie.poster_url || movie.posterUrl ? (
-              <img
-                src={movie.poster_url || movie.posterUrl}
-                alt={movie.title}
-                className="w-full object-contain"
-              />
-            ) : (
-              <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
-                No Image
+      {/* Movie Cards */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        {paginatedMovies.map((movie) => {
+          const poster = movie.poster_url || movie.posterUrl;
+          const year = movie.release_year || movie.releaseYear;
+          const id = movie.id || movie.imdbId;
+
+          return id ? (
+            <Link
+              key={id}
+              to={`/movie/${id}`}
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-900/70 border border-gray-700 shadow-lg transform transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+            >
+              {/* Poster */}
+              <div className="relative w-full bg-black flex items-center justify-center">
+                {poster ? (
+                  <img
+                    src={poster}
+                    alt={movie.title}
+                    className="w-full max-h-96 object-contain"
+                  />
+                ) : (
+                  <div className="w-full max-h-96 flex items-center justify-center text-gray-400">
+                    No Image
+                  </div>
+                )}
               </div>
-            )}
-            <div className="p-2 flex flex-col gap-1">
-              <h2 className="font-semibold text-sm text-white leading-snug">
-                {movie.title}
-              </h2>
-              <p className="text-gray-400 text-xs">
-                {movie.releaseYear || movie.release_year}
-              </p>
-            </div>
-          </Link>
-        ))}
+
+              {/* Title & Year Box */}
+              <div className="p-3 flex flex-col h-28">
+                <h3 className="font-bold text-sm neon-text break-words text-center flex-grow">
+                  {movie.title}
+                </h3>
+                <p className="text-xs opacity-70 text-center mt-2">{year || "N/A"}</p>
+              </div>
+            </Link>
+          ) : null;
+        })}
       </div>
 
-      {/* Pagination controls */}
+      {/* Pagination */}
       {!loading && !error && totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-8">
           <button
             onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === 1}
-            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
           >
             ← Previous
           </button>
@@ -179,7 +179,7 @@ export default function GenreBrowse() {
           <button
             onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded bg-purple-700 text-white disabled:opacity-40 hover:bg-purple-600 transition"
+            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
           >
             Next →
           </button>

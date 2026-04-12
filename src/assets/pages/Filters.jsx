@@ -576,57 +576,83 @@ export default function Filters() {
 
       </div>
 
-      {/* RESULTS */}
-      {searched && (
-        <>
-          <h2 className="text-2xl font-bold mb-6 text-center text-pink-300">
-            Search Results
-          </h2>
+ {/* RESULTS */}
+{searched && (
+  <>
+    <h2 className="text-2xl font-bold mb-6 text-center text-pink-300">
+      Search Results
+    </h2>
 
-          {loading ? (
-            <p className="text-center text-gray-300">Searching...</p>
-          ) : error ? (
-            <p className="text-center text-red-400">{error}</p>
-          ) : movies.length === 0 ? (
-            <p className="text-center text-gray-300">No movies match your filters. Try broadening your search.</p>
-          ) : (
-            <>
-              <p className="text-center text-gray-400 text-sm mb-6">{movies.length} movies found</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {movies.map((movie, index) => (
-                  <Link
-                    key={index}
-                    to={`/movie/${movie.imdbId || movie.id}`}
-                    className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
-                  >
-                    {movie.posterUrl || movie.poster_url || movie.poster ? (
-                      <img
-                        src={movie.posterUrl || movie.poster_url || movie.poster}
-                        alt={movie.title || movie.name}
-                        className="w-full object-contain"
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
-                        No Image
-                      </div>
-                    )}
-                    <div className="p-2 flex flex-col gap-1">
-                      <h3 className="font-semibold text-sm text-white leading-snug">{movie.title || movie.name}</h3>
-                      <p className="text-gray-400 text-xs">{movie.releaseYear || movie.release_year || movie.year || "N/A"}</p>
-                      {movie.mpaaRating && (
-                        <span className="text-xs border border-gray-500 px-1.5 py-0.5 rounded text-gray-400 w-fit">
-                          {movie.mpaaRating}
-                        </span>
-                      )}
+    {loading ? (
+      <p className="text-center text-gray-300">Searching...</p>
+    ) : error ? (
+      <p className="text-center text-red-400">{error}</p>
+    ) : movies.length === 0 ? (
+      <p className="text-center text-gray-300">
+        No movies match your filters. Try broadening your search.
+      </p>
+    ) : (
+      <>
+        <p className="text-center text-gray-400 text-sm mb-6">
+          {movies.length} movies found
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {movies.map((movie, index) => {
+            const poster =
+              movie.posterUrl || movie.poster_url || movie.poster;
+            const title = movie.title || movie.name;
+            const year =
+              movie.releaseYear ||
+              movie.release_year ||
+              movie.year;
+            const id = movie.imdbId || movie.id;
+
+            return (
+              <Link
+                key={id || index}
+                to={`/movie/${id}`}
+                className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
+              >
+                {/* Poster */}
+                <div className="w-full h-64 bg-black flex items-center justify-center">
+                  {poster ? (
+                    <img
+                      src={poster}
+                      alt={title}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                      No Image
                     </div>
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-        </>
-      )}
+                  )}
+                </div>
 
-    </div>
-  );
+                {/* Title + Year */}
+                <div className="p-2 flex flex-col h-28">
+                  <h3 className="font-semibold text-sm text-white text-center break-words line-clamp-2">
+                    {title}
+                  </h3>
+
+                  <p className="text-gray-400 text-xs text-center mt-auto">
+                    {year || "N/A"}
+                  </p>
+
+                  {movie.mpaaRating && (
+                    <span className="text-[10px] border border-gray-500 px-1.5 py-0.5 rounded text-gray-400 w-fit mx-auto mt-1">
+                      {movie.mpaaRating}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </>
+    )}
+  </>
+)}
+</div>
+);
 }

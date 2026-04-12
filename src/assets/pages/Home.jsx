@@ -16,29 +16,33 @@ function MovieGrid({ movies, title }) {
       {movies.length === 0 ? (
         <p className="text-gray-400">No movies found.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           {movies.map((movie) => (
             <Link
               key={movie.imdbId || movie.id}
               to={`/movie/${movie.imdbId || movie.id}`}
-              className="flex flex-col rounded-xl overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-300 shadow-lg"
+              className="flex flex-col rounded-xl overflow-hidden bg-black/70 shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
             >
-              {movie.poster_url || movie.posterUrl ? (
-                <img
-                  src={movie.poster_url || movie.posterUrl}
-                  alt={movie.title}
-                  className="w-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
-                  No Image
-                </div>
-              )}
-              <div className="p-2 flex flex-col gap-1">
-                <h4 className="font-semibold text-sm text-white leading-snug">
-                  {movie.title}
+              <div className="w-full h-64 bg-black flex items-center justify-center">
+                {movie.poster_url || movie.posterUrl ? (
+                  <img
+                    src={movie.poster_url || movie.posterUrl}
+                    alt={movie.title}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div className="p-3 flex flex-col h-28">
+                <h4 className="font-bold text-sm neon-text break-words text-center flex-grow">
+                   {movie.title}
                 </h4>
-                <p className="text-sm text-gray-400 mt-1">{movie.release_year || movie.releaseYear}</p>
+                <p className="text-xs opacity-70 text-center mt-2">
+                  {movie.release_year || movie.releaseYear || "N/A"}
+                </p>
               </div>
             </Link>
           ))}
