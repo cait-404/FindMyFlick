@@ -123,11 +123,16 @@ export default function MovieDetails() {
   const handleVote = async (tagId, vote) => {
     setVoteLoading(prev => ({ ...prev, [tagId]: true }));
     try {
-      await fetch(`${API_URL}/api/movies/${id}/plot-tags/${tagId}/vote`, {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/movies/${id}/plot-tags/${tagId}/vote`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { "Authorization": `Bearer ${token}` })
+        },
         body: JSON.stringify({ vote })
       });
+      if (!res.ok) throw new Error("Vote failed");
       setVotes(prev => ({ ...prev, [tagId]: vote }));
     } catch (err) {
       console.error("Vote failed:", err);

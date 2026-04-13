@@ -9,7 +9,7 @@ export default function ProfileMenu() {
 
   const API = API_URL;
 
-  // ETCH USER DATA
+  // FETCH USER DATA
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
