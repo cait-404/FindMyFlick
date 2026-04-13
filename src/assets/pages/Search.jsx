@@ -5,7 +5,6 @@ import API_URL from "../../config.js";
 function Search() {
   const location = useLocation();
   const query = new URLSearchParams(location.search).get("query");
-  const navigate = useNavigate();
 
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
