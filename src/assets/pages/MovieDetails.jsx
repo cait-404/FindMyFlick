@@ -146,24 +146,32 @@ export default function MovieDetails() {
     setAddTagMessage("");
 
     try {
-      // Find the tag ID from allPlotTags data
-      const res = await fetch(`${API_URL}/api/movies/plot-tags/getbyname/${encodeURIComponent(tagName)}`);
-      if (!res.ok) throw new Error("Tag not found");
-      const tagData = await res.json();
-      const tagId = tagData.plotTagId;
-
-      // Vote upvote to "add" the tag
+      // Check login first
       const token = localStorage.getItem("token");
       if (!token) {
         setAddTagMessage("Please log in to suggest plot tags.");
         return;
       }
+
+      // Find the tag ID from allPlotTags data
+      const res = await fetch(`${API_URL}/api/movies/plot-tags/getbyname/${encodeURIComponent(tagName)}`);
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Tag lookup failed (${res.status}): ${errText}`);
+      }
+      const tagData = await res.json();
+      const tagId = tagData.plotTagId;
+
+      // Vote upvote to "add" the tag
       const voteRes = await fetch(`${API_URL}/api/movies/${id}/plot-tags/${tagId}/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ vote: 1 })
       });
-      if (!voteRes.ok) throw new Error("Vote failed");
+      if (!voteRes.ok) {
+        const voteErr = await voteRes.text();
+        throw new Error(`Vote failed (${voteRes.status}): ${voteErr}`);
+      }
 
       // Refresh plot tags
       const refreshRes = await fetch(`${API_URL}/api/Movies/${id}/plot-tags`);
@@ -173,7 +181,8 @@ export default function MovieDetails() {
       }
       setAddTagMessage(`"${tagName}" added successfully!`);
     } catch (err) {
-      setAddTagMessage("Could not add tag. Please try again.");
+      console.error("Plot tag error:", err);
+      setAddTagMessage(err.message || "Could not add tag. Please try again.");
     } finally {
       setAddingTag(false);
     }

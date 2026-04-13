@@ -882,7 +882,12 @@ namespace FindMyFlickWebsite.Server.Controllers
                 q = q.Where(m => !excludeIds.Contains(m.ImdbId));
 
             if (!string.IsNullOrWhiteSpace(req.TitleContains))
-                q = q.Where(m => EF.Functions.ILike(m.Title!, $"%{req.TitleContains.Trim()}%"));
+            {
+                var term = req.TitleContains.Trim();
+                q = q.Where(m =>
+                    EF.Functions.ILike(m.Title!, $"%{term}%") ||
+                    EF.Functions.TrigramsAreSimilar(m.Title!, term));
+            }
 
             if (req.MpaaRatings.Count > 0)
                 q = q.Where(m => m.MpaaRating != null && req.MpaaRatings.Contains(m.MpaaRating.ToUpper()));
