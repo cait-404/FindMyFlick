@@ -69,11 +69,7 @@ export default function Roadmap() {
         <div className="space-y-4 text-gray-300">
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
-            Advanced filtering (multiple genres, include/exclude tags)
-          </div>
-
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
-            Personalized recommendations based on user behavior
+            Personalized recommendations based on user account behavior
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
@@ -85,7 +81,7 @@ export default function Roadmap() {
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
-            Mobile optimization and performance improvements
+            AI chatbot for quick and detailed searches
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-4">

@@ -166,9 +166,13 @@ export default function Filters() {
   const [includePlotTags, setIncludePlotTags] = useState([]);
   const [excludePlotTags, setExcludePlotTags] = useState([]);
 
-  const [movies, setMovies] = useState([]);
+  // Restore cached results on mount (so back-button preserves search)
+  const cached = sessionStorage.getItem("filtersCache");
+  const initial = cached ? JSON.parse(cached) : null;
+
+  const [movies, setMovies] = useState(initial?.movies || []);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [searched, setSearched] = useState(initial?.searched || false);
   const [error, setError] = useState(null);
 
   // Load genres
@@ -337,7 +341,9 @@ export default function Filters() {
         return;
       }
       
-      setMovies(data.results || []);
+      const results = data.results || [];
+      setMovies(results);
+      sessionStorage.setItem("filtersCache", JSON.stringify({ movies: results, searched: true }));
     } catch (err) {
       console.error("Search error:", err);
       setError("Search failed. Please try again.");
@@ -362,6 +368,7 @@ export default function Filters() {
     setMovies([]);
     setSearched(false);
     setError(null);
+    sessionStorage.removeItem("filtersCache");
   };
 
   const activeWarningCount = includeWarningIds.size + excludeWarningIds.size + includeCategoryIds.size + excludeCategoryIds.size;

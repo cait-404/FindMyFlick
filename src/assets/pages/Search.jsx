@@ -85,10 +85,10 @@ function Search() {
         <h2 className="text-4xl font-extrabold neon-text">Results for: {query}</h2>
       </div>
 
-      {loading && <p className="text-center mt-20 opacity-70">Loading movies...</p>}
-      {error && <p className="text-center mt-20 text-red-400">{error}</p>}
+      {loading && <p className="max-w-6xl mx-auto text-lg text-gray-300 mt-4">Loading movies...</p>}
+      {error && <p className="max-w-6xl mx-auto text-lg text-red-400 mt-4">{error}</p>}
       {!loading && movies.length === 0 && !error && (
-        <p className="text-center mt-20 text-gray-400">No results found for "{query}".</p>
+        <p className="max-w-6xl mx-auto text-lg text-gray-400 mt-4">No results found for "{query}".</p>
       )}
 
       <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">

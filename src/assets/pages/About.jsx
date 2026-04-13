@@ -40,12 +40,11 @@ export default function About() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${API_URL}/api/Movies?page=1`),
+      fetch(`${API_URL}/api/Movies/count`).then(res => res.json()),
       fetch(`${API_URL}/api/Genres`).then(res => res.json())
     ])
-      .then(async ([moviesRes, genres]) => {
-        const total = parseInt(moviesRes.headers.get("X-Total-Count") || "0", 10);
-        setMovieCount(total || null);
+      .then(([countData, genres]) => {
+        setMovieCount(countData.count || null);
         setGenreCount(genres.length);
         setStatus("Connected");
       })
