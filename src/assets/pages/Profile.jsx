@@ -120,22 +120,22 @@ fetch(`${API_URL}/api/Profile`, {
   }
 
   return (
-    <div className="p-6 text-white max-w-6xl mx-auto">
+    <div className="px-4 sm:px-6 py-6 text-white max-w-6xl mx-auto">
 
-      <div className="flex items-center gap-6 mb-10">
-        <div className="w-28 h-28 rounded-full bg-linear-to-br from-pink-500 to-purple-700 
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-8 sm:mb-10 text-center sm:text-left">
+        <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-linear-to-br from-pink-500 to-purple-700 
                         flex items-center justify-center text-4xl font-bold neon-text">
           {profile.username ? profile.username[0].toUpperCase() : "U"}
         </div>
 
         <div>
-          <h2 className="text-3xl font-bold neon-text">
+          <h2 className="text-xl sm:text-3xl font-bold neon-text">
             {profile.username || "Your Profile"}
           </h2>
         </div>
       </div>
 
-      <div className="bg-gray-900/80 rounded-xl p-6 shadow-xl">
+      <div className="bg-gray-900/80 rounded-xl p-4 sm:p-6 shadow-xl">
 
         {!editing ? (
           <>
@@ -148,13 +148,13 @@ fetch(`${API_URL}/api/Profile`, {
 
             <button
               onClick={() => setEditing(true)}
-              className="mt-6 px-6 py-2 rounded-full bg-pink-600 hover:bg-pink-500 neon-text"
+              className="mt-6 px-6 py-3 sm:py-2 rounded-full bg-pink-600 hover:bg-pink-500 neon-text w-full sm:w-auto"
             >
               Edit Profile
             </button>
           </>
         ) : (
-          <div className="grid gap-4 max-w-xl">
+          <div className="grid gap-4 w-full max-w-xl">
 
             <Textarea
               label="Bio"
@@ -168,12 +168,12 @@ fetch(`${API_URL}/api/Profile`, {
                 Favorite Genres
               </label>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 {["Action","Comedy","Drama","Horror","Sci-Fi","Romance"].map((g) => (
                   <button
                     key={g}
                     onClick={() => toggleGenre(g)}
-                    className={`px-3 py-1 rounded-full border ${
+                    className={`px-3 py-2 sm:py-1 rounded-full border ${
                       formData.favoriteGenres.includes(g)
                         ? "bg-pink-600 border-pink-500"
                         : "border-gray-600"
@@ -187,7 +187,7 @@ fetch(`${API_URL}/api/Profile`, {
 
             <button
               onClick={handleSave}
-              className="px-6 py-2 rounded-full bg-green-600"
+              className="px-6 py-3 sm:py-2 rounded-full bg-green-600 w-full sm:w-auto"
             >
               Save
             </button>
@@ -202,7 +202,7 @@ function InfoRow({ label, value }) {
   return (
     <div className="mb-4">
       <p className="text-sm text-gray-400">{label}</p>
-      <p className="text-lg">{value}</p>
+      <p className="text-sm sm:text-lg">{value}</p>
     </div>
   );
 }
@@ -211,7 +211,7 @@ function Textarea({ label, ...props }) {
   return (
     <div>
       <label className="block mb-1 text-sm font-semibold">{label}</label>
-      <textarea {...props} className="w-full p-2 rounded bg-black border border-gray-700" />
+      <textarea {...props} className="w-full p-3 sm:p-2 rounded bg-black border border-gray-700" />
     </div>
   );
 }

@@ -55,21 +55,21 @@ export default function About() {
   }, []);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto text-white">
+    <div className="px-4 sm:px-6 py-6 max-w-5xl mx-auto text-white">
 
       {/* Title */}
-      <h2 className="text-4xl font-bold neon-text mb-6">
+      <h2 className="text-3xl sm:text-4xl font-bold neon-text mb-6">
         About FindMyFlick
       </h2>
 
       {/* Description */}
-      <p className="text-lg mb-4 opacity-90">
+      <p className="text-base sm:text-lg mb-4 opacity-90">
         FindMyFlick is a movie discovery platform designed to help users explore,
         search, and discover movies with ease. From trending titles to browsing
         by genre, the goal is to simplify how users find something great to watch.
       </p>
 
-      <p className="text-lg mb-10 opacity-90">
+      <p className="text-base sm:text-lg mb-10 opacity-90">
         This application is built as a full-stack project, combining a modern
         React frontend with a backend API that delivers movie data and genres
         in real time.
@@ -81,10 +81,10 @@ export default function About() {
       {/* Meet the Team */}
       <h3 className="text-2xl font-semibold neon-text mb-4">Meet the Team</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-10">
         {team.map((member) => (
           <div key={member.name} className="bg-purple-900/40 p-4 rounded-xl shadow-lg text-center hover:scale-105 transition">
-            <img src={member.img} alt={member.name} className="w-48 h-48 object-cover mx-auto mb-4" />
+            <img src={member.img} alt={member.name} className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover mx-auto mb-4 rounded-full" />
             <h4 className="font-bold text-lg neon-text">{member.name}</h4>
             <p className="opacity-80 mb-2">{member.role}</p>
             <p className="text-sm opacity-90">{member.bio}</p>
@@ -99,7 +99,7 @@ export default function About() {
         Live Platform Stats
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-center mb-10">
 
         {/* Movies */}
         <div className="bg-purple-900/40 p-6 rounded-xl shadow-lg hover:scale-105 transition">

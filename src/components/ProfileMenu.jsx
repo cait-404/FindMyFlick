@@ -45,25 +45,25 @@ export default function ProfileMenu() {
     <div className="relative">
       <div
         onClick={() => setOpen(!open)}
-        className="w-10 h-10 rounded-full bg-linear-to-br from-pink-500 to-purple-700 
-                   flex items-center justify-center text-lg font-bold cursor-pointer"
+        className="w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-linear-to-br from-pink-500 to-purple-700 
+           flex items-center justify-center text-lg font-bold cursor-pointer active:scale-95 transition"
       >
         {/* ✅ FIXED HERE */}
         {user?.username ? user.username[0].toUpperCase() : "U"}
       </div>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-gray-900 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute right-0 mt-2 w-44 bg-gray-900 rounded-lg shadow-lg overflow-hidden z-50">
           <button
             onClick={() => navigate("/profile")}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-800"
+            className="block w-full text-left px-4 py-3 hover:bg-gray-800 active:bg-gray-700 transition"
           >
             Profile
           </button>
 
           <button
             onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 hover:bg-gray-800 text-red-400"
+            className="block w-full text-left px-4 py-3 hover:bg-gray-800 active:bg-gray-700 transition text-pink-400"
           >
             Logout
           </button>

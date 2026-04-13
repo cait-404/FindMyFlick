@@ -1,11 +1,11 @@
 // Roadmap.jsx
 export default function Roadmap() {
   return (
-    <div className="min-h-screen px-6 py-12 text-white max-w-5xl mx-auto">
+    <div className="min-h-screen px-4 sm:px-6 py-10 sm:py-12 text-white max-w-5xl mx-auto">
 
       {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-extrabold neon-text mb-4">
+      <div className="text-center mb-8 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl font-extrabold neon-text mb-4">
           Future Roadmap
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto">
@@ -20,9 +20,9 @@ export default function Roadmap() {
           Why FindMyFlick?
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
             <h3 className="font-semibold text-lg mb-2">🎯 No More Endless Scrolling</h3>
             <p className="text-gray-300 text-sm">
               Stop wasting time searching through hundreds of movies. FindMyFlick
@@ -30,7 +30,7 @@ export default function Roadmap() {
             </p>
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
             <h3 className="font-semibold text-lg mb-2">⚡ Built for Speed</h3>
             <p className="text-gray-300 text-sm">
               Browse by letter, genre, or filters without lag or clutter.
@@ -38,7 +38,7 @@ export default function Roadmap() {
             </p>
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
             <h3 className="font-semibold text-lg mb-2">🧠 Smarter Discovery</h3>
             <p className="text-gray-300 text-sm">
               Instead of generic recommendations, FindMyFlick focuses on what you
@@ -46,7 +46,7 @@ export default function Roadmap() {
             </p>
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-[0_0_20px_#ff52d9] transition">
             <h3 className="font-semibold text-lg mb-2">🎬 Made for Real Users</h3>
             <p className="text-gray-300 text-sm">
               This isn’t just another movie database. It’s built with real user
@@ -66,29 +66,29 @@ export default function Roadmap() {
           What’s Coming Next
         </h2>
 
-        <div className="space-y-4 text-gray-300">
+        <div className="space-y-3 sm:space-y-4 text-gray-300">
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Advanced filtering (multiple genres, include/exclude tags)
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Personalized recommendations based on user behavior
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Watchlist and favorites system
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Improved movie detail pages (cast, crew, streaming info)
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Mobile optimization and performance improvements
           </div>
 
-          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Social features (sharing, reviews, ratings)
           </div>
 

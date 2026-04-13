@@ -72,16 +72,16 @@ export default function Genres() {
   }
 
   return (
-    <div className="min-h-screen px-6 py-12 bg-linear-to-b from-black via-[#12001a] to-black text-white">
+    <div className="min-h-screen px-4 sm:px-6 py-8 sm:py-12 bg-linear-to-b from-black via-[#12001a] to-black text-white">
 
       {/* Header */}
-      <div className="max-w-6xl mx-auto mb-12 text-center relative">
+      <div className="max-w-6xl mx-auto mb-8 sm:mb-12 text-center relative">
 
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-wide">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold mb-4 tracking-wide">
           Explore Movies by Genre
         </h1>
 
-        <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
           Browse curated genres and discover films that match your mood.
           From epic adventures to heartwarming comedies, every story awaits.
         </p>
@@ -98,14 +98,14 @@ export default function Genres() {
       )}
 
       {/* Genre Cards */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
 
         {genres.map((genre, i) => (
           <button
             key={i}
             onClick={() => navigate(`/genre/${encodeURIComponent(genre.name)}`)}
             className={`
-              group relative rounded-2xl h-52 p-6 text-left
+              group relative rounded-2xl h-44 sm:h-52 p-4 sm:p-6 text-left
               bg-linear-to-br ${genreColors[genre.name] || "from-fuchsia-600/90 to-purple-900/90"}
               shadow-xl transition-transform duration-300
               hover:scale-105 hover:shadow-2xl hover:-translate-y-1
@@ -119,11 +119,11 @@ export default function Genres() {
             {/* Card Content */}
             <div className="relative z-10 flex flex-col justify-between h-full">
 
-              <h2 className="text-3xl font-bold capitalize tracking-wide transition-colors group-hover:text-pink-400">
+              <h2 className="text-xl sm:text-3xl font-bold capitalize tracking-wide transition-colors group-hover:text-pink-400">
                 {genre.name}
               </h2>
 
-              <p className="text-sm text-gray-200/80 mt-1 max-w-[90%]">
+              <p className="text-xs sm:text-sm text-gray-200/80 mt-1 max-w-[90%]">
                 {genreTaglines[genre.name] || "Discover amazing movies."}
               </p>
 
@@ -135,7 +135,7 @@ export default function Genres() {
                   </span>
                 )}
 
-                <FaChevronRight className="opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-pink-400" />
+                <FaChevronRight className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-hover:translate-x-1 transition-all duration-300 text-pink-400" />
 
               </div>
 
@@ -150,7 +150,7 @@ export default function Genres() {
       </div>
 
       {/* Footer Message */}
-      <div className="max-w-4xl mx-auto mt-20 text-center text-gray-400">
+      <div className="max-w-4xl mx-auto mt-12 sm:mt-20 text-center text-gray-400">
         <p>
           More genres, smarter filters, and personalized recommendations coming soon — stay tuned!
         </p>

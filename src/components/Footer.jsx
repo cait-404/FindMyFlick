@@ -13,7 +13,7 @@ export default function Footer() {
   <img
     src={fmy}
     alt="Find My Flick banner"
-    className="w-48 mb-3"
+    className="w-40 sm:w-48 mb-3"
   />
 
   <p className="opacity-80 text-sm">
@@ -111,15 +111,15 @@ export default function Footer() {
 
         </div>
 
-        <div className="border-t border-purple-900 pt-6 text-sm flex flex-col md:flex-row justify-between opacity-70">
+        <div className="border-t border-purple-900 pt-6 text-sm flex flex-col gap-4 md:flex-row md:items-center md:justify-between opacity-70">
 
           <p>
             FindMyFlick ©2026. Built for movie discovery and exploration.
           </p>
 
-        <div className="flex gap-4 mt-3 md:mt-0">
+       <div className="flex flex-wrap gap-4 mt-3 md:mt-0">
 
-  <div className="flex gap-4 mt-3 md:mt-0">
+ 
 
   <NavLink
     to="/terms"
@@ -147,7 +147,6 @@ export default function Footer() {
         </div>
 
       </div>
-</div>
     </footer>
   );
 }

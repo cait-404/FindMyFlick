@@ -89,10 +89,10 @@ export default function GenreBrowse() {
       </div>
 
       {/* Alphabet Filter */}
-      <div className="max-w-6xl mx-auto mb-6 overflow-x-auto px-2">
-        <div className="flex justify-center gap-2 whitespace-nowrap py-2">
+      <div className="flex justify-start md:justify-center gap-2 whitespace-nowrap py-3 overflow-x-auto px-2">
+        <div className="flex justify-center gap-2 whitespace-nowrap py-3">
           <button
-            className={`w-12 h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+            className={`w-14 h-10 md:w-12 md:h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition active:scale-95
               ${selectedLetter === "" ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]" : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"}`}
             onClick={() => setSelectedLetter("")}
           >
@@ -101,7 +101,7 @@ export default function GenreBrowse() {
           {alphabet.map((letter) => (
             <button
               key={letter}
-              className={`w-9 h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition
+              className={`w-10 h-10 md:w-9 md:h-9 rounded border border-pink-500 text-white font-semibold flex items-center justify-center transition active:scale-95
                 ${selectedLetter === letter ? "bg-pink-500/20 text-pink-400 shadow-[0_0_12px_#ff6ed0]" : "hover:text-pink-400 hover:bg-pink-500/10 hover:shadow-[0_0_12px_#ff6ed0]"}`}
               onClick={() => setSelectedLetter(letter)}
             >
@@ -169,7 +169,7 @@ export default function GenreBrowse() {
           <button
             onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === 1}
-            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
+            className="px-5 py-3 rounded bg-pink-500 text-white text-sm md:text-base active:scale-95 hover:bg-pink-600 transition"
           >
             ← Previous
           </button>
@@ -179,7 +179,7 @@ export default function GenreBrowse() {
           <button
             onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); window.scrollTo(0, 0); }}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded bg-pink-500 text-white disabled:opacity-40 hover:bg-pink-600 transition"
+            className="px-5 py-3 rounded bg-pink-500 text-white text-sm md:text-base active:scale-95 hover:bg-pink-600 transition"
           >
             Next →
           </button>

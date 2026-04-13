@@ -8,7 +8,7 @@ function MovieGrid({ movies, title }) {
   return (
     <div className="mt-12">
       {title && (
-        <h3 className="text-2xl md:text-3xl font-bold neon-text mb-6">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold neon-text mb-6">
           {title}
         </h3>
       )}
@@ -16,14 +16,14 @@ function MovieGrid({ movies, title }) {
       {movies.length === 0 ? (
         <p className="text-gray-400">No movies found.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
           {movies.map((movie) => (
             <Link
               key={movie.imdbId || movie.id}
               to={`/movie/${movie.imdbId || movie.id}`}
               className="flex flex-col rounded-xl overflow-hidden bg-black/70 shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
             >
-              <div className="w-full h-64 bg-black flex items-center justify-center">
+              <div className="w-full h-52 sm:h-64 bg-black flex items-center justify-center">
                 {movie.poster_url || movie.posterUrl ? (
                   <img
                     src={movie.poster_url || movie.posterUrl}
@@ -36,8 +36,8 @@ function MovieGrid({ movies, title }) {
                   </div>
                 )}
               </div>
-              <div className="p-3 flex flex-col h-28">
-                <h4 className="font-bold text-sm neon-text break-words text-center flex-grow">
+              <div className="p-3 flex flex-col h-auto sm:h-28">
+                <h4 className="font-bold text-sm neon-text break-words text-center flex-grow line-clamp-2">
                    {movie.title}
                 </h4>
                 <p className="text-xs opacity-70 text-center mt-2">
@@ -55,29 +55,29 @@ function MovieGrid({ movies, title }) {
 export default function Home({ movies, loading, error }) {
   return (
     <div className="text-white">
-      <header className="relative w-full mt-6 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
+      <header className="relative w-full mt-4 sm:mt-6 px-2 sm:px-0 rounded-xl overflow-hidden shadow-xl mx-auto max-w-6xl">
         <img src={fmy} alt="Find My Flick banner" className="w-full h-auto object-contain" />
       </header>
 
-      <section className="mt-8 px-6 max-w-6xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold neon-text">
+      <section className="mt-8 px-4 sm:px-6 max-w-6xl mx-auto text-center">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold neon-text">
           Find Your Next Flick
         </h1>
 
-        <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
+        <p className="mt-4 text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
           Discover movies by genre, tags, triggers, and what actually matters to you.
         </p>
 
-        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
           
           <Link to="/discover"
-            className="px-6 py-3 rounded-full bg-pink-600 hover:bg-pink-500 transition font-semibold shadow-lg"
+            className="px-6 py-3.5 rounded-full bg-pink-600 hover:bg-pink-500 transition font-semibold shadow-lg"
           >
             Explore Movies →
           </Link>
           
           <Link to="/genres"
-            className="px-6 py-3 rounded-full border border-pink-500 text-pink-400 hover:bg-pink-500/10 transition font-semibold"
+            className="px-6 py-3.5 rounded-full border border-pink-500 text-pink-400 hover:bg-pink-500/10 transition font-semibold"
           >
             Browse Genres
           </Link>
@@ -95,7 +95,7 @@ export default function Home({ movies, loading, error }) {
         )}
       </section>
 
-      <div className="h-20" />
+      <div className="h-12 sm:h-20" />
     </div>
   );
 }

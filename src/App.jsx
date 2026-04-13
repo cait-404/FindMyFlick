@@ -63,13 +63,13 @@ export default function App() {
   return (
     <>
       {/* NAVBAR */}
-      <nav className="flex justify-between items-center p-4 bg-black/80 text-white flex-wrap gap-4">
+      <nav className="flex flex-col md:flex-row justify-between items-center p-4 bg-black/80 text-white gap-4">
 
         <Link to="/" className="text-2xl font-bold text-white-500">
           FindMyFlick
         </Link>
 
-        <div className="flex gap-6 items-center flex-wrap">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center w-full md:w-auto">
 
           <NavLink to="/" className={({isActive}) => isActive ? "nav-link active-nav" : "nav-link"}>
             Home
@@ -92,14 +92,14 @@ export default function App() {
           </NavLink>
 
           {/* SEARCH BAR */}
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center w-full md:w-auto">
             <input
               type="text"
               placeholder="Search movies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="p-2 rounded-md text-black text-sm"
+              className="p-2 w-full md:w-64 rounded-md text-black text-sm"
             />
 
             <button
@@ -114,7 +114,7 @@ export default function App() {
           {!token ? (
             <Link
               to="/auth"
-              className="px-5 py-2 rounded-full font-semibold transition
+              className="px-5 py-2 rounded-full font-semibold transition w-full md:w-auto text-center
                          bg-linear-to-r from-[#ff39e1] to-[#ff6ed0]
                          shadow-[0_0_15px_#ff39e1]
                          hover:shadow-[0_0_30px_#ff6ed0]

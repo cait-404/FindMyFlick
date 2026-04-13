@@ -182,14 +182,14 @@ export default function LoginSignup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-900 via-black to-gray-800 px-4">
-      <div className="w-full max-w-md p-8 rounded-xl bg-gray-900/80 shadow-xl text-white">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-900 via-black to-gray-800 px-4 sm:px-6">
+      <div className="w-full max-w-md p-5 sm:p-8 rounded-xl bg-gray-900/80 shadow-xl text-white">
 
-        <h2 className="text-3xl font-bold text-center neon-text mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center neon-text mb-6">
           {isLogin ? "Welcome Back" : "Create an Account"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 
           {/* USERNAME */}
           <div>
@@ -202,7 +202,7 @@ export default function LoginSignup() {
               value={formData.username}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100
+              className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100
                          focus:ring-2 focus:ring-pink-500 outline-none"
             />
           </div>
@@ -219,7 +219,7 @@ export default function LoginSignup() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100
+                className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100
                            focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -236,13 +236,13 @@ export default function LoginSignup() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100 pr-10
+              className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100 pr-10
                          focus:ring-2 focus:ring-pink-500 outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9 text-gray-400 hover:text-pink-400"
+              className="absolute right-3 top-10 sm:top-9 text-gray-400 hover:text-pink-400"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -260,7 +260,7 @@ export default function LoginSignup() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100
+                className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100
                            focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -276,7 +276,7 @@ export default function LoginSignup() {
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100
+                className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100
                            focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -292,7 +292,7 @@ export default function LoginSignup() {
                 name="theme"
                 value={formData.theme}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-100
+                className="w-full px-4 py-3 sm:py-2 rounded-md  bg-gray-800 text-gray-100
                            focus:ring-2 focus:ring-pink-500 outline-none"
               />
             </div>
@@ -304,13 +304,13 @@ export default function LoginSignup() {
               <label className="block text-sm text-gray-300 mb-1">
                 Favorite Genres
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 {["Action","Comedy","Drama","Horror","Sci-Fi","Romance"].map((g) => (
                   <button
                     type="button"
                     key={g}
                     onClick={() => toggleGenre(g)}
-                    className={`px-3 py-1 rounded-full border ${
+                    className={`px-3 py-2 sm:py-1 rounded-full border ${
                       formData.favoriteGenres.includes(g)
                         ? "bg-pink-600 border-pink-500"
                         : "border-gray-600"
@@ -330,13 +330,13 @@ export default function LoginSignup() {
             type="submit"
             disabled={loading}
             className="w-full bg-pink-600 hover:bg-pink-500 transition font-semibold 
-                       py-2 rounded-md shadow-lg disabled:opacity-70"
+            py-3 sm:py-2 rounded-md shadow-lg disabled:opacity-70"
           >
             {loading ? "Processing..." : isLogin ? "Login" : "Sign up"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-400 text-sm">
+        <p className="mt-5 sm:mt-6 text-center text-gray-400 text-sm">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
           <button
             onClick={toggleMode}

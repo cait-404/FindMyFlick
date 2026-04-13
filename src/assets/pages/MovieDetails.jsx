@@ -206,11 +206,11 @@ export default function MovieDetails() {
   const displayedCrew = showAllCrew ? crew : crew.slice(0, 5);
 
   return (
-    <div className="min-h-screen text-white p-6 bg-linear-to-b from-black via-[#12001a] to-black">
+    <div className="min-h-screen text-white px-4 sm:px-6 py-6 bg-linear-to-b from-black via-[#12001a] to-black">
       <div className="max-w-6xl mx-auto">
 
         {/* TOP SECTION: Poster + Core Info */}
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-8">
 
           {/* POSTER */}
           <div className="md:col-span-1">
@@ -218,7 +218,7 @@ export default function MovieDetails() {
               <img
                 src={poster}
                 alt={movie.title}
-                className="w-full rounded-xl shadow-2xl object-contain"
+                className="w-full max-h-[400px] sm:max-h-none rounded-xl shadow-2xl object-contain"
               />
             ) : (
               <div className="w-full h-64 bg-gray-800 flex items-center justify-center rounded-xl text-gray-400">
@@ -229,11 +229,11 @@ export default function MovieDetails() {
 
           {/* CORE INFO */}
           <div className="md:col-span-2">
-            <h1 className="text-4xl font-bold mb-2 text-pink-400">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-pink-400">
               {movie.title || "Untitled"}
             </h1>
 
-            <div className="flex gap-4 mb-4 text-gray-400 text-sm">
+            <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 text-gray-400 text-sm">
               <span>{movie.releaseYear || "N/A"}</span>
               {movie.mpaaRating && (
                 <span className="border border-gray-500 px-2 py-0.5 rounded text-xs">
@@ -271,7 +271,7 @@ export default function MovieDetails() {
             )}
 
             {/* PLOT TAGS */}
-        <div className="bg-black/40 rounded-xl p-6 mb-6">
+        <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Plot Tags</h2>
 
           {plotTags.length === 0 ? (
@@ -280,7 +280,7 @@ export default function MovieDetails() {
             <div className="flex flex-wrap gap-3 mb-4">
               {plotTags.map(tag => (
                 <div key={tag.tagID}
-                  className="flex items-center gap-2 bg-purple-900/60 rounded-full px-3 py-1.5">
+                  className="flex items-center gap-2 bg-purple-900/60 rounded-full px-3 py-2 sm:py-1.5">
                   <span className="text-sm text-white">{tag.tagName}</span>
                   <button
                     onClick={() => handleVote(tag.tagID, 1)}
@@ -318,7 +318,7 @@ export default function MovieDetails() {
               ref={tagInputRef}
               type="text"
               placeholder="Search plot tags..."
-              className="w-full md:w-72 p-2 rounded-md text-black text-sm"
+              className="w-full sm:w-72 p-3 sm:p-2 rounded-md text-black text-sm"
               value={tagQuery}
               onChange={handleTagQueryChange}
               onFocus={() => tagQuery && setShowTagSuggestions(true)}
@@ -326,7 +326,7 @@ export default function MovieDetails() {
               disabled={addingTag}
             />
             {showTagSuggestions && tagSuggestions.length > 0 && (
-              <div className="absolute z-20 w-72 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
+              <div className="absolute left-0 right-0 sm:w-72 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
                 style={{ background: '#1a0033', border: '2px solid #550088' }}>
                 {tagSuggestions.map(tag => (
                   <button
@@ -353,7 +353,7 @@ export default function MovieDetails() {
 
         {/* COLLECTIONS */}
         {collections.length > 0 && collections[0] !== "None" && (
-          <div className="bg-black/40 rounded-xl p-6 mb-6">
+          <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
             <h2 className="text-xl font-bold text-pink-400 mb-4">Collection</h2>
             <div className="flex flex-wrap gap-2">
               {collections.map(c => (
@@ -370,7 +370,7 @@ export default function MovieDetails() {
         )}
 
         {/* CAST */}
-        <div className="bg-black/40 rounded-xl p-6 mb-6">
+        <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Cast</h2>
           <div className="flex flex-col gap-1">
             <div className="grid grid-cols-2 text-xs text-purple-300 font-semibold uppercase mb-1 px-1">
@@ -378,7 +378,7 @@ export default function MovieDetails() {
               <span>Actor</span>
             </div>
             {displayedCast.map(c => (
-              <div key={c.tmdbPersonId} className="grid grid-cols-2 text-sm py-1.5 px-1 border-b border-purple-900/30">
+              <div key={c.tmdbPersonId} className="grid grid-cols-2 text-xs sm:text-sm py-2 px-1 border-b border-purple-900/30">
                 <span className="text-gray-400">{c.characterNames?.[0] || "—"}</span>
                 <span className="text-white font-medium">{c.personName}</span>
               </div>
@@ -395,7 +395,7 @@ export default function MovieDetails() {
         </div>
 
         {/* CREW */}
-        <div className="bg-black/40 rounded-xl p-6 mb-6">
+        <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Crew</h2>
           <div className="flex flex-col gap-1">
             <div className="grid grid-cols-2 text-xs text-purple-300 font-semibold uppercase mb-1 px-1">
@@ -403,7 +403,7 @@ export default function MovieDetails() {
               <span>Name</span>
             </div>
             {displayedCrew.map(c => (
-              <div key={c.tmdbPersonId} className="grid grid-cols-2 text-sm py-1.5 px-1 border-b border-purple-900/30">
+              <div key={c.tmdbPersonId} className="grid grid-cols-2 text-xs sm:text-sm py-2 px-1 border-b border-purple-900/30">
                 <span className="text-gray-400">{c.jobs?.[0] || "—"}</span>
                 <span className="text-white font-medium">{c.personName}</span>
               </div>
@@ -420,7 +420,7 @@ export default function MovieDetails() {
         </div>
 
         {/* CONTENT WARNINGS */}
-        <div className="bg-black/40 rounded-xl p-6 mb-6">
+        <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Content Warnings</h2>
           {warningsByCategory.length === 0 ? (
             <p className="text-gray-400 text-sm">No content warnings recorded for this movie.</p>
@@ -445,7 +445,7 @@ function WarningCategory({ category }) {
     <div className="border border-purple-800 rounded-lg overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex justify-between items-center px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition text-left"
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition text-left"
       >
         <span className="font-semibold text-pink-300 text-sm">{category.categoryName}</span>
         <span className="text-gray-400 text-xs">{open ? "▲" : `▼ ${category.matchingTopics.length} warning${category.matchingTopics.length !== 1 ? "s" : ""}`}</span>
@@ -454,7 +454,7 @@ function WarningCategory({ category }) {
         <div className="px-4 py-3 bg-black/40">
           <ul className="space-y-1">
             {category.matchingTopics.map(w => (
-              <li key={w.dtddTopicId} className="text-sm text-gray-300 flex items-center gap-2">
+              <li key={w.dtddTopicId} className="text-xs sm:text-sm text-gray-300 flex items-center gap-2">
                 <span className="text-yellow-400">⚠</span>
                 {w.topicName}
               </li>

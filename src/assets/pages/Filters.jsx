@@ -34,10 +34,10 @@ function CollapsibleSection({ title, children, defaultOpen = false, headerExtra 
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border border-purple-800 rounded-lg overflow-visible mb-4">
-      <div className="w-full flex justify-between items-center px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition">
+      <div className="w-full flex items-center gap-2 px-4 py-3 bg-purple-900/40 hover:bg-purple-900/60 transition">
         <button
-          onClick={() => setOpen(o => !o)}
-          className="flex-1 text-left"
+         onClick={() => setOpen(o => !o)}
+         className="flex-1 text-left truncate"
         >
           <span className="font-semibold text-pink-300">{title}</span>
         </button>
@@ -61,7 +61,7 @@ function WarningTopicRow({ topic, includeIds, excludeIds, onInclude, onExclude }
       <div className="flex gap-2 ml-2">
         <button
           onClick={() => onInclude(topic.dtddTopicId)}
-          className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
+          className={`px-3 py-1 rounded text-xs font-semibold transition ${
             included ? "bg-green-600 text-white" : "border border-green-600 text-green-400 hover:bg-green-600/20"
           }`}
         >
@@ -69,7 +69,7 @@ function WarningTopicRow({ topic, includeIds, excludeIds, onInclude, onExclude }
         </button>
         <button
           onClick={() => onExclude(topic.dtddTopicId)}
-          className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
+          className={`px-3 py-1 rounded text-xs font-semibold transition ${
             excluded ? "bg-red-600 text-white" : "border border-red-600 text-red-400 hover:bg-red-600/20"
           }`}
         >
@@ -113,7 +113,7 @@ function TagAutocomplete({ label, color, allOptions, selectedTags, onAdd, onRemo
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
         />
         {showSuggestions && filtered.length > 0 && (
-          <div className="absolute z-20 w-full mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
+          <div className="absolute left-0 right-0 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
             style={{ background: '#1a0033', border: '2px solid #550088' }}>
             {filtered.map(opt => (
               <button
@@ -370,10 +370,10 @@ export default function Filters() {
   const otherProviderOptions = MAJOR_PROVIDERS.map(p => p.name);
 
   return (
-    <div className="min-h-screen text-white p-6 max-w-5xl mx-auto">
+    <div className="min-h-screen text-white px-4 sm:px-6 max-w-5xl mx-auto">
 
       {/* TITLE */}
-      <h1 className="text-4xl font-bold text-center mb-2 text-pink-400">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-2 text-pink-400">
         Advanced Movie Search
       </h1>
       <p className="text-center text-gray-400 mb-8 text-sm">
@@ -381,11 +381,11 @@ export default function Filters() {
       </p>
 
       {/* FILTER PANEL */}
-      <div className="bg-black/70 p-6 rounded-xl shadow-lg mb-8">
+      <div className="bg-black/70 p-4 sm:p-6 rounded-xl shadow-lg mb-8">
 
         {/* GENRE */}
         <CollapsibleSection title="Genre" defaultOpen={true}>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
             {genres.map(g => (
               <button
                 key={g.tmdbGenreId}
@@ -437,7 +437,7 @@ export default function Filters() {
 
         {/* CAST & CREW */}
         <CollapsibleSection title="Cast & Crew (Include)">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block mb-1 text-sm text-green-400 font-semibold">Include Cast Member</label>
               <input
@@ -496,7 +496,7 @@ export default function Filters() {
                   
                   <button
                     onClick={() => toggleExcludeCategory(category.categoryId)}
-                    className={`px-2 py-0.5 rounded text-xs font-semibold transition ${
+                    className={`px-3 py-1 rounded text-xs font-semibold transition ${
                       excludeCategoryIds.has(category.categoryId)
                         ? "bg-red-600 text-white"
                         : "border border-red-600 text-red-400 hover:bg-red-600/20"
@@ -559,7 +559,7 @@ export default function Filters() {
         </CollapsibleSection>
 
         {/* BUTTONS */}
-        <div className="flex justify-center gap-4 mt-6">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
           <button
             onClick={handleSearch}
             className="px-8 py-3 rounded-full font-bold bg-pink-500 hover:bg-pink-600 transition text-white shadow-lg"
@@ -597,7 +597,7 @@ export default function Filters() {
           {movies.length} movies found
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {movies.map((movie, index) => {
             const poster =
               movie.posterUrl || movie.poster_url || movie.poster;
@@ -615,7 +615,7 @@ export default function Filters() {
                 className="flex flex-col rounded-lg overflow-hidden bg-gray-900/80 hover:scale-105 transform transition duration-200 shadow-lg"
               >
                 {/* Poster */}
-                <div className="w-full h-64 bg-black flex items-center justify-center">
+                <div className="w-full h-52 sm:h-64 bg-black flex items-center justify-center">
                   {poster ? (
                     <img
                       src={poster}
@@ -630,7 +630,7 @@ export default function Filters() {
                 </div>
 
                 {/* Title + Year */}
-                <div className="p-2 flex flex-col h-28">
+                <div className="p-2 flex flex-col h-auto sm:h-28">
                   <h3 className="font-semibold text-sm text-white text-center break-words line-clamp-2">
                     {title}
                   </h3>

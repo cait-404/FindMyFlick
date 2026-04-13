@@ -34,21 +34,24 @@ function CollectionBrowse() {
   }, [collectionName]);
 
   return (
-    <div className="min-h-screen p-8 text-white bg-black">
+    <div className="min-h-screen p-6 md:p-8 text-white bg-black">
       <h2 className="text-3xl font-bold mb-6 neon-text">{decoded}</h2>
-
+      
+      <div className="text-center mt-10 text-gray-300">
       {loading && <p>Loading movies...</p>}
       {error && <p className="text-red-400">{error}</p>}
       {!loading && movies.length === 0 && !error && (
         <p>No movies found for this collection.</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {movies.map((movie) => (
           <div
             key={movie.imdbId}
             onClick={() => navigate(`/movie/${movie.imdbId}`)}
-            className="bg-black/70 rounded-xl overflow-hidden shadow-lg p-4 transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+            className="bg-black/70 rounded-xl overflow-hidden shadow-lg p-3 md:p-4 transition hover:scale-105 active:scale-95 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
           >
             <div className="h-64 bg-black mb-4">
               <img
