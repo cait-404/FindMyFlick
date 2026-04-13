@@ -54,6 +54,27 @@ namespace FindMyFlickWebsite.Server.Controllers
             public string NewStatus { get; set; } = "";
         }
 
+        // GET /api/movies/{id}/plot-tags/my-votes
+        // Returns the current user's votes for all tags on this movie.
+        [HttpGet("my-votes")]
+        [Authorize]
+        public async Task<IActionResult> GetMyVotes(string id)
+        {
+            id = NormalizeImdb(id);
+            var userId = GetCurrentUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            await using var ctx = _dbFactory.CreateDbContext();
+            var votes = await ctx.MoviePlotTagVotes
+                .AsNoTracking()
+                .Where(v => v.ImdbId == id && v.UserId == userId)
+                .Select(v => new { v.PlotTagId, v.Vote })
+                .ToListAsync();
+
+            return Ok(votes);
+        }
+
         // POST /api/movies/{id}/plot-tags/{tagId}/vote
         // Body: { "vote": 1 } or { "vote": 0 }
         // Only authenticated users. Each user may vote once per (movie, tag) pair.

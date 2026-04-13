@@ -102,6 +102,21 @@ export default function MovieDetails() {
     };
 
     fetchMovieDetails();
+
+    // Load user's existing votes if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch(`${API_URL}/api/movies/${id}/plot-tags/my-votes`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : [])
+        .then(data => {
+          const voteMap = {};
+          data.forEach(v => { voteMap[v.plotTagId] = v.vote; });
+          setVotes(voteMap);
+        })
+        .catch(() => {});
+    }
   }, [id]);
 
   // Handle plot tag vote
