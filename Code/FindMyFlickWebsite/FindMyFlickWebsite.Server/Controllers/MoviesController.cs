@@ -740,6 +740,13 @@ namespace FindMyFlickWebsite.Server.Controllers
         // Added optional ordering via ?order={release_year|none|title_asc|title_desc}
         // ============================================================
 
+        [HttpGet("count")]
+        public async Task<IActionResult> GetMovieCount()
+        {
+            var total = await _context.Movies.CountAsync();
+            return Ok(new { count = total });
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetMoviesView_ParseImdb(
             [FromQuery] int page = 1,

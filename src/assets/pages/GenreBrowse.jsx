@@ -124,7 +124,7 @@ export default function GenreBrowse() {
       )}
 
       {/* Movie Cards */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
         {paginatedMovies.map((movie) => {
           const poster = movie.poster_url || movie.posterUrl;
           const year = movie.release_year || movie.releaseYear;
@@ -134,25 +134,25 @@ export default function GenreBrowse() {
             <Link
               key={id}
               to={`/movie/${id}`}
-              className="flex flex-col rounded-xl overflow-hidden bg-gray-900/70 border border-gray-700 shadow-lg transform transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-800/80 border border-gray-700 shadow-lg transform transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
             >
               {/* Poster */}
-              <div className="relative w-full bg-black flex items-center justify-center">
+              <div className="w-full h-80 bg-black flex items-center justify-center overflow-hidden">
                 {poster ? (
                   <img
                     src={poster}
                     alt={movie.title}
-                    className="w-full max-h-96 object-contain"
+                    className="max-h-full max-w-full object-contain"
                   />
                 ) : (
-                  <div className="w-full max-h-96 flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
                     No Image
                   </div>
                 )}
               </div>
 
               {/* Title & Year Box */}
-              <div className="p-3 flex flex-col h-28">
+              <div className="p-3 flex flex-col h-24">
                 <h3 className="font-bold text-sm neon-text break-words text-center flex-grow">
                   {movie.title}
                 </h3>

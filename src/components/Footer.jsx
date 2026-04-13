@@ -25,7 +25,7 @@ export default function Footer() {
 
           {/* Navigation */}
           <div>
-            <h4 className="footer-heading font-semibold mb-3 cursor-pointer">
+            <h4 className="footer-heading font-semibold mb-3">
   Explore
 </h4>
 
@@ -83,7 +83,7 @@ export default function Footer() {
 
           {/* Project */}
           <div>
-            <h4 className="footer-heading font-semibold mb-3 cursor-pointer">
+            <h4 className="footer-heading font-semibold mb-3">
   Project
 </h4>
 

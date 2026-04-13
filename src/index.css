@@ -290,10 +290,4 @@ input:focus, textarea:focus, select:focus {
 }
 
 .footer-heading:hover {
-  color: #ff39e1;
-  text-shadow:
-    0 0 6px #ff39e1,
-    0 0 12px #ff39e1,
-    0 0 20px #ff6ed0;
-  transform: scale(1.05);
 }

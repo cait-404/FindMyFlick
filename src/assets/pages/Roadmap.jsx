@@ -68,12 +68,17 @@ export default function Roadmap() {
 
         <div className="space-y-3 sm:space-y-4 text-gray-300">
 
+<<<<<<< HEAD
           <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Advanced filtering (multiple genres, include/exclude tags)
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Personalized recommendations based on user behavior
+=======
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+            Personalized recommendations based on user account behavior
+>>>>>>> 6e03850ec6ca9b7f84139e8703ef4916ee2e6771
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
@@ -84,8 +89,13 @@ export default function Roadmap() {
             Improved movie detail pages (cast, crew, streaming info)
           </div>
 
+<<<<<<< HEAD
           <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
             Mobile optimization and performance improvements
+=======
+          <div className="bg-black/40 border border-gray-700 rounded-xl p-4">
+            AI chatbot for quick and detailed searches
+>>>>>>> 6e03850ec6ca9b7f84139e8703ef4916ee2e6771
           </div>
 
           <div className="bg-black/40 border border-gray-700 rounded-xl p-3 sm:p-4">
