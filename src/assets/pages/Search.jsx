@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import API_URL from "../../config.js";
 
 function Search() {
@@ -26,9 +25,8 @@ function Search() {
       take: 20,
       minMatches: 1,
       enableApiFallback: true,
-      alwaysAddFromApis: true,
-      minMatches: 5,
-      titleContains: query,   // ✅ title-first search
+      alwaysAddFromApis: false,
+      titleContains: query,
       genreNames: [],
       keywordNames: [],
       personNames: [],
@@ -83,33 +81,53 @@ function Search() {
 }, [query]);
 
   return (
-    <div className="min-h-screen p-8 text-white bg-black">
-      <h2 className="text-3xl font-bold mb-6 neon-text">Results for: {query}</h2>
+    <div className="min-h-screen p-4 sm:p-6 md:p-8 text-white bg-gradient-to-b from-black via-[#12001a] to-black">
+      <div className="max-w-6xl mx-auto mb-8">
+        <h2 className="text-4xl font-extrabold neon-text">Results for: {query}</h2>
+      </div>
 
-      {loading && <p>Loading movies...</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {loading && <p className="text-center mt-20 opacity-70">Loading movies...</p>}
+      {error && <p className="text-center mt-20 text-red-400">{error}</p>}
       {!loading && movies.length === 0 && !error && (
-        <p>No results found for "{query}".</p>
+        <p className="text-center mt-20 text-gray-400">No results found for "{query}".</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {movies.map((movie) => (
-          <div
-  key={movie.imdbId || movie.tmdbId || movie.id}
-  onClick={() => navigate(`/movie/${movie.imdbId || movie.tmdbId || movie.id}`)}
-  className="bg-black/70 rounded-xl overflow-hidden shadow-lg p-4 transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
->
-            <div className="h-64 bg-black mb-4">
-              <img
-                src={movie.posterUrl || "https://via.placeholder.com/300x450?text=No+Poster"}
-                alt={movie.title || "Movie Poster"}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <h3 className="font-bold text-lg truncate neon-text">{movie.title || "Unknown Title"}</h3>
-            <p className="text-sm opacity-70 mt-1">{movie.releaseYear || "N/A"}</p>
-          </div>
-        ))}
+      <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        {movies.map((movie) => {
+          const poster = movie.posterUrl || movie.poster_url;
+          const year = movie.releaseYear || movie.release_year;
+          const id = movie.imdbId || movie.tmdbId || movie.id;
+
+          return (
+            <Link
+              key={id}
+              to={`/movie/${id}`}
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-800/80 border border-gray-700 shadow-lg transform transition hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+            >
+              <div className="w-full h-80 bg-black flex items-center justify-center overflow-hidden">
+                {poster ? (
+                  <img
+                    src={poster}
+                    alt={movie.title}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div className="p-3 flex flex-col h-24">
+                <h3 className="font-bold text-sm neon-text break-words text-center flex-grow">
+                  {movie.title || "Unknown Title"}
+                </h3>
+                <p className="text-xs opacity-70 text-center mt-2">
+                  {year || "N/A"}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

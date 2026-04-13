@@ -1,5 +1,5 @@
 import './App.css'; 
-import { Routes, Route, NavLink, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import Footer from "./components/Footer";
@@ -31,7 +31,12 @@ export default function App() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token"); 
+  const token = localStorage.getItem("token");
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Fetch random movies for home page — different selection each visit
   // Updated with Claude (April 2026)

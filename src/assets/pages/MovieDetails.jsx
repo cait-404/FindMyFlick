@@ -153,11 +153,17 @@ export default function MovieDetails() {
       const tagId = tagData.plotTagId;
 
       // Vote upvote to "add" the tag
-      await fetch(`${API_URL}/api/movies/${id}/plot-tags/${tagId}/vote`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setAddTagMessage("Please log in to suggest plot tags.");
+        return;
+      }
+      const voteRes = await fetch(`${API_URL}/api/movies/${id}/plot-tags/${tagId}/vote`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ vote: 1 })
       });
+      if (!voteRes.ok) throw new Error("Vote failed");
 
       // Refresh plot tags
       const refreshRes = await fetch(`${API_URL}/api/Movies/${id}/plot-tags`);
