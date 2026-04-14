@@ -181,7 +181,7 @@ export default function MovieDetails() {
       }
 
       // Find the tag ID from allPlotTags data
-      const normalizedName = tagName.toLowerCase().trim().replace(/\s+/g, '_');
+      const normalizedName = tagName.toLowerCase().trim().replace(/[\s-]+/g, '_');
       const res = await fetch(`${API_URL}/api/movies/plot-tags/getbyname/${encodeURIComponent(normalizedName)}`);
       if (!res.ok) {
         const errText = await res.text();
