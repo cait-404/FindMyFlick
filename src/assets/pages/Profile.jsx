@@ -16,26 +16,24 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Profile fetch — token present:", !!token, "length:", token?.length);
 
-fetch(`${API_URL}/api/Profile`, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
-
-        if (!token) {
+        if (!token || token === "undefined" || token === "null") {
           throw new Error("Not logged in");
         }
 
-        //const res = await fetch(`${API_URL}/api/Profile`, { 
         const res = await fetch(`${API_URL}/api/Profile`, {
           headers: {
-            Authorization: `Bearer ${token}`, // THIS IS THE FIX
+            Authorization: `Bearer ${token}`,
           },
         });
 
-        if (res.status === 401) {
-          throw new Error("Not logged in");
+        console.log("Profile fetch — status:", res.status);
+
+        if (!res.ok) {
+          const body = await res.text();
+          console.error("Profile fetch failed:", res.status, body);
+          throw new Error(`Profile fetch failed (${res.status})`);
         }
 
         const data = await res.json();
@@ -48,7 +46,7 @@ fetch(`${API_URL}/api/Profile`, {
         });
 
       } catch (err) {
-        console.error(err);
+        console.error("Profile error:", err);
         setProfile(null);
       } finally {
         setLoading(false);

@@ -163,13 +163,24 @@ namespace FindMyFlickWebsite.Server.Controllers
                 .Where(v => v.ImdbId == id && v.PlotTagId == tagId && v.Vote == -1)
                 .CountAsync();
 
-            // Update status: rejected when disagrees >= agrees, otherwise approved
-            var newStatus = disagrees >= agrees ? "rejected" : "approved"; 
-            if (moviePlotTag.Status != newStatus)
+            // If net score goes negative (more disagrees than agrees), remove the tag from this movie entirely.
+            // Otherwise, keep it approved.
+            string newStatus;
+            if (disagrees > agrees)
             {
-                moviePlotTag.Status = newStatus;
-                ctx.MoviePlotTags.Update(moviePlotTag);
+                ctx.MoviePlotTags.Remove(moviePlotTag);
                 await ctx.SaveChangesAsync();
+                newStatus = "removed";
+            }
+            else
+            {
+                newStatus = "approved";
+                if (moviePlotTag.Status != newStatus)
+                {
+                    moviePlotTag.Status = newStatus;
+                    ctx.MoviePlotTags.Update(moviePlotTag);
+                    await ctx.SaveChangesAsync();
+                }
             }
 
             var result = new VoteResult

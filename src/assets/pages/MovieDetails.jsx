@@ -130,10 +130,17 @@ export default function MovieDetails() {
           "Content-Type": "application/json",
           ...(token && { "Authorization": `Bearer ${token}` })
         },
-        body: JSON.stringify({ vote })
+        body: JSON.stringify({ vote: vote === 1 ? 1 : 0 })
       });
       if (!res.ok) throw new Error("Vote failed");
       setVotes(prev => ({ ...prev, [tagId]: vote }));
+
+      // Refresh plot tags in case the net score went negative and the tag was removed
+      const refreshRes = await fetch(`${API_URL}/api/Movies/${id}/plot-tags`);
+      if (refreshRes.ok) {
+        const refreshed = await refreshRes.json();
+        setPlotTags(refreshed.filter(t => t.tagName));
+      }
     } catch (err) {
       console.error("Vote failed:", err);
     } finally {
@@ -174,7 +181,7 @@ export default function MovieDetails() {
       }
 
       // Find the tag ID from allPlotTags data
-      const normalizedName = tagName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+      const normalizedName = tagName.toLowerCase().trim().replace(/\s+/g, '_');
       const res = await fetch(`${API_URL}/api/movies/plot-tags/getbyname/${encodeURIComponent(normalizedName)}`);
       if (!res.ok) {
         const errText = await res.text();
