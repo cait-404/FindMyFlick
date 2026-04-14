@@ -1,4 +1,5 @@
 using FindMyFlickWebsite.Server.DataModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -7,6 +8,7 @@ namespace FindMyFlickWebsite.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly FindmyflickContext _context;

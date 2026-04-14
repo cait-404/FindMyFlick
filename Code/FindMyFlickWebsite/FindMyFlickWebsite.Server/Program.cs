@@ -116,52 +116,12 @@ builder.Services.AddAuthentication(options =>
         NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier
     };
 
-    // Optional: helpful diagnostics during development
     options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
     {
-        OnMessageReceived = ctx =>
-        {
-            // Log the raw Authorization header and the token string
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            var authHeader = ctx.Request.Headers["Authorization"].FirstOrDefault();
-            // Sanitize header value to prevent log forging (strip line breaks)
-            string SanitizeForLogging(string value)
-            {
-                if (string.IsNullOrEmpty(value))
-                    return value;
-
-                // Remove CRLF and standalone CR/LF to avoid log forging via new lines
-                return value
-                    .Replace(Environment.NewLine, string.Empty)
-                    .Replace("\r", string.Empty)
-                    .Replace("\n", string.Empty);
-            }
-
-            var safeAuthHeader = authHeader is null ? "(missing)" : SanitizeForLogging(authHeader);
-            logger.LogInformation("OnMessageReceived - Authorization header: {Header}", safeAuthHeader);
-            var token = ctx.Request.Headers.ContainsKey("Authorization")
-                        ? ctx.Request.Headers["Authorization"].ToString().Split(' ').LastOrDefault()
-                        : null;
-            logger.LogInformation("OnMessageReceived - extracted token length: {Len}", token?.Length ?? 0);
-            return Task.CompletedTask;
-        },
         OnAuthenticationFailed = ctx =>
         {
             var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ctx.Exception, "JWT authentication failed: {Message}", ctx.Exception.Message);
-            // include inner exception if present
-            if (ctx.Exception.InnerException != null)
-                logger.LogError(ctx.Exception.InnerException, "Inner exception: {Message}", ctx.Exception.InnerException.Message);
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = ctx =>
-        {
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            var roles = string.Join(",", ctx.Principal?.FindAll(System.Security.Claims.ClaimTypes.Role).Select(c => c.Value) ?? Enumerable.Empty<string>());
-            logger.LogInformation("OnTokenValidated - sub={Sub} nameid={NameId} roles={Roles}",
-                ctx.Principal?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value,
-                ctx.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
-                roles);
+            logger.LogWarning(ctx.Exception, "JWT authentication failed");
             return Task.CompletedTask;
         }
     };
