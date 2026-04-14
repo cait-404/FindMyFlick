@@ -277,9 +277,13 @@ export default function Filters() {
       // Add any "other" provider names selected via autocomplete
       otherProviderIds.forEach(name => streamingProviderNames.push(name));
 
-      const personNames = [];
-      if (includeCast.trim()) personNames.push(includeCast.trim());
-      if (includeCrew.trim()) personNames.push(includeCrew.trim());
+      const splitNames = (input) =>
+        input.split(",").map(s => s.trim()).filter(s => s.length > 0);
+
+      const personNames = [
+        ...splitNames(includeCast),
+        ...splitNames(includeCrew),
+      ];
 
       const body = {
         genreNames: selectedGenres,
@@ -449,7 +453,7 @@ export default function Filters() {
               <label className="block mb-1 text-sm text-green-400 font-semibold">Include Cast Member</label>
               <input
                 type="text"
-                placeholder="e.g. Tom Hanks"
+                placeholder="e.g. Tom Hanks, Meg Ryan"
                 className="w-full p-2 rounded-md text-black text-sm"
                 value={includeCast}
                 onChange={(e) => setIncludeCast(e.target.value)}
@@ -459,7 +463,7 @@ export default function Filters() {
               <label className="block mb-1 text-sm text-green-400 font-semibold">Include Crew Member (Director, Writer, etc.)</label>
               <input
                 type="text"
-                placeholder="e.g. Christopher Nolan"
+                placeholder="e.g. Christopher Nolan, Quentin Tarantino"
                 className="w-full p-2 rounded-md text-black text-sm"
                 value={includeCrew}
                 onChange={(e) => setIncludeCrew(e.target.value)}

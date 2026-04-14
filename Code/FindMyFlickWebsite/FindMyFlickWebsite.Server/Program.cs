@@ -177,6 +177,17 @@ builder.Services.AddAuthorization(
 
 var app = builder.Build();
 
+// Seed Identity roles. Roles granted manually.
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    foreach (var roleName in new[] { "Admin", "User" })
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

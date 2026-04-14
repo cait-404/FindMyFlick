@@ -16,14 +16,14 @@ function MovieGrid({ movies, title }) {
       {movies.length === 0 ? (
         <p className="text-gray-400">No movies found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
           {movies.map((movie) => (
             <Link
               key={movie.imdbId || movie.id}
               to={`/movie/${movie.imdbId || movie.id}`}
-              className="flex flex-col rounded-xl overflow-hidden bg-black/70 shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
+              className="flex flex-col rounded-xl overflow-hidden bg-gray-800/80 border border-gray-700 shadow-lg transform transition hover:scale-105 active:scale-95 hover:shadow-[0_0_25px_#ff6ed0] cursor-pointer"
             >
-              <div className="w-full h-52 sm:h-64 bg-black flex items-center justify-center">
+              <div className="w-full h-72 sm:h-80 bg-black flex items-center justify-center overflow-hidden">
                 {movie.poster_url || movie.posterUrl ? (
                   <img
                     src={movie.poster_url || movie.posterUrl}
@@ -36,9 +36,9 @@ function MovieGrid({ movies, title }) {
                   </div>
                 )}
               </div>
-              <div className="p-3 flex flex-col h-auto sm:h-28">
-                <h4 className="font-bold text-sm neon-text break-words text-center flex-grow line-clamp-2">
-                   {movie.title}
+              <div className="p-3 flex flex-col min-h-[6rem]">
+                <h4 className="font-bold text-sm neon-text break-words text-center flex-grow">
+                  {movie.title}
                 </h4>
                 <p className="text-xs opacity-70 text-center mt-2">
                   {movie.release_year || movie.releaseYear || "N/A"}

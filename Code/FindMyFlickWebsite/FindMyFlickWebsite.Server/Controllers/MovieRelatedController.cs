@@ -224,7 +224,6 @@ ORDER BY pt.tag_text;";
             var rows = await ctx.MovieStreamings
                 .AsNoTracking()
                 .Where(ms => ms.ImdbId == id)
-                .Where(ms => ms.OfferType.Contains("subscription"))
                 .Select(ms => new
                 {
                     ms.TmdbProviderId,

@@ -82,7 +82,7 @@ export default function MovieDetails() {
         // 🎯 MAPPINGS
         setPlotTags(plotTagsData.filter(t => t.tagName));
         setGenres(genresData.map(g => g.genreName || "").filter(Boolean));
-        setProviders(streamingData.map(p => p.providerName || "").filter(Boolean));
+        setProviders(streamingData);
         setCast(castData);
         setCrew(crewData);
         // Only show warnings where answer is "yes"
@@ -293,22 +293,47 @@ export default function MovieDetails() {
             </p>
 
             {/* Streaming */}
-            {providers.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-pink-300 mb-2">Available On</h3>
-                <div className="flex flex-wrap gap-2">
-                  {providers.map(p => (
-                    <span key={p} className="px-3 py-1 rounded-full bg-green-900/60 text-green-300 text-sm">
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-pink-300 mb-2">Available On</h3>
+              {(() => {
+                const subProviders = providers.filter(p =>
+                  p.offerTypes?.some(o => o?.toLowerCase().includes("subscription"))
+                );
+                if (subProviders.length > 0) {
+                  return (
+                    <div className="flex flex-wrap gap-2">
+                      {subProviders.map(p => (
+                        <span key={p.providerId} className="px-3 py-1 rounded-full bg-green-900/60 text-green-300 text-sm">
+                          {p.providerName}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                }
+                if (providers.length > 0) {
+                  return (
+                    <p className="text-sm text-gray-400 italic">
+                      This movie is not currently available to stream with a subscription.
+                    </p>
+                  );
+                }
+                return (
+                  <p className="text-sm text-gray-400 italic">
+                    This movie is not available to stream in the U.S.
+                  </p>
+                );
+              })()}
+            </div>
 
             {/* PLOT TAGS */}
         <div className="bg-black/40 rounded-xl p-4 sm:p-6 mb-6">
           <h2 className="text-xl font-bold text-pink-400 mb-4">Plot Tags</h2>
+
+          {!localStorage.getItem("token") && plotTags.length > 0 && (
+            <p className="text-sm text-gray-400 mb-3">
+              <Link to="/auth" className="text-pink-400 hover:text-pink-300 underline">Log in</Link> to vote on plot tags.
+            </p>
+          )}
 
           {plotTags.length === 0 ? (
             <p className="text-gray-400 text-sm mb-4">No plot tags yet — be the first to add one!</p>
@@ -318,30 +343,34 @@ export default function MovieDetails() {
                 <div key={tag.tagID}
                   className="flex items-center gap-2 bg-purple-900/60 rounded-full px-3 py-2 sm:py-1.5">
                   <span className="text-sm text-white">{tag.tagName}</span>
-                  <button
-                    onClick={() => handleVote(tag.tagID, 1)}
-                    disabled={voteLoading[tag.tagID]}
-                    className={`text-xs px-1.5 py-0.5 rounded transition ${
-                      votes[tag.tagID] === 1
-                        ? "bg-green-600 text-white"
-                        : "text-green-400 hover:bg-green-600/30"
-                    }`}
-                    title="Upvote — this tag fits"
-                  >
-                    👍
-                  </button>
-                  <button
-                    onClick={() => handleVote(tag.tagID, -1)}
-                    disabled={voteLoading[tag.tagID]}
-                    className={`text-xs px-1.5 py-0.5 rounded transition ${
-                      votes[tag.tagID] === -1
-                        ? "bg-red-600 text-white"
-                        : "text-red-400 hover:bg-red-600/30"
-                    }`}
-                    title="Downvote — this tag doesn't fit"
-                  >
-                    👎
-                  </button>
+                  {localStorage.getItem("token") && (
+                    <>
+                      <button
+                        onClick={() => handleVote(tag.tagID, 1)}
+                        disabled={voteLoading[tag.tagID]}
+                        className={`text-xs px-1.5 py-0.5 rounded transition ${
+                          votes[tag.tagID] === 1
+                            ? "bg-green-600 text-white"
+                            : "text-green-400 hover:bg-green-600/30"
+                        }`}
+                        title="Upvote — this tag fits"
+                      >
+                        👍
+                      </button>
+                      <button
+                        onClick={() => handleVote(tag.tagID, -1)}
+                        disabled={voteLoading[tag.tagID]}
+                        className={`text-xs px-1.5 py-0.5 rounded transition ${
+                          votes[tag.tagID] === -1
+                            ? "bg-red-600 text-white"
+                            : "text-red-400 hover:bg-red-600/30"
+                        }`}
+                        title="Downvote — this tag doesn't fit"
+                      >
+                        👎
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

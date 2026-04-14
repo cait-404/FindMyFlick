@@ -1,4 +1,5 @@
 ﻿using FindMyFlickWebsite.Server.DataModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -89,6 +90,7 @@ namespace FindMyFlickWebsite.Server.Controllers
 
         //add role
         [HttpPost("add-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddRole([FromBody] string role)
         {
             if(!await _roleManager.RoleExistsAsync(role))
@@ -102,6 +104,7 @@ namespace FindMyFlickWebsite.Server.Controllers
         }
 
         [HttpPost("assign-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole([FromBody] UserRole model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
