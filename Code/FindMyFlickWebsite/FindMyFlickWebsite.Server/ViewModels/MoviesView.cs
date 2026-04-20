@@ -12,6 +12,11 @@ namespace FindMyFlickWebsite.Server.Models
         [JsonPropertyName("id")]
         public int ID { get; set; }                       // maps to movies.imdb_id
 
+        // Full IMDB id string (e.g. "tt0123456"). Needed by clients to build stable
+        // movie-detail URLs; deriving it from ID loses leading zeros.
+        [JsonPropertyName("imdbId")]
+        public string? ImdbId { get; set; }
+
         // primary metadata
         [JsonPropertyName("title")]
         public string? Name { get; set; }                 // maps to movies.title

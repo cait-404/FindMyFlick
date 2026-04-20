@@ -199,6 +199,7 @@ namespace FindMyFlickWebsite.Server.Controllers
             var dtoList = loaded.Select(m => new MoviesView
             {
                 ID = ParseImdbToInt(m.ImdbId),
+                ImdbId = m.ImdbId,
                 Name = m.Title ?? "(Untitled)",
                 Year = m.ReleaseYear,
                 AgeRating = m.MpaaRating,
@@ -402,6 +403,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                     dtoList = loaded.Select(m => new MoviesView
                     {
                         ID = ParseImdbToInt(m.ImdbId),
+                        ImdbId = m.ImdbId,
                         Name = m.Title ?? "(Untitled)",
                         Year = m.ReleaseYear,
                         AgeRating = m.MpaaRating,
@@ -521,6 +523,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                         dtoList = loaded2.Select(m => new MoviesView
                         {
                             ID = ParseImdbToInt(m.ImdbId),
+                            ImdbId = m.ImdbId,
                             Name = m.Title ?? "(Untitled)",
                             Year = m.ReleaseYear,
                             AgeRating = m.MpaaRating,
@@ -622,6 +625,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 dtoList = loadedResp.Select(m => new MoviesView
                 {
                     ID = ParseImdbToInt(m.ImdbId),
+                    ImdbId = m.ImdbId,
                     Name = m.Title ?? "(Untitled)",
                     Year = m.ReleaseYear,
                     AgeRating = m.MpaaRating,
@@ -807,6 +811,7 @@ namespace FindMyFlickWebsite.Server.Controllers
                 var dtoList = loaded.Select(m => new MoviesView
                 {
                     ID = ParseImdbToInt(m.ImdbId),
+                    ImdbId = m.ImdbId,
                     Name = m.Title ?? "(Untitled)",
                     Year = m.ReleaseYear,
                     AgeRating = m.MpaaRating,
@@ -874,20 +879,18 @@ namespace FindMyFlickWebsite.Server.Controllers
                 if (string.IsNullOrWhiteSpace(id))
                     return BadRequest(new { message = "id cannot be empty." });
 
-                if (!id.StartsWith("tt", StringComparison.OrdinalIgnoreCase))
-                    id = "tt" + id; // ensure it starts with 'tt' for consistent searching
-
-                //half copilot gnerated via asking it to create a get by id method using imdb ids ex. tt31227572, but then refactored for preformance by me
-                if (string.IsNullOrWhiteSpace(id))
-                    return BadRequest(new { message = "id cannot be empty." });
+                var ttId = id.StartsWith("tt", StringComparison.OrdinalIgnoreCase)
+                    ? id
+                    : "tt" + id;
 
                 var movie = await _context.Movies
                     .AsNoTracking()
-                    .Select(m => m)
-                    .Where(m => m.ImdbId == id)
+                    .Where(m => m.ImdbId == ttId)
                     .Take(1)
                     .ToListAsync();
-                if (movie == null) return NotFound(new { message = $"Movie with ID '{id}' not found." });
+
+                if (movie.Count == 0)
+                    return NotFound(new { message = $"Movie with ID '{id}' not found." });
                 return Ok(movie);
             }
             catch (Exception ex)

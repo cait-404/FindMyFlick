@@ -49,15 +49,19 @@ export default function MovieDetails() {
         const movieData = Array.isArray(data) ? data[0] : data;
         setMovie(movieData);
 
+        // Use the real IMDB ID from the fetched movie for sub-resource fetches.
+        // The URL param may be a partial/TMDB ID that the backend resolved via fallback.
+        const realId = movieData?.imdbId || id;
+
         // ⚡ PARALLEL FETCHES (safe)
         const responses = await Promise.allSettled([
-          fetch(`${API_URL}/api/Movies/${id}/plot-tags`),
-          fetch(`${API_URL}/api/Movies/${id}/genres`),
-          fetch(`${API_URL}/api/Movies/${id}/streaming-providers`),
-          fetch(`${API_URL}/api/Movies/${id}/cast`),
-          fetch(`${API_URL}/api/Movies/${id}/crew`),
-          fetch(`${API_URL}/api/Movies/${id}/warnings`),
-          fetch(`${API_URL}/api/Movies/${id}/collections`),
+          fetch(`${API_URL}/api/Movies/${realId}/plot-tags`),
+          fetch(`${API_URL}/api/Movies/${realId}/genres`),
+          fetch(`${API_URL}/api/Movies/${realId}/streaming-providers`),
+          fetch(`${API_URL}/api/Movies/${realId}/cast`),
+          fetch(`${API_URL}/api/Movies/${realId}/crew`),
+          fetch(`${API_URL}/api/Movies/${realId}/warnings`),
+          fetch(`${API_URL}/api/Movies/${realId}/collections`),
           fetch(`${API_URL}/api/WarningTaxonomy`),
           fetch(`${API_URL}/api/movies/plot-tags/getall`)
         ]);
