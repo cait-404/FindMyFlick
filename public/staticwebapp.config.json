@@ -1,14 +1,15 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/images/*", "*.js", "*.css", "*.png", "*.jpg", "*.ico", "*.svg", "/sitemap.xml", "/robots.txt"]
+    "exclude": ["/assets/*", "/images/*", "*.js", "*.css", "*.png", "*.jpg", "*.ico", "*.svg"]
   },
   "globalHeaders": {
     "Cache-Control": "no-cache, no-store, must-revalidate",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://findmyflick-api-ecargjhzf4acffec.canadacentral-01.azurewebsites.net https://cloudflareinsights.com; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' static.cloudflareinsights.com; style-src 'self'; img-src 'self' data: https://image.tmdb.org; connect-src 'self' https://findmyflick-api-ecargjhzf4acffec.canadacentral-01.azurewebsites.net https://cloudflareinsights.com; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
   }
 }

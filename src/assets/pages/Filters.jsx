@@ -113,8 +113,7 @@ function TagAutocomplete({ label, color, allOptions, selectedTags, onAdd, onRemo
           onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
         />
         {showSuggestions && filtered.length > 0 && (
-          <div className="absolute left-0 right-0 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
-            style={{ background: '#1a0033', border: '2px solid #550088' }}>
+          <div className="absolute left-0 right-0 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto bg-[#1a0033] border-2 border-[#550088]">
             {filtered.map(opt => (
               <button
                 key={opt}

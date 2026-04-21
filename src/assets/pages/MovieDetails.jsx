@@ -402,8 +402,7 @@ export default function MovieDetails() {
               disabled={addingTag}
             />
             {showTagSuggestions && tagSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 sm:w-72 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
-                style={{ background: '#1a0033', border: '2px solid #550088' }}>
+              <div className="absolute left-0 right-0 sm:w-72 z-20 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto bg-[#1a0033] border-2 border-[#550088]">
                 {tagSuggestions.map(tag => (
                   <button
                     key={tag}
