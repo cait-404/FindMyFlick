@@ -1,0 +1,10 @@
+recommendation based on tags design idea/ process:
+
+list of tags:
+
+must have / must not have tags (required)
+
+would be nice to have tags
+
+
+of the movies containing the must tags find the one with the most would be nice tags
