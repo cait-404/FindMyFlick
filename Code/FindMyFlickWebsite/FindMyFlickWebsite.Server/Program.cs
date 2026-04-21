@@ -11,6 +11,11 @@ using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
@@ -158,6 +163,25 @@ if (app.Environment.IsDevelopment())
     app.Urls.Add("https://localhost:5002");
     app.Urls.Add("http://localhost:5003");
 }
+
+app.Use(async (ctx, next) =>
+{
+    ctx.Response.OnStarting(() =>
+    {
+        var h = ctx.Response.Headers;
+        h["X-Content-Type-Options"] = "nosniff";
+        h["X-Frame-Options"] = "DENY";
+        h["Referrer-Policy"] = "strict-origin-when-cross-origin";
+        if (ctx.Request.IsHttps)
+        {
+            h["Strict-Transport-Security"] = "max-age=31536000";
+        }
+        h.Remove("X-Powered-By");
+        h.Remove("Server");
+        return Task.CompletedTask;
+    });
+    await next();
+});
 
 app.UseRouting();
 
