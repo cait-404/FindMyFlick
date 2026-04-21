@@ -1,0 +1,17 @@
+Basic idea behind the search system:
+
+
+can do search w/o items in main search bar visually (tag only searches)
+
+
+main search bar can have anything(?) typed into it and take it as an input
+
+
+search system takes in input from search bar and then the include/exclude filters from other parts of UI
+
+
+if nothing is found give a blank page
+
+if tag is parent tag search for all children as well
+
+

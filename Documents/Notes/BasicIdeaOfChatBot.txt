@@ -1,0 +1,15 @@
+you can input a vibe into the bot and it will convert your vibe into a series of tags
+
+ex: 
+
+fun 90s movie with no slurs and smoking
+
+convert to tags
+wrapper idea: using this list of tags pick out tags to include and exclude to match this query:  ""
+
+chatbot export
+tags:
+include: campy, upbeat, comedy, 1990, 1991, etc.
+exclude: smoking, cigerettes, slurs
+
+use to search -> get results

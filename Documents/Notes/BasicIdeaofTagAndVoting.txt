@@ -1,0 +1,11 @@
+tags are attached to the movie
+
+you can search via tags
+
+tag voting:
+
+when you add a tag from the db of tags it counts as 1 vote
+
+when a tag has an equal number of positive and negative votes it remains on the movie
+
+when the negative votes overpower the positive ones it is removed from the movie
